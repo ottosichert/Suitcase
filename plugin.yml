@@ -1,6 +1,7 @@
 name: Suitcase
 main: me.eight.suitcase.suitcase
 version: 0.1
+authors: [eight, HavaTequila]
 description: >
              Suitcase manages player karma and a warning system.
 commands:

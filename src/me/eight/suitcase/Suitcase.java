@@ -1,52 +1,48 @@
 package me.eight.suitcase;
 
-import java.util.logging.Logger;
-
 import me.eight.suitcase.event.SuitcaseCommand;
+import me.eight.suitcase.event.SuitcaseLogger;
+import me.eight.suitcase.event.SuitcaseLogger.SystemType;
+import me.eight.suitcase.config.SuitcaseColor;
+import me.eight.suitcase.config.SuitcaseConfig;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Suitcase extends JavaPlugin {
 
+	// define static variables
 	public static Suitcase plugin;
-	public final Logger logger = Logger.getLogger("Minecraft");
-	protected FileConfiguration config;
+	public static SuitcaseConfig scConfig = new SuitcaseConfig();
+	public static SuitcaseColor scColor = new SuitcaseColor();
+	public static SuitcaseCommand scCommand = new SuitcaseCommand();
+	public static SuitcaseLogger scLogger = new SuitcaseLogger();
+	
+	// define other variables
 	
 	@Override
 	public void onDisable() {
-		PluginDescriptionFile pdfFile = this.getDescription();
-		this.logger.info("[Suitcase] " + pdfFile.getName() + " disabled."); // Disabling plugin
+		// TODO: disposing some variables and stuff
+		
+		// disabling finished, send to log
+		scLogger.sendSystem(SystemType.PLUGIN_DISABLED);
 	}
 	
 	@Override
 	public void onEnable() {
-		getCommand("suitcase").setExecutor(new SuitcaseCommand(this));
-		config = getConfig();
-		PluginDescriptionFile pdfFile = this.getDescription();
-		this.logger.info("[Suitcase] " + pdfFile.getName() + " " + pdfFile.getVersion() + " enabled."); // Enabling plugin
+		// set command executor classes
+		getCommand("suitcase").setExecutor(scCommand);
+		
+		// load and check config
+		scConfig.setConfig(getConfig());
+		
+		// enabling finished, send to log
+		scLogger.sendSystem(SystemType.PLUGIN_ENABLED);
 	}
 	
 	public void reload() {
-		PluginManager pm = getServer().getPluginManager();
-		pm.disablePlugin(this);
-		pm.enablePlugin(this);
 		reloadConfig();
-	}
-	
-	public void initConfig() {
-		config.addDefault("vote.karma.max", "100");
-		config.addDefault("vote.karma.min", "100");
-		config.addDefault("vote.karma.d", "");
-		config.addDefault("", "");
-		config.addDefault("", "");
-		config.addDefault("", "");
-		config.addDefault("", "");
-		config.addDefault("", "");
-		config.addDefault("", "");
-		config.addDefault("", "");
-		config.addDefault("", "");
+
+		// enabling finished, send to log
+		scLogger.sendSystem(SystemType.PLUGIN_RELOADED);
 	}
 }

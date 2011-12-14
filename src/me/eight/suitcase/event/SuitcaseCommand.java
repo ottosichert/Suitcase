@@ -7,11 +7,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class SuitcaseCommand implements CommandExecutor {
-	public static Suitcase plugin;
-
-	public SuitcaseCommand(Suitcase instance) {
-		plugin = instance;
-	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -20,11 +15,12 @@ public class SuitcaseCommand implements CommandExecutor {
 		String arg = "";
 		if (args.length > 0) arg = args[1];
 		
-		if (cmd == "vote" || cmd == "v") vote(sender, cmd, arg); // Vote a player
-		else if (cmd == "warn" || cmd == "w") warn(sender, cmd, arg); // Warn a player
-		else if (cmd == "info" || cmd == "i") info(); // Show plugin info
-		else if (cmd == "reload" || cmd == "r") plugin.reload(); // Reload plugin
-		else help(sender, cmd); // Help or command not found
+		if (cmd == "vote" || cmd == "v") vote(sender, cmd, arg); // rate players
+		else if (cmd == "warn" || cmd == "w") warn(sender, cmd, arg); // warn players
+		else if (cmd == "info" || cmd == "i") info(); // show plugin info
+		else if (cmd == "reload" || cmd == "r") Suitcase.plugin.reload(); // reload plugin
+		else if (cmd == "help" || cmd == "h" || cmd == "?") help(sender, cmd); // show help message
+		else sender.sendMessage("Command " + cmd + " not found. Type /suitcase help"); // command not found
 		
 		return true;
 	}
@@ -43,10 +39,7 @@ public class SuitcaseCommand implements CommandExecutor {
 	}
 
 	private void help(CommandSender sender, String cmd) {
-		if (!cmd.isEmpty() || !(cmd.toLowerCase() == "?") || !(cmd.toLowerCase() == "help")) {
-			sender.sendMessage("Command " + cmd + " not found."); // Send message when using unknown command
-		}
-		
+				
 		
 	}
 }
