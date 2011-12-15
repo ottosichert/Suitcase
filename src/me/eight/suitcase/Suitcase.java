@@ -1,8 +1,8 @@
 package me.eight.suitcase;
 
 import me.eight.suitcase.event.SuitcaseCommand;
-import me.eight.suitcase.event.SuitcaseLogger;
-import me.eight.suitcase.event.SuitcaseLogger.SystemType;
+import me.eight.suitcase.util.SuitcaseLog;
+import me.eight.suitcase.util.SuitcaseLog.SystemType;
 import me.eight.suitcase.config.SuitcaseColor;
 import me.eight.suitcase.config.SuitcaseConfig;
 
@@ -15,7 +15,7 @@ public class Suitcase extends JavaPlugin {
 	public static SuitcaseConfig scConfig = new SuitcaseConfig();
 	public static SuitcaseColor scColor = new SuitcaseColor();
 	public static SuitcaseCommand scCommand = new SuitcaseCommand();
-	public static SuitcaseLogger scLogger = new SuitcaseLogger();
+	public static SuitcaseLog scLogger = new SuitcaseLog();
 	
 	// define other variables
 	
@@ -32,7 +32,7 @@ public class Suitcase extends JavaPlugin {
 		// set command executor classes
 		getCommand("suitcase").setExecutor(scCommand);
 		
-		// load and check config
+		// load and check configuration
 		scConfig.setConfig(getConfig());
 		
 		// enabling finished, send to log

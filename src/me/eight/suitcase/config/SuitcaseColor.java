@@ -1,36 +1,58 @@
 package me.eight.suitcase.config;
 
 import me.eight.suitcase.Suitcase;
-import me.eight.suitcase.event.SuitcaseLogger.ErrorType;
+import me.eight.suitcase.util.SuitcaseLog.ErrorType;
 
 import org.bukkit.ChatColor;
 
 public class SuitcaseColor {
-
-	// define variables
-	private ChatColor header, frame, text, info, error;
 	
+	// available elements
+	public enum ElementType {
+		HEADER,
+		FRAME,
+		TEXT,
+		INFO,
+		COMMAND,
+		ERROR
+	}
 	// returns color value of specified type
-	public ChatColor getColor (String type) {
-		type = type.toLowerCase();
-		if (type == "header") return header;
-		else if (type == "frame") return frame;
-		else if (type == "text") return text;
-		else if (type == "info") return info;
-		else if (type == "error") return error;
-		else Suitcase.scLogger.sendError(ErrorType.COLOR_TYPE_NOT_FOUND, type);
-		return null;
+	public ChatColor getColor (ElementType type) {
+		switch (type) {
+		case HEADER:
+			return colorName(Suitcase.scConfig.cfColor.header);
+		case FRAME:
+			return colorName(Suitcase.scConfig.cfColor.frame);
+		case TEXT:
+			return colorName(Suitcase.scConfig.cfColor.text);
+		case INFO:
+			return colorName(Suitcase.scConfig.cfColor.info);
+		case COMMAND:
+			return colorName(Suitcase.scConfig.cfColor.command);
+		case ERROR:
+			return colorName(Suitcase.scConfig.cfColor.error);
+		default:
+			Suitcase.scLogger.sendError(ErrorType.TYPE_NOT_FOUND, type.toString());
+			return null;
+		}
 	}
 	
 	// sets specified color
-	public void setColor (String type, String color) {
-		type = type.toLowerCase();
-		if (type == "header") header = colorName(color);
-		else if (type == "frame") frame = colorName(color);
-		else if (type == "text") text = colorName(color);
-		else if (type == "info") info = colorName(color);
-		else if (type == "error") error = colorName(color);
-		else Suitcase.scLogger.sendError(ErrorType.COLOR_TYPE_NOT_FOUND, type);
+	public void setColor (ElementType type, String color) {
+		switch (type) {
+		case HEADER:
+			Suitcase.scConfig.cfColor.header = color;
+		case FRAME:
+			Suitcase.scConfig.cfColor.frame = color;
+		case TEXT:
+			Suitcase.scConfig.cfColor.text = color;
+		case INFO:
+			Suitcase.scConfig.cfColor.info = color;
+		case COMMAND:
+			Suitcase.scConfig.cfColor.command = color;
+		default:
+			Suitcase.scLogger.sendError(ErrorType.TYPE_NOT_FOUND, type.toString());
+		}
 	}
 	
 	// converts color name to ChatColor
