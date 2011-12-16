@@ -8,7 +8,7 @@ public class SuitcasePermission {
 	
 	public boolean hasPermission (CommandSender sender, String permission) {
 		if (Suitcase.cfMechanics.op_permissions && sender.isOp()) return true;
-	    else if (sender.hasPermission(permission)) return true;
+		else if (sender.hasPermission(permission)) return true;
 		else return false;
 	}
 }

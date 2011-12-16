@@ -45,7 +45,6 @@ public class Suitcase extends JavaPlugin {
 	public void onEnable() {
 		// set command executor classes
 		getCommand("suitcase").setExecutor(scCommand);
-		getCommand("sc").setExecutor(scCommand);
 		
 		// load and check configuration
 		scConfig.setConfig(getConfig());
