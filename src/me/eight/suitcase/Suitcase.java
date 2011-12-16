@@ -1,5 +1,7 @@
 package me.eight.suitcase;
 
+//test 1234
+
 import me.eight.suitcase.event.SuitcaseCommand;
 import me.eight.suitcase.util.SuitcaseColor;
 import me.eight.suitcase.util.SuitcaseLog;
