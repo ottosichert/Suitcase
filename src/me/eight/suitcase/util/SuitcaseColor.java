@@ -68,6 +68,9 @@ public class SuitcaseColor {
 			if (hex.contains(firstChar)) {
 				result += ChatColor.getByCode(hex.indexOf(firstChar)) + split[i].substring(1);
 			}
+			else {
+				result += "&" + split[i];
+			}
 		}
 		return result;
 	}
@@ -94,5 +97,4 @@ public class SuitcaseColor {
 		else Suitcase.scLogger.sendError(ErrorType.COLOR_NOT_FOUND, color);
 		return null;
 	}
-
 }
