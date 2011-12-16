@@ -63,14 +63,13 @@ public class SuitcaseLog {
 		default:
 			sendError(ErrorType.TYPE_NOT_FOUND, type.toString());
 		}
-		
 	}
 	
 	// send warning message (warning level)
 	public void sendWarning(WarningType type, String argument) {
 		switch (type) {
 		case CONFIG_FILE_NOT_FOUND:
-			mcLogger.warning(tag + "Cannot find plugin.yml! Creating default...");
+			mcLogger.warning(tag + "Cannot find config.yml! Creating default...");
 			// TODO: scConfig.setDefaultPlugin();
 			break;
 		case MESSAGE_FILE_NOT_FOUND:
@@ -94,6 +93,5 @@ public class SuitcaseLog {
 		default:
 			sendError(ErrorType.TYPE_NOT_FOUND, type.toString());
 		}
-		
 	}
 }

@@ -27,32 +27,27 @@ public class SuitcaseCommand implements CommandExecutor {
 	}
 	
 	private void help(CommandSender sender, String cmd) {
-		
+		// checking permission
 		if (Suitcase.scPermission.hasPermission(sender, ""));
-		
 	}
 	private void info(CommandSender sender) {
-		
 		
 	}
 
 	private void vote(CommandSender sender, String cmd, String arg) {
-
 		
 	}
 
 	private void warn(CommandSender sender, String cmd, String arg) {
 		
-		
 	}
 
 	private void reload(CommandSender sender) {
 		
-		
 	}
 	
 	private void unknown(CommandSender sender, String command) {
+		// TODO: Check permissions first!
 		sender.sendMessage(Suitcase.scColor.getColor(ElementType.ERROR) + "Command " + command.trim() + " not found. Type /suitcase help");
 	}
-
 }
