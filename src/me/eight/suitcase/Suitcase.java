@@ -7,12 +7,14 @@ import me.eight.suitcase.util.SuitcaseLog.SystemType;
 import me.eight.suitcase.util.SuitcasePermission;
 import me.eight.suitcase.config.SuitcaseConfig;
 import me.eight.suitcase.config.SuitcaseConfig.config;
+import me.eight.suitcase.config.SuitcaseMessage.messages;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Suitcase extends JavaPlugin {
 
 	// define static classes
+	
 	// general classes (prefix sc)
 	public static Suitcase plugin;
 	public static SuitcaseConfig scConfig = new SuitcaseConfig();
@@ -20,6 +22,7 @@ public class Suitcase extends JavaPlugin {
 	public static SuitcaseCommand scCommand = new SuitcaseCommand();
 	public static SuitcaseLog scLogger = new SuitcaseLog();
 	public static SuitcasePermission scPermission = new SuitcasePermission();
+	
 	// config classes (prefix cf)
 	public static config.mechanics cfMechanics;
 	public static config.mechanics.rating cfRating;
@@ -31,7 +34,12 @@ public class Suitcase extends JavaPlugin {
 	public static config.appearance.color cfColor;
 	public static config.stats cfStats;
 	
-	// define other variables
+	// messages classes (prefix ms)
+	public static messages.info msInfo;
+	public static messages.player msPlayer;
+	public static messages.system msSystem;
+	public static messages.header msHeader;
+	// TODO: Custom event messages
 	
 	@Override
 	public void onDisable() {

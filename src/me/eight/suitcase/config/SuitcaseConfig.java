@@ -5,7 +5,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class SuitcaseConfig {
 	
 	// define variables
-	protected FileConfiguration cfFile;
+	private FileConfiguration configYML;
 	
 	// set up config
 	public class config {
@@ -15,7 +15,7 @@ public class SuitcaseConfig {
 			
 			public class rating {
 				public boolean enable = true;
-				public boolean allow_revert = false;
+				public boolean allow_revoke = false;
 				public boolean multiple_rating = false;
 				public String interval = "1d";
 				public int min = 0;
@@ -71,9 +71,8 @@ public class SuitcaseConfig {
 	}
 	
 	// define basic classes
-	public boolean setConfig(FileConfiguration config) {
-		cfFile = parseConfig(config);
-		return true;
+	public void setConfig(FileConfiguration config) {
+		configYML = parseConfig(config);
 	}
 	
 	private FileConfiguration parseConfig(FileConfiguration config) {
