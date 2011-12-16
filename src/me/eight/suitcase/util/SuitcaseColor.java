@@ -1,4 +1,4 @@
-package me.eight.suitcase.config;
+package me.eight.suitcase.util;
 
 import me.eight.suitcase.Suitcase;
 import me.eight.suitcase.util.SuitcaseLog.ErrorType;
@@ -17,20 +17,20 @@ public class SuitcaseColor {
 		ERROR
 	}
 	// returns color value of specified type
-	public ChatColor getColor (ElementType type) {
+	public ChatColor getColor(ElementType type) {
 		switch (type) {
 		case HEADER:
-			return colorName(Suitcase.scConfig.cfColor.header);
+			return colorName(Suitcase.cfColor.header);
 		case FRAME:
-			return colorName(Suitcase.scConfig.cfColor.frame);
+			return colorName(Suitcase.cfColor.frame);
 		case TEXT:
-			return colorName(Suitcase.scConfig.cfColor.text);
+			return colorName(Suitcase.cfColor.text);
 		case INFO:
-			return colorName(Suitcase.scConfig.cfColor.info);
+			return colorName(Suitcase.cfColor.info);
 		case COMMAND:
-			return colorName(Suitcase.scConfig.cfColor.command);
+			return colorName(Suitcase.cfColor.command);
 		case ERROR:
-			return colorName(Suitcase.scConfig.cfColor.error);
+			return colorName(Suitcase.cfColor.error);
 		default:
 			Suitcase.scLogger.sendError(ErrorType.TYPE_NOT_FOUND, type.toString());
 			return null;
@@ -38,25 +38,42 @@ public class SuitcaseColor {
 	}
 	
 	// sets specified color
-	public void setColor (ElementType type, String color) {
+	public void setColor(ElementType type, String color) {
 		switch (type) {
 		case HEADER:
-			Suitcase.scConfig.cfColor.header = color;
+			Suitcase.cfColor.header = color;
 		case FRAME:
-			Suitcase.scConfig.cfColor.frame = color;
+			Suitcase.cfColor.frame = color;
 		case TEXT:
-			Suitcase.scConfig.cfColor.text = color;
+			Suitcase.cfColor.text = color;
 		case INFO:
-			Suitcase.scConfig.cfColor.info = color;
+			Suitcase.cfColor.info = color;
 		case COMMAND:
-			Suitcase.scConfig.cfColor.command = color;
+			Suitcase.cfColor.command = color;
+		case ERROR:
+			Suitcase.cfColor.error = color;
 		default:
 			Suitcase.scLogger.sendError(ErrorType.TYPE_NOT_FOUND, type.toString());
 		}
 	}
 	
-	// converts color name to ChatColor
-	private ChatColor colorName (String color) {
+	// returns colored message
+	public String parseColor(String message) {
+		String hex = "0123456789abcdef";
+		String[] split = message.split("&");
+		String result = split[0];
+		String firstChar = "";
+		for (int i = 1; i < split.length; i++) {
+			firstChar = split[i].substring(0, 1).toLowerCase();
+			if (hex.contains(firstChar)) {
+				result += ChatColor.getByCode(hex.indexOf(firstChar)) + split[i].substring(1);
+			}
+		}
+		return result;
+	}
+	
+	// converts color name to ChatColor (config only)
+	private ChatColor colorName(String color) {
 		color = color.toLowerCase();
 		if (color == "aqua") return ChatColor.AQUA;
 		else if (color == "black") return ChatColor.BLACK;
