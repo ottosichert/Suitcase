@@ -7,57 +7,8 @@ import org.bukkit.ChatColor;
 
 public class SuitcaseColor {
 	
-	// available elements
-	public enum ElementType {
-		HEADER,
-		FRAME,
-		TEXT,
-		INFO,
-		COMMAND,
-		ERROR
-	}
-	// returns color value of specified type
-	public ChatColor getColor(ElementType type) {
-		switch (type) {
-		case HEADER:
-			return colorName(Suitcase.cfColor.header);
-		case FRAME:
-			return colorName(Suitcase.cfColor.frame);
-		case TEXT:
-			return colorName(Suitcase.cfColor.text);
-		case INFO:
-			return colorName(Suitcase.cfColor.info);
-		case COMMAND:
-			return colorName(Suitcase.cfColor.command);
-		case ERROR:
-			return colorName(Suitcase.cfColor.error);
-		default:
-			Suitcase.scLogger.sendError(ErrorType.TYPE_NOT_FOUND, type.toString());
-			return null;
-		}
-	}
-	
-	// sets specified color
-	public void setColor(ElementType type, String color) {
-		switch (type) {
-		case HEADER:
-			Suitcase.cfColor.header = color;
-		case FRAME:
-			Suitcase.cfColor.frame = color;
-		case TEXT:
-			Suitcase.cfColor.text = color;
-		case INFO:
-			Suitcase.cfColor.info = color;
-		case COMMAND:
-			Suitcase.cfColor.command = color;
-		case ERROR:
-			Suitcase.cfColor.error = color;
-		default:
-			Suitcase.scLogger.sendError(ErrorType.TYPE_NOT_FOUND, type.toString());
-		}
-	}
-	
 	// returns colored message
+	/* Not used :/
 	public String parseColor(String message) {
 		String hex = "0123456789abcdef";
 		String[] split = message.split("&");
@@ -74,9 +25,10 @@ public class SuitcaseColor {
 		}
 		return result;
 	}
+	*/
 	
-	// converts color name to ChatColor (config only)
-	private ChatColor colorName(String color) {
+	// converts color name to ChatColor 
+	public ChatColor colorName(String color) { // TODO: merge this and variable section
 		color = color.toLowerCase();
 		if (color == "aqua") return ChatColor.AQUA;
 		else if (color == "black") return ChatColor.BLACK;

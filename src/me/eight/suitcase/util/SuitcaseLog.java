@@ -22,7 +22,8 @@ public class SuitcaseLog {
 	
 	// default message types
 	public enum MessageType {
-		PLAYER_COMMAND
+		PLAYER_COMMAND,
+		PLAYER_COMMAND_DENY
 	}
 	
 	// warning types
@@ -34,6 +35,7 @@ public class SuitcaseLog {
 	// error types
 	public enum ErrorType {
 		COLOR_NOT_FOUND,
+		VARIABLE_NOT_FOUND,
 		TYPE_NOT_FOUND
 	}
 	
@@ -41,7 +43,7 @@ public class SuitcaseLog {
 	public void sendSystem (SystemType type) {
 		switch (type) {
 		case PLUGIN_ENABLED:
-			mcLogger.info(tag + pdf.getVersion() + "by" + pdf.getAuthors().toString().replaceAll("^[\\[\\]]|[\\[\\]]$", " ") + "enabled."); // remove brackets
+			mcLogger.info(tag + Suitcase.version + " by " + pdf.getAuthors().toString().replaceAll("^[\\[\\]]|[\\[\\]]$", "") + " enabled."); // remove brackets
 			break;
 		case PLUGIN_DISABLED:
 			mcLogger.info(tag + "disabled.");
@@ -56,10 +58,12 @@ public class SuitcaseLog {
 	
 	// send default message (info level)
 	public void sendMessage(MessageType type, String argument) {
-		switch (type) {
+		switch (type) { // argument = Player123: /sc vote Player456 +
 		case PLAYER_COMMAND:
 			mcLogger.info(tag + "Executing command for " + argument);
 			break;
+		case PLAYER_COMMAND_DENY:
+			mcLogger.info(tag + "Denied command for " + argument);
 		default:
 			sendError(ErrorType.TYPE_NOT_FOUND, type.toString());
 		}
@@ -87,6 +91,8 @@ public class SuitcaseLog {
 		case COLOR_NOT_FOUND:
 			mcLogger.severe(tag + "Cannot find color: " + argument);
 			break;
+		case VARIABLE_NOT_FOUND:
+			mcLogger.severe(tag + "Cannot find variable: " + argument);
 		case TYPE_NOT_FOUND:
 			mcLogger.severe(tag + "Cannot find type: " + argument);
 			break;
