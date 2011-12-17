@@ -59,7 +59,8 @@ public class Suitcase extends JavaPlugin {
 		getCommand("suitcase").setExecutor(scCommand);
 		
 		// load and check configuration
-		scConfig.setConfig(getConfig());
+		scConfig.initConfig();
+		scMessage.initConfig();
 		
 		// enabling finished, send to log
 		scLogger.sendSystem(SystemType.PLUGIN_ENABLED);

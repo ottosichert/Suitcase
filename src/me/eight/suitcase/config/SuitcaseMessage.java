@@ -1,19 +1,24 @@
 package me.eight.suitcase.config;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import me.eight.suitcase.Suitcase;
 import me.eight.suitcase.util.SuitcaseLog.ErrorType;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 // import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 public class SuitcaseMessage {
 
 	// define variables
-	/*
-	private FileConfiguration messagesYML;
-	TODO: read messages.yml
-	*/
+	public static Map<String, Object> messagesKeys = new HashMap<String, Object>();
+	private File messagesFile;
+	
 	
 	// set up messages
 	public static class messages {
@@ -46,7 +51,17 @@ public class SuitcaseMessage {
 		// TODO: Add custom event messages!
 	}
 	
-	// parses {variables}
+	// get messages file
+	public void initConfig() {
+		// read file
+		messagesFile = new File(Suitcase.plugin.getDataFolder(), "messages.yml");
+		FileConfiguration conf = YamlConfiguration.loadConfiguration(messagesFile);
+		
+		
+		messagesKeys = conf.getValues(true);
+	}
+	
+	// parses all {variables}
 	private String parseMessage(Player player, String message, String...addition) {
 		String[] split = message.split("{");
 		String var = "";
@@ -122,16 +137,4 @@ public class SuitcaseMessage {
 	public void sendUnknown(CommandSender sender, String command, String argument) {
 		
 	}
-	
-	/*
-	private String commandInfoName(String argument) {
-		if (argument == "help") return Suitcase.msInfo.help;
-		else if (argument == "info") return Suitcase.msInfo.info;
-		else if (argument == "vote") return Suitcase.msInfo.vote;
-		else if (argument == "warn") return Suitcase.msInfo.warn;
-		else if (argument == "reload") return Suitcase.msInfo.reload;
-		else Suitcase.scLogger.sendError(ErrorType.COMMAND_INFO_NOT_FOUND, argument);
-		return null;
-	}
-	*/
 }

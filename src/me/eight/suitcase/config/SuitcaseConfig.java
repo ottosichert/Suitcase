@@ -1,11 +1,19 @@
 package me.eight.suitcase.config;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import me.eight.suitcase.Suitcase;
+
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 public class SuitcaseConfig {
 	
 	// define variables
-	private FileConfiguration configYML;
+	public static Map<String, Object> configKeys = new HashMap<String, Object>();
+	private File configFile;
 	
 	// set up config
 	public static class config {
@@ -30,12 +38,12 @@ public class SuitcaseConfig {
 		}
 		
 		public static class log {	
-			public boolean command = false; // enable logging of player commands
-			public boolean rate = true; // show player ratings in log
+			public boolean command = true; // enable logging of player commands
+			public boolean vote = true; // show player votes in log
 			public boolean warn = true; // show admin warnings in log
 			public boolean system = true; // log reload etc. as well
 			
-			public static class database {
+			public static class database { // TODO: Use Hibernate
 				public boolean enable = false;
 				public String type = "MySQL";
 				public String database_name = "minecraft";
@@ -70,13 +78,13 @@ public class SuitcaseConfig {
 		}
 	}
 	
-	// define basic classes
-	public void setConfig(FileConfiguration config) {
-		configYML = parseConfig(config);
-	}
-	
-	private FileConfiguration parseConfig(FileConfiguration config) {
-		config = configYML;
-		return config;
+	// get config file
+	public void initConfig() {
+		// read file
+		configFile = new File(Suitcase.plugin.getDataFolder(), "config.yml");
+		FileConfiguration conf = YamlConfiguration.loadConfiguration(configFile);
+		
+		
+		configKeys = conf.getValues(true);
 	}
 }
