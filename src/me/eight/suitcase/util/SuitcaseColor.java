@@ -28,7 +28,7 @@ public class SuitcaseColor {
 	*/
 	
 	// converts color name to ChatColor 
-	public ChatColor colorName(String color) {
+	public ChatColor colorName(String color) { // TODO: merge this and variable section
 		color = color.toLowerCase();
 		if (color == "aqua") return ChatColor.AQUA;
 		else if (color == "black") return ChatColor.BLACK;

@@ -11,51 +11,67 @@ public class SuitcaseCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// split arguments
-		String cmd = "", arg = "";
-		if (args.length > 0) cmd = args[0];
-		if (args.length > 1) arg = args[1];
+		String subCommand = "", arguments = "";
+		if (args.length > 0) subCommand = args[0];
+		if (args.length > 1) arguments = args[1];
+		if (args.length > 2) arguments += " " + args[1];
 		
 		// execute commands
-		if (cmd == "help" || cmd == "h" || cmd == "?") help(sender, cmd); // show help message
-		else if (cmd == "info" || cmd == "i" || cmd == "about" || cmd == "a") info(sender); // show plugin info
-		else if (cmd == "vote" || cmd == "v") vote(sender, cmd, arg); // rate players
-		else if (cmd == "warn" || cmd == "w") warn(sender, cmd, arg); // warn players
-		else if (cmd == "reload" || cmd == "r") reload(sender); // reload plugin
-		else unknown(sender, "/" + label + " " + cmd + " " + arg); // command not found
+		if (subCommand == "help" || subCommand == "h" || subCommand == "?") executeHelp(sender, subCommand, arguments);
+		else if (subCommand == "info" || subCommand == "i" || subCommand == "about" || subCommand == "a") executeInfo(sender, subCommand, arguments);
+		else if (subCommand == "vote" || subCommand == "v") executeVote(sender, subCommand, arguments);
+		else if (subCommand == "warn" || subCommand == "w") executeWarn(sender, subCommand, arguments);
+		else if (subCommand == "reload" || subCommand == "r") executeReload(sender, subCommand, arguments);
+		else executeUnknown(sender, subCommand, arguments);
 		return true;
 	}
 	
-	private void help(CommandSender sender, String cmd) {
-		// check permission for help command
+	private void executeHelp(CommandSender sender, String command, String argument) {
 		if (Suitcase.scPermission.hasPermission(sender, "suitcase.help")) {
-			if (!Suitcase.cfAppearance.full_help || Suitcase.scPermission.hasPermission(sender, "suitcase.info")) {
-				return;
-			}
-			else {
-				
-			}
+			Suitcase.scMessage.sendHelp(sender, command, argument);
 		}
 		else {
-			// msPermission.send(USER_NOT_ALLOWED); blah blah.
+			Suitcase.scMessage.sendDeny(sender, command, argument);
 		}
 	}
-	private void info(CommandSender sender) {
-		
-	}
-
-	private void vote(CommandSender sender, String cmd, String arg) {
-		
-	}
-
-	private void warn(CommandSender sender, String cmd, String arg) {
-		
-	}
-
-	private void reload(CommandSender sender) {
-		
+	
+	private void executeInfo(CommandSender sender, String command, String argument) {
+		if (Suitcase.scPermission.hasPermission(sender, "suitcase.info")) {
+			Suitcase.scMessage.sendHelp(sender, command, argument);
+		}
+		else {
+			Suitcase.scMessage.sendDeny(sender, command, argument);
+		}
 	}
 	
-	private void unknown(CommandSender sender, String command) {
-		
+	private void executeVote(CommandSender sender, String command, String argument) {
+		if (Suitcase.scPermission.hasPermission(sender, "suitcase.vote")) {
+			Suitcase.scMessage.sendHelp(sender, command, argument);
+		}
+		else {
+			Suitcase.scMessage.sendDeny(sender, command, argument);
+		}
+	}
+	
+	private void executeWarn(CommandSender sender, String command, String argument) {
+		if (Suitcase.scPermission.hasPermission(sender, "suitcase.warn")) {
+			Suitcase.scMessage.sendHelp(sender, command, argument);
+		}
+		else {
+			Suitcase.scMessage.sendDeny(sender, command, argument);
+		}
+	}
+	
+	private void executeReload(CommandSender sender, String command, String argument) {
+		if (Suitcase.scPermission.hasPermission(sender, "suitcase.reload")) {
+			Suitcase.scMessage.sendHelp(sender, command, argument);
+		}
+		else {
+			Suitcase.scMessage.sendDeny(sender, command, argument);
+		}
+	}
+	
+	private void executeUnknown(CommandSender sender, String command, String argument) {
+		Suitcase.scMessage.sendUnknown(sender, command, argument);
 	}
 }
