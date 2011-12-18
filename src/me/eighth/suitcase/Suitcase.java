@@ -4,12 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.eighth.suitcase.config.SuitcaseConfig;
+import me.eighth.suitcase.config.SuitcaseEvent;
 import me.eighth.suitcase.config.SuitcaseMessage;
 import me.eighth.suitcase.event.SuitcaseCommand;
+import me.eighth.suitcase.log.SuitcaseConsole;
+import me.eighth.suitcase.log.SuitcaseDatabase;
+import me.eighth.suitcase.log.SuitcaseFile;
+import me.eighth.suitcase.log.SuitcaseLog;
 import me.eighth.suitcase.util.SuitcaseColor;
-import me.eighth.suitcase.util.SuitcaseLog;
 import me.eighth.suitcase.util.SuitcasePermission;
-import me.eighth.suitcase.util.SuitcaseLog.SystemType;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -17,12 +20,24 @@ public class Suitcase extends JavaPlugin {
 
 	// static classes
 	public static Suitcase plugin;
-	public static SuitcaseConfig scConfig = new SuitcaseConfig();
-	public static SuitcaseMessage scMessage = new SuitcaseMessage();
-	public static SuitcaseColor scColor = new SuitcaseColor();
-	public static SuitcaseCommand scCommand = new SuitcaseCommand();
-	public static SuitcaseLog scLogger = new SuitcaseLog();
-	public static SuitcasePermission scPermission = new SuitcasePermission();
+	
+	// config
+	public static SuitcaseConfig cfConfig = new SuitcaseConfig();
+	public static SuitcaseEvent cfEvent = new SuitcaseEvent();
+	public static SuitcaseMessage cfMessage = new SuitcaseMessage();
+	
+	// event
+	public static SuitcaseCommand evCommand = new SuitcaseCommand();
+	
+	// log
+	public static SuitcaseConsole lgConsole = new SuitcaseConsole();
+	public static SuitcaseDatabase lgDatabase = new SuitcaseDatabase();
+	public static SuitcaseFile lgFile = new SuitcaseFile();
+	public static SuitcaseLog lgLog = new SuitcaseLog();
+	
+	// util
+	public static SuitcaseColor utColor = new SuitcaseColor();
+	public static SuitcasePermission utPermission = new SuitcasePermission();
 	
 	// define variables
 	public static String version = "Leather Suitcase v0.1";
@@ -34,26 +49,26 @@ public class Suitcase extends JavaPlugin {
 		// TODO: disposing some variables and stuff
 		
 		// disabling finished, send to log
-		scLogger.sendSystem(SystemType.PLUGIN_DISABLED);
+		// scLogger.sendSystem(SystemType.PLUGIN_DISABLED);
 	}
 	
 	@Override
 	public void onEnable() {
 		// set command executor classes
-		getCommand("suitcase").setExecutor(scCommand);
+		getCommand("suitcase").setExecutor(evCommand);
 		
 		// load and check configuration
-		scConfig.initConfig();
-		scMessage.initConfig();
+		cfConfig.initConfig();
+		cfMessage.initConfig();
 		
 		// enabling finished, send to log
-		scLogger.sendSystem(SystemType.PLUGIN_ENABLED);
+		// scLogger.sendSystem(SystemType.PLUGIN_ENABLED);
 	}
 	
 	public void reload() {
 		reloadConfig();
 
 		// enabling finished, send to log
-		scLogger.sendSystem(SystemType.PLUGIN_RELOADED);
+		// scLogger.sendSystem(SystemType.PLUGIN_RELOADED);
 	}
 }

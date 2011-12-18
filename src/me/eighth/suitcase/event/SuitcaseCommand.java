@@ -27,51 +27,51 @@ public class SuitcaseCommand implements CommandExecutor {
 	}
 	
 	private void executeHelp(CommandSender sender, String command, String argument) {
-		if (Suitcase.scPermission.hasPermission(sender, "suitcase.help")) {
-			Suitcase.scMessage.sendHelp(sender, command, argument);
+		if (Suitcase.utPermission.hasPermission(sender, "suitcase.help")) {
+			Suitcase.cfMessage.sendHelp(sender, command, argument);
 		}
 		else {
-			Suitcase.scMessage.sendDeny(sender, command, argument);
+			Suitcase.cfMessage.sendDeny(sender, command, argument);
 		}
 	}
 	
 	private void executeInfo(CommandSender sender, String command, String argument) {
-		if (Suitcase.scPermission.hasPermission(sender, "suitcase.info")) {
-			Suitcase.scMessage.sendHelp(sender, command, argument);
+		if (Suitcase.utPermission.hasPermission(sender, "suitcase.info")) {
+			Suitcase.cfMessage.sendHelp(sender, command, argument);
 		}
 		else {
-			Suitcase.scMessage.sendDeny(sender, command, argument);
+			Suitcase.cfMessage.sendDeny(sender, command, argument);
 		}
 	}
 	
 	private void executeVote(CommandSender sender, String command, String argument) {
-		if (Suitcase.scPermission.hasPermission(sender, "suitcase.vote")) {
-			Suitcase.scMessage.sendHelp(sender, command, argument);
+		if (Suitcase.utPermission.hasPermission(sender, "suitcase.vote")) {
+			Suitcase.cfMessage.sendHelp(sender, command, argument);
 		}
 		else {
-			Suitcase.scMessage.sendDeny(sender, command, argument);
+			Suitcase.cfMessage.sendDeny(sender, command, argument);
 		}
 	}
 	
 	private void executeWarn(CommandSender sender, String command, String argument) {
-		if (Suitcase.scPermission.hasPermission(sender, "suitcase.warn")) {
-			Suitcase.scMessage.sendHelp(sender, command, argument);
+		if (Suitcase.utPermission.hasPermission(sender, "suitcase.warn")) {
+			Suitcase.cfMessage.sendHelp(sender, command, argument);
 		}
 		else {
-			Suitcase.scMessage.sendDeny(sender, command, argument);
+			Suitcase.cfMessage.sendDeny(sender, command, argument);
 		}
 	}
 	
 	private void executeReload(CommandSender sender, String command, String argument) {
-		if (Suitcase.scPermission.hasPermission(sender, "suitcase.reload")) {
-			Suitcase.scMessage.sendHelp(sender, command, argument);
+		if (Suitcase.utPermission.hasPermission(sender, "suitcase.reload")) {
+			Suitcase.cfMessage.sendHelp(sender, command, argument);
 		}
 		else {
-			Suitcase.scMessage.sendDeny(sender, command, argument);
+			Suitcase.cfMessage.sendDeny(sender, command, argument);
 		}
 	}
 	
 	private void executeUnknown(CommandSender sender, String command, String argument) {
-		Suitcase.scMessage.sendUnknown(sender, command, argument);
+		Suitcase.cfMessage.sendUnknown(sender, command, argument);
 	}
 }

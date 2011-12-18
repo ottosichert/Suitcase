@@ -3,7 +3,6 @@ package me.eighth.suitcase.config;
 import java.io.File;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.util.SuitcaseLog.ErrorType;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -75,7 +74,7 @@ public class SuitcaseMessage {
 			else if (var == "command_info") result += addition[1]; // won't work here..
 			else if (var == "error") result += addition;
 			else { // TODO: move this section to plugin startup
-				Suitcase.scLogger.sendError(ErrorType.VARIABLE_NOT_FOUND, "{" + var + "}");
+				// Suitcase.scLogger.sendError(ErrorType.VARIABLE_NOT_FOUND, "{" + var + "}");
 				result += "{" + var + "}";
 			}
 			
