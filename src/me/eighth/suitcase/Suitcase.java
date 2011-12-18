@@ -7,11 +7,10 @@ import me.eighth.suitcase.config.SuitcaseConfig;
 import me.eighth.suitcase.config.SuitcaseEvent;
 import me.eighth.suitcase.config.SuitcaseMessage;
 import me.eighth.suitcase.event.SuitcaseCommand;
-import me.eighth.suitcase.log.SuitcaseConsole;
 import me.eighth.suitcase.log.SuitcaseDatabase;
 import me.eighth.suitcase.log.SuitcaseFile;
-import me.eighth.suitcase.log.SuitcaseLog;
 import me.eighth.suitcase.util.SuitcaseColor;
+import me.eighth.suitcase.util.SuitcaseLog;
 import me.eighth.suitcase.util.SuitcasePermission;
 
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,13 +29,12 @@ public class Suitcase extends JavaPlugin {
 	public static SuitcaseCommand evCommand = new SuitcaseCommand();
 	
 	// log
-	public static SuitcaseConsole lgConsole = new SuitcaseConsole();
 	public static SuitcaseDatabase lgDatabase = new SuitcaseDatabase();
 	public static SuitcaseFile lgFile = new SuitcaseFile();
-	public static SuitcaseLog lgLog = new SuitcaseLog();
 	
 	// util
 	public static SuitcaseColor utColor = new SuitcaseColor();
+	public static SuitcaseLog utLog = new SuitcaseLog();
 	public static SuitcasePermission utPermission = new SuitcasePermission();
 	
 	// define variables
