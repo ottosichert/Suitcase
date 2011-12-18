@@ -11,80 +11,57 @@ public class SuitcaseConfig {
 	
 	// define variables
 	private FileConfiguration cfConfig;
-	private File cfFile = new File(Suitcase.plugin.getDataFolder(), "config.yml");
-	
-	/*
-	// set up config
-	public static class config {
-		
-		public static class mechanics {
-			public boolean op_permissions = true;
-			
-			public static class rating {
-				public boolean enable = true;
-				public boolean allow_revoke = false;
-				public boolean multiple_rating = false;
-				public String interval = "1d";
-				public int min = 0;
-				public int max = 100;
-				public int start = 0;
-			}
-			
-			public static class warning {
-				public boolean enable = true;
-				public int max = 3;
-			}
-		}
-		
-		public static class log {	
-			public boolean command = true; // enable logging of player commands
-			public boolean vote = true; // show player votes in log
-			public boolean warn = true; // show admin warnings in log
-			public boolean system = true; // log reload etc. as well
-			
-			public static class database { // TODO: Use Hibernate
-				public boolean enable = false;
-				public String type = "MySQL";
-				public String database_name = "minecraft";
-				public String table = "suitcase";
-				public String username = "root";
-				public String password = "root";
-			}
-			
-			public static class text {
-				public boolean enable = true;
-				public String file_name = "log_{date}_{count}.txt"; // {date} = file creation date {count} = current index
-				public int max_lines = 10000;
-			}
-		}
-		
-		public static class appearance {
-			public boolean full_help = false; // display commands without permission
-			
-			public static class color {
-				public String header = "dark_aqua"; // DaRK_aqUa works as well
-				public String frame = "gray";
-				public String text = "aqua";
-				public String info = "light_green";
-				public String command = "gold";
-				public String error = "dark_red";
-			}
-		}
-		
-		public static class stats {
-			public boolean enable = false;
-			// TODO: Getting an idea how to provide stats
-		}
-	}
-	*/
+	private File cfFile;
 	
 	// get config file
 	public void initConfig() {
 		// read file
 		cfFile = new File(Suitcase.plugin.getDataFolder(), "config.yml");
-		FileConfiguration conf = YamlConfiguration.loadConfiguration(cfFile);
+		cfConfig = YamlConfiguration.loadConfiguration(cfFile);
 		
+		// load default values
+		loadConfig();
 		
-		Suitcase.configKeys = conf.getValues(true);
+		// add property if missing
+		for (String path : Suitcase.configKeys.keySet()) {
+			if (!cfConfig.contains(path)) {
+				cfConfig.set(path, Suitcase.configKeys.get(path));
+			}
+			// compare object types
+			else if (!cfConfig.get(path).equals(Suitcase.configKeys.get(path))) {
+				cfConfig.set(path, Suitcase.configKeys.get(path));
+			}
+		}
+		
+		// set verified configKeys eventually
+		Suitcase.configKeys = cfConfig.getValues(true);
+	}
+	
+	// TODO: Add new entries here
+	private void loadConfig() {
+		Suitcase.configKeys.put("mechanics.language", "en");
+		Suitcase.configKeys.put("mechanics.full-help", false);
+		Suitcase.configKeys.put("mechanics.op-permissions", true);
+		Suitcase.configKeys.put("mechanics.rating.enable", true);
+		Suitcase.configKeys.put("mechanics.rating.multiple-rating", false);
+		Suitcase.configKeys.put("mechanics.rating.interval", "3d");
+		Suitcase.configKeys.put("mechanics.rating.minimum", 0);
+		Suitcase.configKeys.put("mechanics.rating.maximum", 100);
+		Suitcase.configKeys.put("mechanics.rating.default", 0);
+		Suitcase.configKeys.put("mechanics.warning.enable", true);
+		Suitcase.configKeys.put("mechanics.warning.maximum", 3);
+		Suitcase.configKeys.put("log.rate", true);
+		Suitcase.configKeys.put("log.warn", true);
+		Suitcase.configKeys.put("log.system", true);
+		Suitcase.configKeys.put("log.database.enable", true);
+		Suitcase.configKeys.put("log.database.type", "MySQL");
+		Suitcase.configKeys.put("log.database.database-name", "minecraft");
+		Suitcase.configKeys.put("log.database.table", "suitcase");
+		Suitcase.configKeys.put("log.database.username", "root");
+		Suitcase.configKeys.put("log.database.password", "root");
+		Suitcase.configKeys.put("log.file.enable", true);
+		Suitcase.configKeys.put("log.file.file-name", "suitcase_{date}_{number}.txt");
+		Suitcase.configKeys.put("log.file.max-lines", 10000);
+		Suitcase.configKeys.put("stats.enable", false);
 	}
 }
