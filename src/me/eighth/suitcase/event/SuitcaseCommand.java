@@ -46,7 +46,19 @@ public class SuitcaseCommand implements CommandExecutor {
 	
 	private void executeVote(CommandSender sender, String command, String argument) {
 		if (Suitcase.utPermission.hasPermission(sender, "suitcase.vote")) {
-			Suitcase.cfMessage.sendHelp(sender, command, argument);
+			//Player target
+			Player target = (Player) this.getServer().getPlayer(args[1]);
+			//Positiv Karma
+			if (args[2] == "+" || args[2] == "positive")
+				//TODO Suitcase.cfEvent.positiv
+			//Negativ Karma	
+			else if (args[2] == "-" || args[2] == "negative")
+				//TODO Suitcase.cfEvent.negativ
+			//Neutral Karma	
+			else if (args[2] == "/." || args[2] == "neutral")
+				//TODO Suitcase.cfEvent.neutral
+			else
+				Suitcase.cfMessage.sendHelp(sender, command, argument);
 		}
 		else {
 			Suitcase.cfMessage.sendDeny(sender, command, argument);
@@ -55,6 +67,13 @@ public class SuitcaseCommand implements CommandExecutor {
 	
 	private void executeWarn(CommandSender sender, String command, String argument) {
 		if (Suitcase.utPermission.hasPermission(sender, "suitcase.warn")) {
+			//Player target
+			Player target = (Player) this.getServer().getPlayer(args[1]);
+			if (args[2] == "forgive")
+				//TODO Reset Warnings
+			else if 
+				//TODO Warnings +1
+			else
 			Suitcase.cfMessage.sendHelp(sender, command, argument);
 		}
 		else {
