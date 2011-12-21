@@ -1,9 +1,10 @@
 package me.eighth.suitcase.event;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.util.SuitcaseLog.actionType;
+import me.eighth.suitcase.util.SuitcaseConsole.actionType;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,135 +17,152 @@ public class SuitcaseCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// execute commands
 		// args[0] -> sub command (help, info etc.)
-		if (Arrays.asList(Suitcase.configKeys.get("commands.help")).contains(args[0])) executeHelp(sender, args);
-		else if (Arrays.asList(Suitcase.configKeys.get("commands.info")).contains(args[0])) executeInfo(sender, args);
-		else if (Arrays.asList(Suitcase.configKeys.get("commands.rate")).contains(args[0])) executeRate(sender, args);
-		else if (Arrays.asList(Suitcase.configKeys.get("commands.warn")).contains(args[0])) executeWarn(sender, args);
-		else if (Arrays.asList(Suitcase.configKeys.get("commands.reload")).contains(args[0])) executeReload(sender, args);
-		else executeUnknown(sender, args);
-		return true;
-	}
-	
-	private void executeHelp(CommandSender sender, String...args) {
-		if (Suitcase.utPermission.hasPermission(sender, "suitcase.help")) {
-			Suitcase.cfMessage.sendHelp(sender, args);
-		}
-		else {
-			Suitcase.cfMessage.sendDeny(sender, args);
-		}
-	}
-	
-	private void executeInfo(CommandSender sender, String...args) {
-		if (Suitcase.utPermission.hasPermission(sender, "suitcase.info")) {
-			Suitcase.cfMessage.sendHelp(sender, args);
-		}
-		else {
-			Suitcase.cfMessage.sendDeny(sender, args);
-		}
-	}
-	
-	private void executeRate(CommandSender sender, String...args) {
-		// check if args[1] == null ...
-		if (!(sender instanceof Player)) {
-			// player is console
-			executeConsole(sender, args);
-			return;
-		}
+		// args[1] -> player or command name
+		// args[2] -> rating
 		
-		// targeted player
-		Player target = (Player) Suitcase.plugin.getServer().getPlayer(args[1]);
-		
-		if (target == null) {
-			// can't find player
-			Suitcase.cfMessage.sendPlayer(sender, args);
-			Suitcase.utLog.logAction(actionType.PLAYER_COMMAND_ERROR, sender.getName(), "/suitcase rate " + args[1] + " " + args[2], "playerNotFound");
-			return;
+		// list of all available sub commands
+		ArrayList<String> commands = (ArrayList<String>) Arrays.asList("help", "info", "rate", "warn", "forgive", "reload");
+		// messages are put here
+		ArrayList<String> lines = new ArrayList<String>();
+		// convert args to lowercase ArrayList
+		ArrayList<String> arguments = new ArrayList<String>();
+		for (String arg : args) {
+			arguments.add(arg.toLowerCase());
 		}
+		// full command for error messages
+		String full = "&4/" + label.toLowerCase() + " " + Suitcase.cfMessage.getString(arguments);
 		
-		if (Suitcase.utPermission.hasPermission(sender, "suitcase.rate")) {
+		// /suitcase help [command]
+		if (Suitcase.commandAliases.get("help").contains(arguments.get(0)) || arguments.size() == 0) {
 			
-			// view rating
-			if (args[2] == null) {
-				Suitcase.cfMessage.sendRate(sender, args);
-				Suitcase.utLog.logAction(actionType.PLAYER_COMMAND_EXECUTE, sender.getName(), "/suitcase rate " + args[1]);
+			// set first argument to help if no arguments are given
+			if (arguments.size() == 0) {
+				arguments.add("help");
 			}
-			// positive rating
-			else if (Arrays.asList(Suitcase.configKeys.get("commands.rate-positive")).contains(args[2])) {
-				Suitcase.lgFile.addRating(sender.getName(), 1);
-				Suitcase.cfMessage.sendRate(sender, args);
-				Suitcase.utLog.logAction(actionType.PLAYER_COMMAND_EXECUTE, sender.getName(), "/suitcase rate " + args[1] + " positive");
-			}
-			// neutral rating
-			else if (Arrays.asList(Suitcase.configKeys.get("commands.rate-positive")).contains(args[2])) {
-				Suitcase.lgFile.addRating(sender.getName(), 0);
-				Suitcase.cfMessage.sendRate(sender, args);
-				Suitcase.utLog.logAction(actionType.PLAYER_COMMAND_EXECUTE, sender.getName(), "/suitcase rate " + args[1] + " neutral");
-			}
-			// negative rating
-			else if (Arrays.asList(Suitcase.configKeys.get("commands.rate-positive")).contains(args[2])) {
-				Suitcase.lgFile.addRating(sender.getName(), -1);
-				Suitcase.cfMessage.sendRate(sender, args);
-				Suitcase.utLog.logAction(actionType.PLAYER_COMMAND_EXECUTE, sender.getName(), "/suitcase rate " + args[1] + " negative");
-			}
-		}
-		else {
-			Suitcase.cfMessage.sendDeny(sender, args);
-			Suitcase.utLog.logAction(actionType.PLAYER_COMMAND_DENY, sender.getName(), "/suitcase rate" + args[1] + " " + args[2]);
-		}
-	}
-
-	private void executeWarn(CommandSender sender, String...args) {
-		if (!(sender instanceof Player)) {
-			// player is console
-			executeConsole(sender, args);
-			return;
-		}
-		
-		// targeted player
-		Player target = (Player) Suitcase.plugin.getServer().getPlayer(args[1]);
-		
-		if (target == null) {
-			// can't find player
-			Suitcase.cfMessage.sendPlayer(sender, args);
-			Suitcase.utLog.logAction(actionType.PLAYER_COMMAND_ERROR, sender.getName(), "/suitcase " + args[0] + " " + args[1], "playerNotFound");
-			return;
-		}
-		
-		if (Suitcase.utPermission.hasPermission(sender, "suitcase.rate")) {
+			
+			if (Suitcase.utPermission.hasPermission(sender, "suitcase.help")) {
 				
-			// warn
-			if (Arrays.asList(Suitcase.configKeys.get("commands.warn")).contains(args[0])) {
-				Suitcase.lgFile.addWarning(sender.getName(), 1);
-				Suitcase.cfMessage.sendRate(sender, args);
-				Suitcase.utLog.logAction(actionType.PLAYER_COMMAND_EXECUTE, sender.getName(), "/suitcase " + args[0] + " " + args[1]);
+				// check command argument
+				if (args.length > 1 && commands.contains(arguments.get(1))) {
+					
+					// send help for that command
+					if (commands.contains(arguments.get(1))) {
+						if (Suitcase.utPermission.hasPermission(sender, "suitcase." + arguments.get(1)) || Boolean.getBoolean(Suitcase.configKeys.get("mechanics.full-help").toString())) {
+							// send header, usage and aliases
+							lines.add(Suitcase.messagesKeys.get("help.command." + args[1] + ".header").toString());
+							lines.add(Suitcase.messagesKeys.get("help.command." + args[1] + ".usage").toString());
+							lines.add(Suitcase.messagesKeys.get("help.command." + args[1] + ".aliases").toString());
+							// get each argument
+							for (String key : Suitcase.messagesKeys.getConfigurationSection("help.command." + args[1] + ".argument").getKeys(false)) {
+								lines.add(Suitcase.messagesKeys.get("help.command." + arguments.get(1) + ".argument." + key).toString());
+							}
+						}
+						else {
+							lines.add(Suitcase.messagesKeys.get("system.command.deny").toString());
+							lines.add(full);
+						}
+						
+					}
+					// can't find sub command
+					else {
+						lines.add(Suitcase.messagesKeys.get("system.command.invalid").toString());
+						lines.add(full);
+					}
+					
+				}
+				else {
+					// add header
+					lines.add(Suitcase.messagesKeys.get("help.self.header").toString());
+					
+					// parsing permissions for commands
+					for (String cmd : commands) {
+						// command forgive has permission suitcase.warn
+						if (cmd == "forgive") {
+							if (Suitcase.utPermission.hasPermission(sender, "suitcase.warn") || Boolean.getBoolean(Suitcase.configKeys.get("mechanics.full-help").toString())) {
+								lines.add(Suitcase.messagesKeys.get("help.self.info.forgive").toString());
+							}
+						}
+						else if (Suitcase.utPermission.hasPermission(sender, "suitcase." + cmd) || Boolean.getBoolean(Suitcase.configKeys.get("mechanics.full-help").toString())) {
+							lines.add(Suitcase.messagesKeys.get("help.self.info." + cmd).toString());
+						}
+					}
+					
+					// add info message
+					lines.add(Suitcase.messagesKeys.get("help.self.optional").toString());
+				}
 			}
-			// forgive
-			else if (Arrays.asList(Suitcase.configKeys.get("commands.warn-forgive")).contains(args[0])) {
-				Suitcase.lgFile.addWarning(sender.getName(), -1);
-				Suitcase.cfMessage.sendRate(sender, args);
-				Suitcase.utLog.logAction(actionType.PLAYER_COMMAND_EXECUTE, sender.getName(), "/suitcase " + args[0] + " " + args[1]);
+			else {
+				lines.add(Suitcase.messagesKeys.get("system.command.deny").toString());
+				lines.add(full);
 			}
 		}
+		// /suitcase info
+		else if (Suitcase.commandAliases.get("info").contains(arguments.get(0))) {
+			if (Suitcase.utPermission.hasPermission(sender, "suitcase.info")) {
+				if (arguments.size() > 1) {
+					lines.add(Suitcase.messagesKeys.get("system.command.invalid").toString());
+					lines.add(full);
+				}
+				else {
+					lines.add(Suitcase.messagesKeys.get("info.self.header").toString());
+					lines.add(Suitcase.messagesKeys.get("info.self.version").toString() + Suitcase.version);
+					lines.add(Suitcase.messagesKeys.get("info.self.description").toString());
+					lines.add(Suitcase.messagesKeys.get("info.self.authors").toString());
+					lines.add(Suitcase.messagesKeys.get("info.self.website").toString());
+					lines.add(Suitcase.messagesKeys.get("info.self.source").toString());
+				}
+			}
+			else {
+				lines.add(Suitcase.messagesKeys.get("system.command.deny").toString());
+				lines.add(full);
+			}
+		}
+		// /suitcase rate [player] [rating]
+		else if (Suitcase.commandAliases.get("rate").contains(arguments.get(0))) {
+			
+		}
+		// /suitcase positive [player]
+		else if (Suitcase.commandAliases.get("rate.positive").contains(arguments.get(0))) {
+			
+		}
+		// /suitcase negative [player]
+		else if (Suitcase.commandAliases.get("rate.negative").contains(arguments.get(0))) {
+			
+		}
+		// /suitcase warn [player]
+		else if (Suitcase.commandAliases.get("warn").contains(arguments.get(0))) {
+			
+		}
+		// /suitcase forgive [player]
+		else if (Suitcase.commandAliases.get("warn.forgive").contains(arguments.get(0))) {
+			
+		}
+		// /suitcase reload
+		else if (Suitcase.commandAliases.get("reload").contains(arguments.get(0))) {
+			if (Suitcase.utPermission.hasPermission(sender, "suitcase.reload")) {
+				if (arguments.size() > 1) {
+					lines.add(Suitcase.messagesKeys.get("system.command.invalid").toString());
+					lines.add(full);
+				}
+				else {
+					Suitcase.reload();
+				}
+			}
+			else {
+				lines.add(Suitcase.messagesKeys.get("system.command.deny").toString());
+				lines.add(full);
+			}
+		}
+		// command not found
 		else {
-			Suitcase.cfMessage.sendDeny(sender, args);
-			Suitcase.utLog.logAction(actionType.PLAYER_COMMAND_DENY, sender.getName(), "/suitcase " + args[0] + " " + args[1]);
+			lines.add(Suitcase.messagesKeys.get("system.error.unknown").toString());
+			lines.add(full);
 		}
-	}
-	
-	private void executeReload(CommandSender sender, String...args) {
-		if (Suitcase.utPermission.hasPermission(sender, "suitcase.reload")) {
-			Suitcase.cfMessage.sendHelp(sender, args);
-		}
-		else {
-			Suitcase.cfMessage.sendDeny(sender, args);
-		}
-	}
-	
-	private void executeUnknown(CommandSender sender, String...args) {
-		Suitcase.cfMessage.sendUnknown(sender, args);
-	}
-	
-	private void executeConsole(CommandSender sender, String...args) {
-		Suitcase.cfMessage.sendConsole(sender, args);
+		
+		// send edited message at the end
+		Suitcase.cfMessage.sendMessage(sender, lines);
+		// log to console
+		Suitcase.utConsole.sendAction(actionType.PLAYER_COMMAND_EXECUTE, (ArrayList<String>) Arrays.asList(sender.getName(), full));
+		return true;
 	}
 }
