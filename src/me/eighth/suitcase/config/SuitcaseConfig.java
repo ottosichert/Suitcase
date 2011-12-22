@@ -33,6 +33,7 @@ public class SuitcaseConfig {
 					cfConfig.set(path, Suitcase.configKeys.get(path));
 				}
 				// compare object types
+				// TODO: check if this is working
 				else if (cfConfig.get(path).getClass() != (Suitcase.configKeys.get(path).getClass())) {
 					cfConfig.set(path, Suitcase.configKeys.get(path));
 				}

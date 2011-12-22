@@ -19,6 +19,7 @@ public class SuitcaseMessage {
 	private FileConfiguration msConfig;
 	private File msFile;
 	
+	// TODO: use mechanics.language
 	// get messages file
 	public boolean initMessages() {
 		
@@ -118,7 +119,12 @@ public class SuitcaseMessage {
 		// system messages
 		Suitcase.messagesKeys.set("system.command.deny", "&4You don't have permission for that command!");
 		Suitcase.messagesKeys.set("system.command.unknown", "&4Can't find that command! Try /suitcase help");
-		Suitcase.messagesKeys.set("system.command.invalid", "&4Invalid command!");
+		Suitcase.messagesKeys.set("system.command.invalid", "&4Invalid command or argument!");
+		Suitcase.messagesKeys.set("system.command.console", "&4This command can't be used by console!");
+		Suitcase.messagesKeys.set("system.command.player", "&4Player not found!");
+		Suitcase.messagesKeys.set("system.rate.disabled", "&4Rating has been disabled.");
+		Suitcase.messagesKeys.set("system.rate.unrated", "&4You have to rate this player first to view his rating!");
+		Suitcase.messagesKeys.set("system.error.log", "&4Can't fetch data from file or database!");
 		// TODO: custom events
 		/*
 		Suitcase.messagesKeys.set("event.", "");
@@ -133,7 +139,7 @@ public class SuitcaseMessage {
 		}
 	}
 
-	// format string
+	// get string from ArrayList and remove brackets
 	public String getString(ArrayList<String> list) {
 		return list.toString().replaceAll("^\\[|\\]$", "");
 	}

@@ -16,6 +16,7 @@ import me.eighth.suitcase.util.SuitcaseConsole.actionType;
 import me.eighth.suitcase.util.SuitcasePermission;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Suitcase extends JavaPlugin {
@@ -80,6 +81,7 @@ public class Suitcase extends JavaPlugin {
 		}
 	}
 	
+	// reload plugin (user command)
 	public static void reload() {
 		
 		// plugin reload
@@ -93,5 +95,11 @@ public class Suitcase extends JavaPlugin {
 			// enabling reloading, send to log
 			utConsole.sendAction(actionType.PLUGIN_RELOAD_FINISH);
 		}
+	}
+	
+	// disable plugin due to internal error
+	public static void disable() {
+		PluginManager pm = plugin.getServer().getPluginManager();
+		pm.disablePlugin(plugin);
 	}
 }

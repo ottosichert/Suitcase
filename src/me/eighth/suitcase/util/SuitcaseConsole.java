@@ -34,6 +34,8 @@ public class SuitcaseConsole {
 		
 		// player command
 		PLAYER_COMMAND_EXECUTE,
+		PLAYER_COMMAND_DENY,
+		PLAYER_COMMAND_INVALID,
 		PLAYER_COMMAND_ERROR,
 		
 		// config property handling
@@ -55,8 +57,7 @@ public class SuitcaseConsole {
 			return true;
 		}
 		else {
-			ArrayList<String> errorArguments = (ArrayList<String>) Arrays.asList(action.toString(), Suitcase.cfMessage.getString(arguments));
-			sendAction(actionType.ARGUMENTS_INVALID, errorArguments);
+			sendAction(actionType.ARGUMENTS_INVALID, (ArrayList<String>) Arrays.asList(action.toString(), Suitcase.cfMessage.getString(arguments)));
 			return false;
 		}
 	}
@@ -119,12 +120,22 @@ public class SuitcaseConsole {
 			mcLogger.info(tag + "Suitcase successfully disabled.");
 			break;
 			
-			
+
 			// argument format 0 -> 'Player'
 			// argument format 1 -> '/suitcase help rate'
 		case PLAYER_COMMAND_EXECUTE:
 			if (!checkArguments(action, arguments, 2)) break;
 			mcLogger.info(tag + "[PLAYER_COMMAND] " + arguments.get(0) + " used command '" + arguments.get(1) + "'.");
+			break;
+			// argument format ^
+		case PLAYER_COMMAND_DENY:
+			if (!checkArguments(action, arguments, 2)) break;
+			mcLogger.info(tag + "[PLAYER_COMMAND] " + arguments.get(0) + " was denied command '" + arguments.get(1) + "'.");
+			break;
+			// argument format ^
+		case PLAYER_COMMAND_INVALID:
+			if (!checkArguments(action, arguments, 2)) break;
+			mcLogger.info(tag + "[PLAYER_COMMAND] " + arguments.get(0) + " tried invalid command '" + arguments.get(1) + "'.");
 			break;
 			// argument format ^
 			// argument format 2 -> 'errorName'
