@@ -40,7 +40,7 @@ public class SuitcaseConfig {
 			}
 			// save and use verified configKeys
 			try {
-				cfConfig.save(cfFile);
+				saveConfig();
 				Suitcase.configKeys = cfConfig;
 				return true;
 			} catch (IOException e) {
@@ -53,13 +53,34 @@ public class SuitcaseConfig {
 			try {
 				cfFile.createNewFile();
 				cfConfig = Suitcase.configKeys;
-				cfConfig.save(cfFile);
+				saveConfig();
 				return true;
 			} catch (IOException e) {
 				Suitcase.utConsole.sendAction(actionType.FILE_SAVE_ERROR, (ArrayList<String>) Arrays.asList("config.yml", e.toString()));
 				return false;
 			}
 		}
+	}
+	
+	public boolean freeConfig() {
+		cfConfig = null;
+		cfFile = null;
+		Suitcase.messagesKeys = null;
+		return true;
+	}
+	
+	public boolean reloadConfig() {
+		if (freeConfig() && initConfig()) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	// save config to file
+	private void saveConfig() throws IOException {
+		cfConfig.save(cfFile);
 	}
 	
 	private void loadConfig() {

@@ -6,14 +6,11 @@ import java.util.logging.Logger;
 
 import me.eighth.suitcase.Suitcase;
 
-import org.bukkit.plugin.PluginDescriptionFile;
-
 public class SuitcaseConsole {
 	
 	// define variables
 	private final Logger mcLogger = Logger.getLogger("Minecraft");
-	private PluginDescriptionFile pdf = Suitcase.plugin.getDescription();
-	private String tag = "[" + pdf.getName() + "] "; // this should be '[Suitcase] '
+	private String tag = "[Suitcase] ";
 	
 	public enum actionType {
 		
@@ -73,7 +70,7 @@ public class SuitcaseConsole {
 			// no arguments
 		case PLUGIN_ENABLE_START:
 			if (!checkArguments(action, arguments, 0)) break;
-			mcLogger.info(tag + Suitcase.version + " by " + Suitcase.cfMessage.getString(pdf.getAuthors()) + " enabling...");
+			mcLogger.info(tag + Suitcase.pdf.getFullName() + " by " + Suitcase.cfMessage.getString(Suitcase.pdf.getAuthors()) + " enabling...");
 			break;
 			// argument format 0 -> 'errorName'
 		case PLUGIN_ENABLE_ERROR:

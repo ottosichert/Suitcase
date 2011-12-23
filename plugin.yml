@@ -1,7 +1,31 @@
-name: Suitcase
+name: Leather Suitcase
 main: me.eight.suitcase.suitcase
 version: 0.1
 authors: [eighth, HavaTequila]
-description: >
-             Suitcase is a rating system for players and a warning system for admins.
+website: www.gamez-pla.net
+description: Suitcase is a rating system for players and a warning system for admins with website integration.
 commands:
+  suitcase:
+    description: Rate and warn players.
+    aliases: [sc, suit]
+    permission: suitcase
+    
+permissions:
+  suitcase.*:
+    description: Gives access to all Suitcase commands
+    children:
+      suitcase.help: true
+      suitcase.info: true
+      suitcase.rate: true
+      suitcase.warn: true
+      suitcase.reload: true
+  suitcase.help:
+    description: Shows command help
+  suitcase.info:
+    description: Shows plugin info
+  suitcase.rate:
+    description: Rates other players or view rating
+  suitcase.warn:
+    description: Warns players
+  suitcase.reload:
+    description: Reloads the plugin and configuration files

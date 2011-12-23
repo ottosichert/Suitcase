@@ -16,6 +16,7 @@ import me.eighth.suitcase.util.SuitcaseConsole.actionType;
 import me.eighth.suitcase.util.SuitcasePermission;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -39,7 +40,7 @@ public class Suitcase extends JavaPlugin {
 	
 	// define other variables
 	public static Suitcase plugin;
-	public static String version = "Leather Suitcase v0.1";
+	public static PluginDescriptionFile pdf = plugin.getDescription();
 	public static FileConfiguration configKeys = null;
 	public static FileConfiguration messagesKeys = null;
 	public static Map<String, ArrayList<String>> commandAliases = new HashMap<String, ArrayList<String>>();
@@ -48,10 +49,29 @@ public class Suitcase extends JavaPlugin {
 	public void onDisable() {
 		// plugin unload
 		utConsole.sendAction(actionType.PLUGIN_DISABLE_START);
-		// TODO: save ratings and warnings
-		
-		// disabling finished, send to log
-		utConsole.sendAction(actionType.PLUGIN_DISABLE_FINISH);
+
+		// save and dispose configuration
+		if (!cfConfig.freeConfig()) {
+			Suitcase.utConsole.sendAction(actionType.PLUGIN_DISABLE_ERROR, (ArrayList<String>) Arrays.asList("freeConfigError"));
+			disable();
+			return;
+		}
+		else if (!cfMessage.freeMessages()) {
+			Suitcase.utConsole.sendAction(actionType.PLUGIN_DISABLE_ERROR, (ArrayList<String>) Arrays.asList("freeMessagesError"));
+			disable();
+			return;
+		}
+		/*
+		else if (!lgConnector.freeLog()) {
+			Suitcase.utConsole.sendAction(actionType.PLUGIN_DISABLE_ERROR, (ArrayList<String>) Arrays.asList("freeConnectorError"));
+			disable();
+			return;
+		}
+		*/
+		else {		
+			// disabling finished, send to log
+			utConsole.sendAction(actionType.PLUGIN_DISABLE_FINISH);
+		}
 	}
 	
 	@Override
@@ -61,7 +81,6 @@ public class Suitcase extends JavaPlugin {
 		
 		// set commands and aliases
 		getCommand("suitcase").setExecutor(evCommand);
-		getCommand("sc").setExecutor(evCommand);
 		commandAliases.put("help", (ArrayList<String>) Arrays.asList("help", "h", "?"));
 		commandAliases.put("info", (ArrayList<String>) Arrays.asList("info", "i", "about", "a"));
 		commandAliases.put("rate", (ArrayList<String>) Arrays.asList("rate", "r", "vote", "v"));
@@ -72,10 +91,24 @@ public class Suitcase extends JavaPlugin {
 		commandAliases.put("reload", (ArrayList<String>) Arrays.asList("reload"));
 		
 		// load and check configuration
-		if (!cfConfig.initConfig() || !cfMessage.initMessages()) {
-			Suitcase.utConsole.sendAction(actionType.PLUGIN_ENABLE_ERROR, (ArrayList<String>) Arrays.asList("initFilesError"));
+		if (!cfConfig.initConfig()) {
+			Suitcase.utConsole.sendAction(actionType.PLUGIN_ENABLE_ERROR, (ArrayList<String>) Arrays.asList("initConfigError"));
+			disable();
+			return;
 		}
-		else {
+		else if (!cfMessage.initMessages()) {
+			Suitcase.utConsole.sendAction(actionType.PLUGIN_ENABLE_ERROR, (ArrayList<String>) Arrays.asList("initMessagesError"));
+			disable();
+			return;
+		}
+		/*
+		else if (!lgConnector.initLog()) {
+			Suitcase.utConsole.sendAction(actionType.PLUGIN_ENABLE_ERROR, (ArrayList<String>) Arrays.asList("initConnectorError"));
+			disable();
+			return;
+		}
+		*/
+		else {		
 			// enabling finished, send to log
 			utConsole.sendAction(actionType.PLUGIN_ENABLE_FINISH);
 		}
@@ -87,12 +120,26 @@ public class Suitcase extends JavaPlugin {
 		// plugin reload
 		utConsole.sendAction(actionType.PLUGIN_RELOAD_START);
 		
-		// reload and check configuration
-		if (!cfConfig.initConfig() || !cfMessage.initMessages()) {
-			Suitcase.utConsole.sendAction(actionType.PLUGIN_RELOAD_ERROR, (ArrayList<String>) Arrays.asList("initFilesError"));
+		// reload configuration
+		if (!cfConfig.reloadConfig()) {
+			Suitcase.utConsole.sendAction(actionType.PLUGIN_RELOAD_ERROR, (ArrayList<String>) Arrays.asList("reloadConfigError"));
+			disable();
+			return;
 		}
-		else {
-			// enabling reloading, send to log
+		else if (!cfMessage.reloadMessages()) {
+			Suitcase.utConsole.sendAction(actionType.PLUGIN_RELOAD_ERROR, (ArrayList<String>) Arrays.asList("reloadMessagesError"));
+			disable();
+			return;
+		}
+		/*
+		else if (!lgConnector.reloadLog()) {
+			Suitcase.utConsole.sendAction(actionType.PLUGIN_RELOAD_ERROR, (ArrayList<String>) Arrays.asList("reloadConnectorError"));
+			disable();
+			return;
+		}
+		*/
+		else {		
+			// reloading finished, send to log
 			utConsole.sendAction(actionType.PLUGIN_RELOAD_FINISH);
 		}
 	}

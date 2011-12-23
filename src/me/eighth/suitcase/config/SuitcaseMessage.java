@@ -21,60 +21,82 @@ public class SuitcaseMessage {
 	
 	// TODO: use mechanics.language
 	// get messages file
-	public boolean initMessages() {
-		
-		// load default values
-		loadMessages();
-		
-		// read file
-		msFile = new File(Suitcase.plugin.getDataFolder(), "messages.yml");
-		if (msFile.exists()) {
-			msConfig = YamlConfiguration.loadConfiguration(msFile);
-			// add property if missing
-			for (String path : Suitcase.messagesKeys.getKeys(true)) {
-				if (!msConfig.contains(path)) {
-					msConfig.set(path, Suitcase.messagesKeys.get(path));
+		public boolean initMessages() {
+			
+			// load default values
+			loadMessages();
+			
+			// read file
+			msFile = new File(Suitcase.plugin.getDataFolder(), "messages.yml");
+			if (msFile.exists()) {
+				msConfig = YamlConfiguration.loadConfiguration(msFile);
+				// add property if missing
+				for (String path : Suitcase.messagesKeys.getKeys(true)) {
+					if (!msConfig.contains(path)) {
+						msConfig.set(path, Suitcase.messagesKeys.get(path));
+					}
+					// compare object types
+					// TODO: check if this is working
+					else if (msConfig.get(path).getClass() != (Suitcase.messagesKeys.get(path).getClass())) {
+						msConfig.set(path, Suitcase.messagesKeys.get(path));
+					}
 				}
-				// compare object types
-				else if (msConfig.get(path).getClass() != (Suitcase.messagesKeys.get(path).getClass())) {
-					msConfig.set(path, Suitcase.messagesKeys.get(path));
+				// save and use verified configKeys
+				try {
+					saveMessages();
+					Suitcase.messagesKeys = msConfig;
+					return true;
+				} catch (IOException e) {
+					Suitcase.utConsole.sendAction(actionType.FILE_SAVE_ERROR, (ArrayList<String>) Arrays.asList("messages.yml", e.toString()));
+					return false;
 				}
 			}
-			// save and use verified configKeys
-			try {
-				msConfig.save(msFile);
-				Suitcase.messagesKeys = msConfig;
+			else {
+				Suitcase.utConsole.sendAction(actionType.FILE_NOT_FOUND, (ArrayList<String>) Arrays.asList("messages.yml"));
+				try {
+					msFile.createNewFile();
+					msConfig = Suitcase.messagesKeys;
+					saveMessages();
+					return true;
+				} catch (IOException e) {
+					Suitcase.utConsole.sendAction(actionType.FILE_SAVE_ERROR, (ArrayList<String>) Arrays.asList("messages.yml", e.toString()));
+					return false;
+				}
+			}
+		}
+		
+		public boolean freeMessages() {
+			msConfig = null;
+			msFile = null;
+			Suitcase.messagesKeys = null;
+			return true;
+		}
+		
+		public boolean reloadMessages() {
+			if (freeMessages() && initMessages()) {
 				return true;
-			} catch (IOException e) {
-				Suitcase.utConsole.sendAction(actionType.FILE_SAVE_ERROR, (ArrayList<String>) Arrays.asList("messages.yml", e.toString()));
+			}
+			else {
 				return false;
 			}
 		}
-		else {
-			Suitcase.utConsole.sendAction(actionType.FILE_NOT_FOUND, (ArrayList<String>) Arrays.asList("messages.yml"));
-			try {
-				msFile.createNewFile();
-				msConfig = Suitcase.messagesKeys;
-				msConfig.save(msFile);
-				return true;
-			} catch (IOException e) {
-				Suitcase.utConsole.sendAction(actionType.FILE_SAVE_ERROR, (ArrayList<String>) Arrays.asList("messages.yml", e.toString()));
-				return false;
-			}
+		
+		// save config to file
+		private void saveMessages() throws IOException {
+			msConfig.save(msFile);
 		}
-	}
 	
-	// TODO: Add new entries here
 	private void loadMessages() {
+		// help command
 		// help page
-		Suitcase.messagesKeys.set("help.self.header", " &7----- &aSuitcase help &7-----");
-		Suitcase.messagesKeys.set("help.self.info.help", "&1/sc &9help &3command &7..... &c>> &6Show command help");
-		Suitcase.messagesKeys.set("help.self.info.info", "&1/sc &9info &7.......... &c>> &6About Suitcase");
-		Suitcase.messagesKeys.set("help.self.info.rate", "&1/sc &9rate &3name &brating &c>> &6Rate or view rating");
-		Suitcase.messagesKeys.set("help.self.info.warn", "&1/sc &9warn &3name &7....... &c>> &6Warn a player");
-		Suitcase.messagesKeys.set("help.self.info.forgive", "&1/sc &9forgive &3name &7....... &c>> &6Forgive a player");
-		Suitcase.messagesKeys.set("help.self.info.reload", "&1/sc &9reload &7......... &c>> &6Reload this plugin");
-		Suitcase.messagesKeys.set("help.self.optional", "&6All &3arguments &6are optional and there are several &5aliases&6");
+		Suitcase.messagesKeys.set("help.header", " &7----- &aSuitcase help &7-----");
+		Suitcase.messagesKeys.set("help.info.help", "&1/sc &9help &3command &7..... &c>> &6Show command help");
+		Suitcase.messagesKeys.set("help.info.info", "&1/sc &9info &7.......... &c>> &6About Suitcase");
+		Suitcase.messagesKeys.set("help.info.rate", "&1/sc &9rate &3name &brating &c>> &6Rate or view rating");
+		Suitcase.messagesKeys.set("help.info.warn", "&1/sc &9warn &3name &7....... &c>> &6Warn a player");
+		Suitcase.messagesKeys.set("help.info.forgive", "&1/sc &9forgive &3name &7....... &c>> &6Forgive a player");
+		Suitcase.messagesKeys.set("help.info.reload", "&1/sc &9reload &7......... &c>> &6Reload this plugin");
+		Suitcase.messagesKeys.set("help.optional", "&6All &3arguments &6are optional and there are several &5aliases&6");
 		// help command help
 		Suitcase.messagesKeys.set("help.command.help.header", " &7----- &aHelp command &7-----");
 		Suitcase.messagesKeys.set("help.command.help.usage", "&5Usage&c: &1/suitcase &9help");
@@ -109,22 +131,49 @@ public class SuitcaseMessage {
 		Suitcase.messagesKeys.set("help.command.reload.usage", "&5Usage&c: &1/suitcase &9reload");
 		Suitcase.messagesKeys.set("help.command.reload.aliases", "&5Aliases&c: &9none");
 		Suitcase.messagesKeys.set("help.command.reload.argument.reload", "&9reload &7.. &c>> &6Reload all configuration files and database connections");
+		// error messages
+		Suitcase.messagesKeys.set("help.error.invalid", "&4There is no help page for that command.");
+		
+		// info command
 		// plugin info
-		Suitcase.messagesKeys.set("info.self.header", " &7----- &aAbout Suitcase &7-----");
-		Suitcase.messagesKeys.set("info.self.version", "&5Current version&4: &6"); // info command adds version here
-		Suitcase.messagesKeys.set("info.self.description", "&5Description&4: &6Suitcase is a rating and warning system with website integration.");
-		Suitcase.messagesKeys.set("info.self.authors", "&5Authors&4: &6eighth&4, &6HavaTequila");
-		Suitcase.messagesKeys.set("info.self.website", "&5Website&4: &6gamez&4-&6pla&4.&6net");
-		Suitcase.messagesKeys.set("info.self.source", "&5Source&4: &6github&4.&6com&4/&6eighth&4/&6Suitcase");
+		Suitcase.messagesKeys.set("info.header", " &7----- &aAbout Suitcase &7-----");
+		Suitcase.messagesKeys.set("info.version", "&5Current version&4: &6{version}");
+		Suitcase.messagesKeys.set("info.description", "&5Description&4: &6{description}");
+		Suitcase.messagesKeys.set("info.authors", "&5Authors&4: &6{authors}");
+		Suitcase.messagesKeys.set("info.website", "&5Website&4: &6{website}");
+		
+		// rate command
+		// one's own rating
+		Suitcase.messagesKeys.set("rate.view.self.header", " &7----- &aYour rating &7-----");
+		Suitcase.messagesKeys.set("rate.view.self.rating", "&5Rating&4: &6{rating}");
+		Suitcase.messagesKeys.set("rate.view.self.warnings", "&5Warnings&4: &6{warnings}");
+		// rating of others
+		Suitcase.messagesKeys.set("rate.view.others.header", " &7----- &a{player}'s rating &7-----");
+		Suitcase.messagesKeys.set("rate.view.others.rating", "&5Rating&4: &6{rating}");
+		Suitcase.messagesKeys.set("rate.view.others.warnings", "&5Warnings&4: &6{warnings}");
+		// rate players
+		Suitcase.messagesKeys.set("rate.set", "&2You have successfully rated {player}!");
+		// rating errors
+		Suitcase.messagesKeys.set("rate.error.invalid", "&4Your entered rating is invalid!");
+		Suitcase.messagesKeys.set("rate.error.disabled", "&4Rating is disabled.");
+		Suitcase.messagesKeys.set("rate.error.unrated", "&4You haven't been rated by this player yet.");
+		Suitcase.messagesKeys.set("rate.error.player", "&4Can't find selected player!");
+		
+		// warn command
+		// warn someone
+		Suitcase.messagesKeys.set("warn.set", "&2You have successfully warned {player}!");
+		// warning errors
+		Suitcase.messagesKeys.set("warn.error.disabled", "&4Warning is disabled.");
+		Suitcase.messagesKeys.set("warn.error.player", "&4Can't find selected player!");
+		
+		
 		// system messages
-		Suitcase.messagesKeys.set("system.command.deny", "&4You don't have permission for that command!");
+		// command errors in general
+		Suitcase.messagesKeys.set("system.command.deny", "&4You don't have permission to that command!");
 		Suitcase.messagesKeys.set("system.command.unknown", "&4Can't find that command! Try /suitcase help");
-		Suitcase.messagesKeys.set("system.command.invalid", "&4Invalid command or argument!");
-		Suitcase.messagesKeys.set("system.command.console", "&4This command can't be used by console!");
-		Suitcase.messagesKeys.set("system.command.player", "&4Player not found!");
-		Suitcase.messagesKeys.set("system.rate.disabled", "&4Rating has been disabled.");
-		Suitcase.messagesKeys.set("system.rate.unrated", "&4You have to rate this player first to view his rating!");
-		Suitcase.messagesKeys.set("system.error.log", "&4Can't fetch data from file or database!");
+		Suitcase.messagesKeys.set("system.command.console", "&4This command can't be run by console!");
+		// internal errors
+		Suitcase.messagesKeys.set("system.log.empty", "&4Can't fetch data from file or database!");
 		// TODO: custom events
 		/*
 		Suitcase.messagesKeys.set("event.", "");

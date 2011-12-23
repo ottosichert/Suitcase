@@ -21,6 +21,7 @@ public class SuitcaseCommand implements CommandExecutor {
 		// args[2] -> rating
 		
 		// command status
+		String errorMsg = "";
 		boolean error = false;
 		boolean denied = false;
 		boolean invalid = false;
@@ -78,23 +79,23 @@ public class SuitcaseCommand implements CommandExecutor {
 				}
 				else {
 					// add header
-					lines.add(Suitcase.messagesKeys.getString("help.self.header"));
+					lines.add(Suitcase.messagesKeys.getString("help.header"));
 					
 					// parsing permissions for commands
 					for (String cmd : commands) {
 						// command forgive has permission suitcase.warn
 						if (cmd == "forgive") {
 							if (Suitcase.utPermission.hasPermission(sender, "suitcase.warn") || Suitcase.configKeys.getBoolean("mechanics.full-help")) {
-								lines.add(Suitcase.messagesKeys.getString("help.self.info.forgive"));
+								lines.add(Suitcase.messagesKeys.getString("help.info.forgive"));
 							}
 						}
 						else if (Suitcase.utPermission.hasPermission(sender, "suitcase." + cmd) || Suitcase.configKeys.getBoolean("mechanics.full-help")) {
-							lines.add(Suitcase.messagesKeys.getString("help.self.info." + cmd));
+							lines.add(Suitcase.messagesKeys.getString("help.info." + cmd));
 						}
 					}
 					
 					// add info message
-					lines.add(Suitcase.messagesKeys.getString("help.self.optional"));
+					lines.add(Suitcase.messagesKeys.getString("help.optional"));
 				}
 			}
 			else {
@@ -115,12 +116,11 @@ public class SuitcaseCommand implements CommandExecutor {
 				}
 				else {
 					// send plugin info
-					lines.add(Suitcase.messagesKeys.getString("info.self.header"));
-					lines.add(Suitcase.messagesKeys.getString("info.self.version") + Suitcase.version);
-					lines.add(Suitcase.messagesKeys.getString("info.self.description"));
-					lines.add(Suitcase.messagesKeys.getString("info.self.authors"));
-					lines.add(Suitcase.messagesKeys.getString("info.self.website"));
-					lines.add(Suitcase.messagesKeys.getString("info.self.source"));
+					lines.add(Suitcase.messagesKeys.getString("info.header"));
+					lines.add(Suitcase.messagesKeys.getString("info.version").replaceFirst("{version}", Suitcase.pdf.getFullName()));
+					lines.add(Suitcase.messagesKeys.getString("info.description").replaceFirst("{description}", Suitcase.pdf.getDescription()));
+					lines.add(Suitcase.messagesKeys.getString("info.authors").replaceFirst("{authors}", Suitcase.cfMessage.getString(Suitcase.pdf.getAuthors())));
+					lines.add(Suitcase.messagesKeys.getString("info.website").replaceFirst("{website}", Suitcase.pdf.getWebsite()));
 				}
 			}
 			else {
@@ -136,25 +136,16 @@ public class SuitcaseCommand implements CommandExecutor {
 				// check if rating is enabled
 				if (Suitcase.configKeys.getBoolean("mechanics.rating.enable")) {
 					// parse arguments
+					
 					// no arguments -> view one's own rating
 					if (arguments.size() == 1 && sender instanceof Player) {
-						// TODO: use a connector class to file and database log, so we don't have to use something like this
-						
-						// we prefer logging to database
-						if (Suitcase.configKeys.getBoolean("log.database.enable")) {
-							// lines.add(Suitcase.lgDatabase.getRating((Player) sender));
-						}
-						else if (Suitcase.configKeys.getBoolean("log.file.enable")) {
-							// lines.add(Suitcase.lgFile.getRating((Player) sender));
-						}
-						else {
-							lines.add(Suitcase.messagesKeys.getString("system.error.log"));
-							error = true;
-						}
-						
-						// better:
-						// lines.add(Suitcase.lgConnector.getRating((Player) sender));
+						// show rating and warnings
+						lines.add(Suitcase.messagesKeys.getString("rate.view.self.header"));
+						lines.add(Suitcase.messagesKeys.getString("rate.view.self.rating").replaceFirst("{rating}", "" /* Suitcase.lgConnector.getRating((Player) sender */));
+						lines.add(Suitcase.messagesKeys.getString("rate.view.self.warnings").replaceFirst("{warnings}", "" /* Suitcase.lgConnector.getWarnings((Player) sender */));
 					}
+					
+					// one argument -> view rating of someone
 					else if (arguments.size() == 2) { // console can view rating of other players
 						// get player from name
 						Player target = Suitcase.plugin.getServer().getPlayer(arguments.get(1));
@@ -162,20 +153,25 @@ public class SuitcaseCommand implements CommandExecutor {
 						if (target != null) {
 							// separate executing player from console
 							if (sender instanceof Player) {
-								/*
-								 * if (Suitcase.lgConnector.hasRated((Player) sender, target)) {
-								 * 	lines.add(Suitcase.lgConnector.getRating(target));
-								 * }
-								 * else {
-								 *  // player has to rate targeted player first in order to view his rating
-								 * 	lines.add(Suitcase.messageKeys.getString("system.rate.unrated"));
-								 * 	lines.add(full);
-								 *  denied = true;
-								 * }
-								 */
+								if (target.getName() == "remove this and use ->" /* Suitcase.lgConnector.hasRated(target, (Player) sender) */) {
+									// send player's rating and warnings and check whether he has rated the player, who executed the command, or not
+									lines.add(Suitcase.messagesKeys.getString("rate.view.others.header").replaceFirst("{player}", target.getDisplayName()));
+									lines.add(Suitcase.messagesKeys.getString("rate.view.others.rating").replaceFirst("{rating}", "" /* Suitcase.lgConnector.getRating(target) */));
+									lines.add(Suitcase.messagesKeys.getString("rate.view.others.warnings").replaceFirst("{warnings}", "" /* Suitcase.lgConnector.getWarnings(target) */));
+								}
+								else {
+									// player has to rate targeted player first in order to view his rating
+									lines.add(Suitcase.messagesKeys.getString("system.rate.unrated"));
+									lines.add(full);
+									denied = true;
+								}
+								 
 							}
 							else {
-								// lines.add(Suitcase.lgConnector.getRating(target));
+								// send player's rating and warnings
+								lines.add(Suitcase.messagesKeys.getString("rate.view.others.header").replaceFirst("{player}", target.getDisplayName()));
+								lines.add(Suitcase.messagesKeys.getString("rate.view.others.rating").replaceFirst("{rating}", "" /* Suitcase.lgConnector.getRating(target) */));
+								lines.add(Suitcase.messagesKeys.getString("rate.view.others.warnings").replaceFirst("{warnings}", "" /* Suitcase.lgConnector.getWarnings(target) */));
 							}
 							
 						}
@@ -186,14 +182,51 @@ public class SuitcaseCommand implements CommandExecutor {
 							invalid = true;
 						}
 					}
+					
+					// two arguments -> rate a player
+					else if (arguments.size() == 3 && sender instanceof Player) {
+						// get player from name
+						Player target = Suitcase.plugin.getServer().getPlayer(arguments.get(1));
+						// check if player exists
+						if (target != null) {
+							if (Suitcase.commandAliases.get("rate.positive").contains(arguments.get(2))) {
+								// Suitcase.lgConnector.ratePlayer(target, true); // true -> positive or good / false -> negative or bad
+								lines.add(Suitcase.messagesKeys.getString("rate.set").replaceFirst("{player}", target.getDisplayName()));
+							}
+							else if (Suitcase.commandAliases.get("rate.negative").contains(arguments.get(2))) {
+								// Suitcase.lgConnector.ratePlayer(target, false);
+								lines.add(Suitcase.messagesKeys.getString("rate.set").replaceFirst("{player}", target.getDisplayName()));
+							}
+							else {
+								// rating not found
+								lines.add(Suitcase.messagesKeys.getString("system.command.invalid"));
+								lines.add(full);
+								invalid = true;
+							}
+						}
+						else {
+							// player doesn't exist
+							lines.add(Suitcase.messagesKeys.getString("system.command.player"));
+							lines.add(full);
+							invalid = true;
+						}
+					}
+					else {
+						// too many arguments
+						lines.add(Suitcase.messagesKeys.getString("system.command.invalid"));
+						lines.add(full);
+						invalid = true;
+					}
 				}
 				else {
-					lines.add(Suitcase.messagesKeys.getString("system.rate.disabled"));
+					// rating is not enabled
+					lines.add(Suitcase.messagesKeys.getString("rate.error.disabled"));
 					lines.add(full);
 					denied = true;
 				}
 			}
 			else {
+				// player doesn't have permission
 				lines.add(Suitcase.messagesKeys.getString("system.command.deny"));
 				lines.add(full);
 				denied = true;
@@ -219,6 +252,7 @@ public class SuitcaseCommand implements CommandExecutor {
 		else if (Suitcase.commandAliases.get("reload").contains(arguments.get(0))) {
 			if (Suitcase.utPermission.hasPermission(sender, "suitcase.reload")) {
 				if (arguments.size() > 1) {
+					// too many arguments
 					lines.add(Suitcase.messagesKeys.getString("system.command.invalid"));
 					lines.add(full);
 					invalid = true;
@@ -228,6 +262,7 @@ public class SuitcaseCommand implements CommandExecutor {
 				}
 			}
 			else {
+				// no permission
 				lines.add(Suitcase.messagesKeys.getString("system.command.deny"));
 				lines.add(full);
 				denied = true;
@@ -245,7 +280,7 @@ public class SuitcaseCommand implements CommandExecutor {
 		
 		// log command status to console
 		if (error) {
-			Suitcase.utConsole.sendAction(actionType.PLAYER_COMMAND_ERROR, (ArrayList<String>) Arrays.asList(sender.getName(), full, "logFetchDataError"));
+			Suitcase.utConsole.sendAction(actionType.PLAYER_COMMAND_ERROR, (ArrayList<String>) Arrays.asList(sender.getName(), full, errorMsg));
 		}
 		else if (denied) {
 			Suitcase.utConsole.sendAction(actionType.PLAYER_COMMAND_DENY, (ArrayList<String>) Arrays.asList(sender.getName(), full));
@@ -256,6 +291,8 @@ public class SuitcaseCommand implements CommandExecutor {
 		else {
 			Suitcase.utConsole.sendAction(actionType.PLAYER_COMMAND_EXECUTE, (ArrayList<String>) Arrays.asList(sender.getName(), full));
 		}
+		
+		// always return true, because we handle wrong commands/arguments
 		return true;
 	}
 }
