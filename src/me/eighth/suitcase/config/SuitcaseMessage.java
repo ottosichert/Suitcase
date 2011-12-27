@@ -94,49 +94,47 @@ public class SuitcaseMessage {
 		// help command
 		// help page
 		Suitcase.messagesKeys.set("help.header", " &7----- &aSuitcase help &7-----");
-		Suitcase.messagesKeys.set("help.info.help", "&1/sc &9help &3command &7..... &c>> &6Show command help");
-		Suitcase.messagesKeys.set("help.info.info", "&1/sc &9info &7.......... &c>> &6About Suitcase");
-		Suitcase.messagesKeys.set("help.info.rate", "&1/sc &9rate &3name &brating &c>> &6Rate or view rating");
-		Suitcase.messagesKeys.set("help.info.warn", "&1/sc &9warn &3name &7....... &c>> &6Warn a player");
-		Suitcase.messagesKeys.set("help.info.forgive", "&1/sc &9forgive &3name &7....... &c>> &6Forgive a player");
-		Suitcase.messagesKeys.set("help.info.reload", "&1/sc &9reload &7......... &c>> &6Reload this plugin");
+		Suitcase.messagesKeys.set("help.info.help", "&1/sc &9help &3command &7>> &6Show command help");
+		Suitcase.messagesKeys.set("help.info.info", "&1/sc &9info &7>> &6About Suitcase");
+		Suitcase.messagesKeys.set("help.info.rate", "&1/sc &9rate &3name &brating &7>> &6Rate or view rating");
+		Suitcase.messagesKeys.set("help.info.warn", "&1/sc &9warn &3name &7>> &6Warn a player");
+		Suitcase.messagesKeys.set("help.info.forgive", "&1/sc &9forgive &3name &7>> &6Forgive a player");
+		Suitcase.messagesKeys.set("help.info.reload", "&1/sc &9reload &7>> &6Reload this plugin");
 		Suitcase.messagesKeys.set("help.optional", "&6All &3arguments &6are optional and there are several &5aliases&6");
 		// help command help
 		Suitcase.messagesKeys.set("help.command.help.header", " &7----- &aHelp command &7-----");
 		Suitcase.messagesKeys.set("help.command.help.usage", "&5Usage&c: &1/suitcase &9help");
 		Suitcase.messagesKeys.set("help.command.help.aliases", "&5Aliases&c: &9help &c[&9h&c, &9?&c]");
-		Suitcase.messagesKeys.set("help.command.help.argument.help", "&9help &7.. &c>> &6Show a list of all accessible commands");
+		Suitcase.messagesKeys.set("help.command.help.argument.help", "&9help &7>> &6Show a list of all accessible commands");
 		// info help
 		Suitcase.messagesKeys.set("help.command.info.header", " &7----- &aInfo command &7-----");
 		Suitcase.messagesKeys.set("help.command.info.usage", "&5Usage&c: &1/suitcase &9info");
 		Suitcase.messagesKeys.set("help.command.info.aliases", "&5Aliases&c: &9info &c[&9i&c, &9about&c, &9a&c]");
-		Suitcase.messagesKeys.set("help.command.info.argument.info", "&9info &7.. &c>> &6Show plugin authors and current version");
+		Suitcase.messagesKeys.set("help.command.info.argument.info", "&9info &7>> &6Show plugin authors and current version");
 		// rate help
 		Suitcase.messagesKeys.set("help.command.rate.header", " &7----- &aRate command &7-----");
 		Suitcase.messagesKeys.set("help.command.rate.usage", "&5Usage&c: &1/suitcase &9rate &3name &brating");
 		Suitcase.messagesKeys.set("help.command.rate.aliases", "&5Aliases&c: &9rate &c[&9r&c, &9vote&c, &9v&c]");
-		Suitcase.messagesKeys.set("help.command.rate.argument.rate", "&9rate &7..... &c>> &6Rate players or view own rating if no name is given");
-		Suitcase.messagesKeys.set("help.command.rate.argument.name", "&3name &7..... &c>> &6Select player");
-		Suitcase.messagesKeys.set("help.command.rate.argument.rating", "&brating &7.. &c>> &6Give a good &2+ or bad &4- &6rating");
+		Suitcase.messagesKeys.set("help.command.rate.argument.rate", "&9rate &7>> &6Rate players or view own rating if no name is given");
+		Suitcase.messagesKeys.set("help.command.rate.argument.name", "&3name &7>> &6Select player");
+		Suitcase.messagesKeys.set("help.command.rate.argument.rating", "&brating &7>> &6Give a good &2+ or bad &4- &6rating");
 		// warn help
 		Suitcase.messagesKeys.set("help.command.warn.header", " &7----- &aWarn command &7-----");
 		Suitcase.messagesKeys.set("help.command.warn.usage", "&5Usage&c: &1/suitcase &9warn &3name");
 		Suitcase.messagesKeys.set("help.command.warn.aliases", "&5Aliases&c: &9warn &c[&9w&c, &9!&c]");
-		Suitcase.messagesKeys.set("help.command.warn.argument.warn", "&9warn &7..... &c>> &6Warn a player and increase his warning counter");
-		Suitcase.messagesKeys.set("help.command.warn.argument.name", "&3name &7..... &c>> &6Select a player");
+		Suitcase.messagesKeys.set("help.command.warn.argument.warn", "&9warn &7>> &6Warn a player and increase his warning counter");
+		Suitcase.messagesKeys.set("help.command.warn.argument.name", "&3name &7>> &6Select a player");
 		// forgive help
 		Suitcase.messagesKeys.set("help.command.forgive.header", " &7----- &aForgive command &7-----");
 		Suitcase.messagesKeys.set("help.command.forgive.usage", "&5Usage&c: &1/suitcase &9forgive &3name");
 		Suitcase.messagesKeys.set("help.command.forgive.aliases", "&5Aliases&c: &9forgive &c[&9f&c]");
-		Suitcase.messagesKeys.set("help.command.forgive.argument.forgive", "&9forgive &7.. &c>> &6Forgive a player and reset his warning counter");
-		Suitcase.messagesKeys.set("help.command.forgive.argument.name", "&3name &7...... &c>> &6Select a player");
+		Suitcase.messagesKeys.set("help.command.forgive.argument.forgive", "&9forgive &7>> &6Forgive a player and reset his warning counter");
+		Suitcase.messagesKeys.set("help.command.forgive.argument.name", "&3name &7>> &6Select a player");
 		// reload help
 		Suitcase.messagesKeys.set("help.command.reload.header", " &7----- &aReload command &7-----");
 		Suitcase.messagesKeys.set("help.command.reload.usage", "&5Usage&c: &1/suitcase &9reload");
 		Suitcase.messagesKeys.set("help.command.reload.aliases", "&5Aliases&c: &9none");
-		Suitcase.messagesKeys.set("help.command.reload.argument.reload", "&9reload &7.. &c>> &6Reload all configuration files and database connections");
-		// help errors
-		Suitcase.messagesKeys.set("help.error.invalid", "&4There is no help page for that command.");
+		Suitcase.messagesKeys.set("help.command.reload.argument.reload", "&9reload &7>> &6Reload all configuration files and database connections");
 		
 		// info command
 		// plugin info
@@ -145,8 +143,6 @@ public class SuitcaseMessage {
 		Suitcase.messagesKeys.set("info.description", "&5Description&4: &6{description}");
 		Suitcase.messagesKeys.set("info.authors", "&5Authors&4: &6{authors}");
 		Suitcase.messagesKeys.set("info.website", "&5Website&4: &6{website}");
-		// info errors
-		Suitcase.messagesKeys.set("info.error.invalid", "&4Too many arguments!");
 		
 		// rate command
 		// one's own rating
@@ -159,33 +155,25 @@ public class SuitcaseMessage {
 		Suitcase.messagesKeys.set("rate.view.others.warnings", "&5Warnings&4: &6{warnings}");
 		// rate players
 		Suitcase.messagesKeys.set("rate.set", "&2You have successfully rated {player}!");
-		// rating errors
-		Suitcase.messagesKeys.set("rate.error.rating", "&4Your entered rating is invalid!");
-		Suitcase.messagesKeys.set("rate.error.invalid", "&4Invalid amount of arguments!");
-		Suitcase.messagesKeys.set("rate.error.disabled", "&4Rating is disabled.");
-		Suitcase.messagesKeys.set("rate.error.unrated", "&4You haven't been rated by this player yet.");
-		Suitcase.messagesKeys.set("rate.error.player", "&4Can't find selected player!");
 		
 		// warn command
-		// warn someone
 		Suitcase.messagesKeys.set("warn.set", "&2You have successfully warned {player}!");
-		// warning errors
-		Suitcase.messagesKeys.set("warn.error.disabled", "&4Warning is disabled.");
-		Suitcase.messagesKeys.set("warn.error.player", "&4Can't find selected player!");
 		
 		// reload command
 		Suitcase.messagesKeys.set("reload.done", "&2Suitcase reloaded.");
-		Suitcase.messagesKeys.set("reload.error.invalid", "&4Too many arguments!");
 		
 		// system messages
-		// command errors in general
+		// command errors
 		Suitcase.messagesKeys.set("system.command.deny", "&4You don't have permission to that command!");
 		Suitcase.messagesKeys.set("system.command.unknown", "&4Can't find that command! Try /suitcase help");
 		Suitcase.messagesKeys.set("system.command.console", "&4This command can't be run by console!");
-		// internal errors
-		Suitcase.messagesKeys.set("system.log.empty", "&4Can't fetch data from file or database!");
-		
-		// TODO: move error messages to one single section
+		Suitcase.messagesKeys.set("system.command.disabled", "&4This command is disabled.");
+		Suitcase.messagesKeys.set("system.command.too-many-arguments", "&4Too many arguments!");
+		Suitcase.messagesKeys.set("system.command.invalid-arguments", "&4Invalid amount of arguments!");
+		Suitcase.messagesKeys.set("system.command.invalid-playername", "&4Can't find selected player!");
+		Suitcase.messagesKeys.set("system.command.invalid-help", "&4There is no help page for that command.");
+		Suitcase.messagesKeys.set("system.command.invalid-rating", "&4Your entered rating is invalid!");
+		Suitcase.messagesKeys.set("system.command.unrated", "&4You haven't been rated by this player yet.");
 		
 		// TODO: custom events
 		/*

@@ -72,7 +72,7 @@ public class SuitcaseCommand implements CommandExecutor {
 					}
 					else {
 						// can't find sub command
-						lines.add(Suitcase.messagesKeys.getString("help.error.invalid"));
+						lines.add(Suitcase.messagesKeys.getString("system.command.invalid-help"));
 						lines.add(full);
 						invalid = true;
 					}
@@ -110,7 +110,7 @@ public class SuitcaseCommand implements CommandExecutor {
 			if (Suitcase.utPermission.hasPermission(sender, "suitcase.info")) {
 				if (arguments.size() > 1) {
 					// too many arguments
-					lines.add(Suitcase.messagesKeys.getString("info.error.invalid"));
+					lines.add(Suitcase.messagesKeys.getString("system.command.too-many-arguments"));
 					lines.add(full);
 					invalid = true;
 				}
@@ -169,7 +169,7 @@ public class SuitcaseCommand implements CommandExecutor {
 								}
 								else {
 									// player has to rate targeted player first in order to view his rating
-									lines.add(Suitcase.messagesKeys.getString("rate.error.unrated"));
+									lines.add(Suitcase.messagesKeys.getString("system.command.unrated"));
 									lines.add(full);
 									denied = true;
 								}
@@ -185,7 +185,7 @@ public class SuitcaseCommand implements CommandExecutor {
 						}
 						else {
 							// player doesn't exist
-							lines.add(Suitcase.messagesKeys.getString("rate.error.player"));
+							lines.add(Suitcase.messagesKeys.getString("system.command.invalid-playername"));
 							lines.add(full);
 							invalid = true;
 						}
@@ -207,28 +207,28 @@ public class SuitcaseCommand implements CommandExecutor {
 							}
 							else {
 								// rating not found
-								lines.add(Suitcase.messagesKeys.getString("rate.error.rating"));
+								lines.add(Suitcase.messagesKeys.getString("system.command.invalid-rating"));
 								lines.add(full);
 								invalid = true;
 							}
 						}
 						else {
 							// player doesn't exist
-							lines.add(Suitcase.messagesKeys.getString("rate.error.player"));
+							lines.add(Suitcase.messagesKeys.getString("system.command.invalid-playername"));
 							lines.add(full);
 							invalid = true;
 						}
 					}
 					else {
 						// too many arguments
-						lines.add(Suitcase.messagesKeys.getString("rate.error.invalid"));
+						lines.add(Suitcase.messagesKeys.getString("system.command.too-many-arguments"));
 						lines.add(full);
 						invalid = true;
 					}
 				}
 				else {
 					// rating is not enabled
-					lines.add(Suitcase.messagesKeys.getString("rate.error.disabled"));
+					lines.add(Suitcase.messagesKeys.getString("system.command.disabled"));
 					lines.add(full);
 					denied = true;
 				}
@@ -262,7 +262,7 @@ public class SuitcaseCommand implements CommandExecutor {
 							}
 							else {
 								// player doesn't exist
-								lines.add(Suitcase.messagesKeys.getString("rate.error.player"));
+								lines.add(Suitcase.messagesKeys.getString("system.command.invalid-playername"));
 								lines.add(full);
 								invalid = true;
 							}
@@ -276,14 +276,14 @@ public class SuitcaseCommand implements CommandExecutor {
 					}
 					else {
 						// invalid amount of arguments
-						lines.add(Suitcase.messagesKeys.getString("rate.error.invalid"));
+						lines.add(Suitcase.messagesKeys.getString("system.command.invalid-arguments"));
 						lines.add(full);
 						invalid = true;
 					}
 				}
 				else {
 					// rating is not enabled
-					lines.add(Suitcase.messagesKeys.getString("rate.error.disabled"));
+					lines.add(Suitcase.messagesKeys.getString("system.command.disabled"));
 					lines.add(full);
 					denied = true;
 				}
@@ -308,7 +308,7 @@ public class SuitcaseCommand implements CommandExecutor {
 			if (Suitcase.utPermission.hasPermission(sender, "suitcase.reload")) {
 				if (arguments.size() > 1) {
 					// too many arguments
-					lines.add(Suitcase.messagesKeys.getString("reload.error.invalid"));
+					lines.add(Suitcase.messagesKeys.getString("system.command.too-many-arguments"));
 					lines.add(full);
 					invalid = true;
 				}
