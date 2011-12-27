@@ -160,7 +160,7 @@ public class SuitcaseConsole {
 			// argument format 0 -> 'filename.ext'
 		case FILE_NOT_FOUND:
 			if (!checkArguments(action, arguments, 1)) break;
-			mcLogger.warning(tag + "'" + arguments.get(0) + "' was not found. Attempting to create default...");
+			mcLogger.warning(tag + "File '" + arguments.get(0) + "' was not found. Attempting to create default...");
 			break;
 			// argument format ^
 			// argument format 1 -> 'error type'
@@ -178,7 +178,7 @@ public class SuitcaseConsole {
 			// argument format ^
 		case TYPE_NOT_HANDLED:
 			if (!checkArguments(action, arguments, 2)) break;
-			mcLogger.severe(tag + "Type " + arguments.get(0) + " was not handled! Arguments: " + Suitcase.cfMessage.getString((ArrayList<String>) arguments.subList(1, arguments.size() - 1)) + "");
+			mcLogger.severe(tag + "Type " + action.toString() + " was not handled! Arguments: '" + Suitcase.cfMessage.getString(arguments) + "'");
 			break;
 			
 			

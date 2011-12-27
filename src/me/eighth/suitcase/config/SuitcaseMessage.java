@@ -33,12 +33,16 @@ public class SuitcaseMessage {
 				// add property if missing
 				for (String path : Suitcase.messagesKeys.getKeys(true)) {
 					if (!msConfig.contains(path)) {
+						// set missing property and log to console
 						msConfig.set(path, Suitcase.messagesKeys.get(path));
+						Suitcase.utConsole.sendAction(actionType.PROPERTY_MISSING, (ArrayList<String>) Arrays.asList(path, "messages.yml", Suitcase.messagesKeys.getString(path)));
 					}
 					// compare object types
 					// TODO: check if this is working
 					else if (msConfig.get(path).getClass() != (Suitcase.messagesKeys.get(path).getClass())) {
+						// reset value and log to console
 						msConfig.set(path, Suitcase.messagesKeys.get(path));
+						Suitcase.utConsole.sendAction(actionType.PROPERTY_BAD_TYPE, (ArrayList<String>) Arrays.asList(path, "messages.yml", msConfig.get(path).getClass().toString(), Suitcase.messagesKeys.get(path).getClass().toString()));
 					}
 				}
 				// save and use verified configKeys
@@ -131,7 +135,7 @@ public class SuitcaseMessage {
 		Suitcase.messagesKeys.set("help.command.reload.usage", "&5Usage&c: &1/suitcase &9reload");
 		Suitcase.messagesKeys.set("help.command.reload.aliases", "&5Aliases&c: &9none");
 		Suitcase.messagesKeys.set("help.command.reload.argument.reload", "&9reload &7.. &c>> &6Reload all configuration files and database connections");
-		// error messages
+		// help errors
 		Suitcase.messagesKeys.set("help.error.invalid", "&4There is no help page for that command.");
 		
 		// info command
@@ -141,6 +145,8 @@ public class SuitcaseMessage {
 		Suitcase.messagesKeys.set("info.description", "&5Description&4: &6{description}");
 		Suitcase.messagesKeys.set("info.authors", "&5Authors&4: &6{authors}");
 		Suitcase.messagesKeys.set("info.website", "&5Website&4: &6{website}");
+		// info errors
+		Suitcase.messagesKeys.set("info.error.invalid", "&4Too many arguments!");
 		
 		// rate command
 		// one's own rating
@@ -154,7 +160,8 @@ public class SuitcaseMessage {
 		// rate players
 		Suitcase.messagesKeys.set("rate.set", "&2You have successfully rated {player}!");
 		// rating errors
-		Suitcase.messagesKeys.set("rate.error.invalid", "&4Your entered rating is invalid!");
+		Suitcase.messagesKeys.set("rate.error.rating", "&4Your entered rating is invalid!");
+		Suitcase.messagesKeys.set("rate.error.invalid", "&4Invalid amount of arguments!");
 		Suitcase.messagesKeys.set("rate.error.disabled", "&4Rating is disabled.");
 		Suitcase.messagesKeys.set("rate.error.unrated", "&4You haven't been rated by this player yet.");
 		Suitcase.messagesKeys.set("rate.error.player", "&4Can't find selected player!");
@@ -166,6 +173,9 @@ public class SuitcaseMessage {
 		Suitcase.messagesKeys.set("warn.error.disabled", "&4Warning is disabled.");
 		Suitcase.messagesKeys.set("warn.error.player", "&4Can't find selected player!");
 		
+		// reload command
+		Suitcase.messagesKeys.set("reload.done", "&2Suitcase reloaded.");
+		Suitcase.messagesKeys.set("reload.error.invalid", "&4Too many arguments!");
 		
 		// system messages
 		// command errors in general
@@ -174,6 +184,9 @@ public class SuitcaseMessage {
 		Suitcase.messagesKeys.set("system.command.console", "&4This command can't be run by console!");
 		// internal errors
 		Suitcase.messagesKeys.set("system.log.empty", "&4Can't fetch data from file or database!");
+		
+		// TODO: move error messages to one single section
+		
 		// TODO: custom events
 		/*
 		Suitcase.messagesKeys.set("event.", "");

@@ -30,12 +30,16 @@ public class SuitcaseConfig {
 			// add property if missing
 			for (String path : Suitcase.configKeys.getKeys(true)) {
 				if (!cfConfig.contains(path)) {
+					// set missing property and log to console
 					cfConfig.set(path, Suitcase.configKeys.get(path));
+					Suitcase.utConsole.sendAction(actionType.PROPERTY_MISSING, (ArrayList<String>) Arrays.asList(path, "config.yml", Suitcase.configKeys.getString(path)));
 				}
 				// compare object types
 				// TODO: check if this is working
-				else if (cfConfig.get(path).getClass() != (Suitcase.configKeys.get(path).getClass())) {
+				else if (cfConfig.get(path).getClass() != Suitcase.configKeys.get(path).getClass()) {
+					// reset value and log to console
 					cfConfig.set(path, Suitcase.configKeys.get(path));
+					Suitcase.utConsole.sendAction(actionType.PROPERTY_BAD_TYPE, (ArrayList<String>) Arrays.asList(path, "config.yml", cfConfig.get(path).getClass().toString(), Suitcase.configKeys.get(path).getClass().toString()));
 				}
 			}
 			// save and use verified configKeys
