@@ -9,6 +9,7 @@ import me.eighth.suitcase.config.SuitcaseConfig;
 import me.eighth.suitcase.config.SuitcaseEvent;
 import me.eighth.suitcase.config.SuitcaseMessage;
 import me.eighth.suitcase.event.SuitcaseCommand;
+import me.eighth.suitcase.log.SuitcaseConnector;
 import me.eighth.suitcase.log.SuitcaseDatabase;
 import me.eighth.suitcase.log.SuitcaseFile;
 import me.eighth.suitcase.util.SuitcaseConsole;
@@ -33,6 +34,7 @@ public class Suitcase extends JavaPlugin {
 	// log
 	public static SuitcaseDatabase lgDatabase = new SuitcaseDatabase();
 	public static SuitcaseFile lgFile = new SuitcaseFile();
+	public static SuitcaseConnector lgConnector = new SuitcaseConnector();
 	
 	// util
 	public static SuitcaseConsole utConsole = new SuitcaseConsole();

@@ -142,8 +142,8 @@ public class SuitcaseCommand implements CommandExecutor {
 						// show rating and warnings
 						if (sender instanceof Player) {
 							lines.add(Suitcase.messagesKeys.getString("rate.view.self.header"));
-							lines.add(Suitcase.messagesKeys.getString("rate.view.self.rating").replaceFirst("{rating}", "" /* Suitcase.lgConnector.getRating((Player) sender */));
-							lines.add(Suitcase.messagesKeys.getString("rate.view.self.warnings").replaceFirst("{warnings}", "" /* Suitcase.lgConnector.getWarnings((Player) sender */));
+							lines.add(Suitcase.messagesKeys.getString("rate.view.self.rating").replaceFirst("{rating}", Suitcase.lgConnector.getRating(sender.getName())));
+							lines.add(Suitcase.messagesKeys.getString("rate.view.self.warnings").replaceFirst("{warnings}", Suitcase.lgConnector.getWarnings(sender.getName())));
 						}
 						else {
 							// console has no rating
@@ -161,11 +161,11 @@ public class SuitcaseCommand implements CommandExecutor {
 						if (target != null) {
 							// separate executing player from console
 							if (sender instanceof Player) {
-								if (target.getName() == "remove this and use ->" /* Suitcase.lgConnector.hasRated(target, (Player) sender) */) {
-									// send player's rating and warnings and check whether he has rated the player, who executed the command, or not
-									lines.add(Suitcase.messagesKeys.getString("rate.view.others.header").replaceFirst("{player}", target.getDisplayName()));
-									lines.add(Suitcase.messagesKeys.getString("rate.view.others.rating").replaceFirst("{rating}", "" /* Suitcase.lgConnector.getRating(target) */));
-									lines.add(Suitcase.messagesKeys.getString("rate.view.others.warnings").replaceFirst("{warnings}", "" /* Suitcase.lgConnector.getWarnings(target) */));
+								if (Suitcase.lgConnector.hasRated(target.getName(), sender.getName())) {
+									// send target's rating and warnings and check whether he has rated the player, who executed the command, or not
+									lines.add(Suitcase.messagesKeys.getString("rate.view.others.header").replaceFirst("{player}", target.getName()));
+									lines.add(Suitcase.messagesKeys.getString("rate.view.others.rating").replaceFirst("{rating}", Suitcase.lgConnector.getRating(target.getName())));
+									lines.add(Suitcase.messagesKeys.getString("rate.view.others.warnings").replaceFirst("{warnings}", Suitcase.lgConnector.getWarnings(target.getName())));
 								}
 								else {
 									// player has to rate targeted player first in order to view his rating
@@ -177,9 +177,9 @@ public class SuitcaseCommand implements CommandExecutor {
 							}
 							else {
 								// send player's rating and warnings
-								lines.add(Suitcase.messagesKeys.getString("rate.view.others.header").replaceFirst("{player}", target.getDisplayName()));
-								lines.add(Suitcase.messagesKeys.getString("rate.view.others.rating").replaceFirst("{rating}", "" /* Suitcase.lgConnector.getRating(target) */));
-								lines.add(Suitcase.messagesKeys.getString("rate.view.others.warnings").replaceFirst("{warnings}", "" /* Suitcase.lgConnector.getWarnings(target) */));
+								lines.add(Suitcase.messagesKeys.getString("rate.view.others.header").replaceFirst("{player}", target.getName()));
+								lines.add(Suitcase.messagesKeys.getString("rate.view.others.rating").replaceFirst("{rating}", Suitcase.lgConnector.getRating(target.getName())));
+								lines.add(Suitcase.messagesKeys.getString("rate.view.others.warnings").replaceFirst("{warnings}", Suitcase.lgConnector.getWarnings(target.getName())));
 							}
 							
 						}
@@ -198,12 +198,12 @@ public class SuitcaseCommand implements CommandExecutor {
 						// check if player exists
 						if (target != null) {
 							if (Suitcase.commandAliases.get("rate.positive").contains(arguments.get(2))) {
-								// Suitcase.lgConnector.ratePlayer(target, true); // true -> positive or good / false -> negative or bad
-								lines.add(Suitcase.messagesKeys.getString("rate.set").replaceFirst("{player}", target.getDisplayName()));
+								Suitcase.lgConnector.setRating(sender.getName(), target.getName(), true); // true -> positive or good / false -> negative or bad
+								lines.add(Suitcase.messagesKeys.getString("rate.set").replaceFirst("{player}", target.getName()));
 							}
 							else if (Suitcase.commandAliases.get("rate.negative").contains(arguments.get(2))) {
-								// Suitcase.lgConnector.ratePlayer(target, false);
-								lines.add(Suitcase.messagesKeys.getString("rate.set").replaceFirst("{player}", target.getDisplayName()));
+								Suitcase.lgConnector.setRating(sender.getName(), target.getName(), false);
+								lines.add(Suitcase.messagesKeys.getString("rate.set").replaceFirst("{player}", target.getName()));
 							}
 							else {
 								// rating not found
@@ -254,10 +254,10 @@ public class SuitcaseCommand implements CommandExecutor {
 							// check if player exists
 							if (target != null) {
 								if (Suitcase.commandAliases.get("rate.positive").contains(arguments.get(0))) {
-									// Suitcase.lgConnector.ratePlayer(target, true);
+									Suitcase.lgConnector.setRating(sender.getName(), target.getName(), true);
 								}
 								else {
-									// Suitcase.lgConnector.ratePlayer(target, false);
+									Suitcase.lgConnector.setRating(sender.getName(), target.getName(), false);
 								}
 							}
 							else {
