@@ -35,7 +35,7 @@ public class SuitcaseConfig {
 					Suitcase.utConsole.sendAction(actionType.PROPERTY_MISSING, (ArrayList<String>) Arrays.asList(path, "config.yml", Suitcase.configKeys.getString(path)));
 				}
 				// compare object types
-				// TODO: check if this is working
+				// TODO: check if this is working, should always return true. Object == Object
 				else if (cfConfig.get(path).getClass() != Suitcase.configKeys.get(path).getClass()) {
 					// reset value and log to console
 					cfConfig.set(path, Suitcase.configKeys.get(path));

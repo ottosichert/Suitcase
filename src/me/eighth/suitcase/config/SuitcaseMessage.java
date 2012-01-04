@@ -169,7 +169,7 @@ public class SuitcaseMessage {
 		Suitcase.messagesKeys.set("system.command.console", "&4This command can't be run by console!");
 		Suitcase.messagesKeys.set("system.command.disabled", "&4This command is disabled.");
 		Suitcase.messagesKeys.set("system.command.too-many-arguments", "&4Too many arguments!");
-		Suitcase.messagesKeys.set("system.command.invalid-arguments", "&4Invalid amount of arguments!");
+		Suitcase.messagesKeys.set("system.command.invalid-arguments", "&4Invalid arguments!");
 		Suitcase.messagesKeys.set("system.command.invalid-playername", "&4Can't find selected player!");
 		Suitcase.messagesKeys.set("system.command.invalid-help", "&4That command doesn't exist.");
 		Suitcase.messagesKeys.set("system.command.invalid-rating", "&4Your entered rating is invalid!");

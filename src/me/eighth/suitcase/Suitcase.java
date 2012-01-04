@@ -18,27 +18,27 @@ import me.eighth.suitcase.util.SuitcasePermission;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Suitcase extends JavaPlugin {
-
+	
+	// public static final variables
 	// config
-	public static SuitcaseConfig cfConfig = new SuitcaseConfig();
-	public static SuitcaseEvent cfEvent = new SuitcaseEvent();
-	public static SuitcaseMessage cfMessage = new SuitcaseMessage();
+	public static final SuitcaseConfig cfConfig = new SuitcaseConfig();
+	public static final SuitcaseEvent cfEvent = new SuitcaseEvent();
+	public static final SuitcaseMessage cfMessage = new SuitcaseMessage();
 	
 	// event
-	public static SuitcaseCommand evCommand = new SuitcaseCommand();
+	public static final SuitcaseCommand evCommand = new SuitcaseCommand();
 	
 	// log
-	public static SuitcaseDatabase lgDatabase = new SuitcaseDatabase();
-	public static SuitcaseFile lgFile = new SuitcaseFile();
-	public static SuitcaseConnector lgConnector = new SuitcaseConnector();
+	public static final SuitcaseDatabase lgDatabase = new SuitcaseDatabase();
+	public static final SuitcaseFile lgFile = new SuitcaseFile();
+	public static final SuitcaseConnector lgConnector = new SuitcaseConnector();
 	
 	// util
-	public static SuitcaseConsole utConsole = new SuitcaseConsole();
-	public static SuitcasePermission utPermission = new SuitcasePermission();
+	public static final SuitcaseConsole utConsole = new SuitcaseConsole();
+	public static final SuitcasePermission utPermission = new SuitcasePermission();
 	
 	// define other variables
 	public static Suitcase plugin;
@@ -63,13 +63,11 @@ public class Suitcase extends JavaPlugin {
 			disable();
 			return;
 		}
-		/*
 		else if (!lgConnector.freeLog()) {
 			Suitcase.utConsole.sendAction(actionType.PLUGIN_DISABLE_ERROR, (ArrayList<String>) Arrays.asList("freeConnectorError"));
 			disable();
 			return;
 		}
-		*/
 		else {		
 			// disabling finished, send to log
 			utConsole.sendAction(actionType.PLUGIN_DISABLE_FINISH);
@@ -103,13 +101,11 @@ public class Suitcase extends JavaPlugin {
 			disable();
 			return;
 		}
-		/*
 		else if (!lgConnector.initLog()) {
 			Suitcase.utConsole.sendAction(actionType.PLUGIN_ENABLE_ERROR, (ArrayList<String>) Arrays.asList("initConnectorError"));
 			disable();
 			return;
 		}
-		*/
 		else {		
 			// enabling finished, send to log
 			utConsole.sendAction(actionType.PLUGIN_ENABLE_FINISH);
@@ -133,13 +129,11 @@ public class Suitcase extends JavaPlugin {
 			disable();
 			return;
 		}
-		/*
 		else if (!lgConnector.reloadLog()) {
 			Suitcase.utConsole.sendAction(actionType.PLUGIN_RELOAD_ERROR, (ArrayList<String>) Arrays.asList("reloadConnectorError"));
 			disable();
 			return;
 		}
-		*/
 		else {		
 			// reloading finished, send to log
 			utConsole.sendAction(actionType.PLUGIN_RELOAD_FINISH);
@@ -148,7 +142,6 @@ public class Suitcase extends JavaPlugin {
 	
 	// disable plugin due to internal error
 	public static void disable() {
-		PluginManager pm = plugin.getServer().getPluginManager();
-		pm.disablePlugin(plugin);
+		plugin.getServer().getPluginManager().disablePlugin(plugin);
 	}
 }

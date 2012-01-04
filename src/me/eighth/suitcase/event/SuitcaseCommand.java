@@ -49,7 +49,7 @@ public class SuitcaseCommand implements CommandExecutor {
 			if (Suitcase.utPermission.hasPermission(sender, "suitcase.help")) {
 				
 				// check command argument
-				if (args.length > 1 && commands.contains(arguments.get(1))) {
+				if (args.length > 1) {
 					
 					// send help for that command
 					if (commands.contains(arguments.get(1))) {
@@ -173,7 +173,6 @@ public class SuitcaseCommand implements CommandExecutor {
 									lines.add(full);
 									denied = true;
 								}
-								 
 							}
 							else {
 								// send player's rating and warnings
@@ -181,7 +180,6 @@ public class SuitcaseCommand implements CommandExecutor {
 								lines.add(Suitcase.messagesKeys.getString("rate.view.others.rating").replaceFirst("{rating}", Suitcase.lgConnector.getRating(target.getName())));
 								lines.add(Suitcase.messagesKeys.getString("rate.view.others.warnings").replaceFirst("{warnings}", Suitcase.lgConnector.getWarnings(target.getName())));
 							}
-							
 						}
 						else {
 							// player doesn't exist
@@ -256,7 +254,7 @@ public class SuitcaseCommand implements CommandExecutor {
 								if (Suitcase.commandAliases.get("rate.positive").contains(arguments.get(0))) {
 									Suitcase.lgConnector.setRating(sender.getName(), target.getName(), true);
 								}
-								else {
+								else { // rate.negative
 									Suitcase.lgConnector.setRating(sender.getName(), target.getName(), false);
 								}
 							}
@@ -295,13 +293,51 @@ public class SuitcaseCommand implements CommandExecutor {
 				denied = true;
 			}
 		}
-		// /suitcase warn [player]
-		else if (Suitcase.commandAliases.get("warn").contains(arguments.get(0))) {
-			
-		}
-		// /suitcase forgive [player]
-		else if (Suitcase.commandAliases.get("warn.forgive").contains(arguments.get(0))) {
-			
+		// /suitcase warn/forgive [player]
+		else if (Suitcase.commandAliases.get("warn").contains(arguments.get(0)) || Suitcase.commandAliases.get("warn.forgive").contains(arguments.get(0))) {
+			if (Suitcase.utPermission.hasPermission(sender, "suitcase.warn")) {
+				// check if warning is enabled
+				if (Suitcase.configKeys.getBoolean("mechanics.warning.enable")) {
+					// two arguments: warn/forgive and a player's name
+					if (arguments.size() == 2) {
+						// get player from name
+						Player target = Suitcase.plugin.getServer().getPlayer(arguments.get(1));
+						// check if targeted player exists
+						if (target != null) {
+							if (Suitcase.commandAliases.get("warn").contains(arguments.get(0))) {
+								Suitcase.lgConnector.setWarnings(sender.getName(), target.getName(), true);
+							}
+							else { // warn.forgive
+								Suitcase.lgConnector.setWarnings(sender.getName(), target.getName(), false);
+							}
+						}
+						else {
+							// player doesn't exist
+							lines.add(Suitcase.messagesKeys.getString("system.command.invalid-playername"));
+							lines.add(full);
+							invalid = true;
+						}
+					}
+					else {
+						// invalid amount of arguments
+						lines.add(Suitcase.messagesKeys.getString("system.command.invalid-arguments"));
+						lines.add(full);
+						invalid = true;
+					}
+				}
+				else {
+					// warning is not enabled
+					lines.add(Suitcase.messagesKeys.getString("system.command.disabled"));
+					lines.add(full);
+					denied = true;
+				}
+			}
+			else {
+				// player isn't allowed to warn
+				lines.add(Suitcase.messagesKeys.getString("system.command.deny"));
+				lines.add(full);
+				denied = true;
+			}
 		}
 		// /suitcase reload
 		else if (Suitcase.commandAliases.get("reload").contains(arguments.get(0))) {
@@ -344,8 +380,8 @@ public class SuitcaseCommand implements CommandExecutor {
 		else if (invalid) {
 			Suitcase.utConsole.sendAction(actionType.PLAYER_COMMAND_INVALID, (ArrayList<String>) Arrays.asList(sender.getName(), full));
 		}
-		else {
-			Suitcase.utConsole.sendAction(actionType.PLAYER_COMMAND_EXECUTE, (ArrayList<String>) Arrays.asList(sender.getName(), full));
+		else { // no error occured
+			Suitcase.utConsole.sendAction(actionType.PLAYER_COMMAND_EXECUTED, (ArrayList<String>) Arrays.asList(sender.getName(), full));
 		}
 		
 		// always return true, because we handle wrong commands/arguments

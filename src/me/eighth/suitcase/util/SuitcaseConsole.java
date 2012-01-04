@@ -30,7 +30,7 @@ public class SuitcaseConsole {
 		PLUGIN_DISABLE_ERROR,
 		
 		// player command
-		PLAYER_COMMAND_EXECUTE,
+		PLAYER_COMMAND_EXECUTED,
 		PLAYER_COMMAND_DENY,
 		PLAYER_COMMAND_INVALID,
 		PLAYER_COMMAND_ERROR,
@@ -97,7 +97,7 @@ public class SuitcaseConsole {
 			// no arguments
 		case PLUGIN_RELOAD_FINISH:
 			if (!checkArguments(action, arguments, 0)) break;
-			mcLogger.info(tag + "Successfully reloaded.");
+			mcLogger.info(tag + "Suitcase successfully reloaded.");
 			break;
 				
 			
@@ -120,7 +120,7 @@ public class SuitcaseConsole {
 
 			// argument format 0 -> 'Player'
 			// argument format 1 -> '/suitcase help rate'
-		case PLAYER_COMMAND_EXECUTE:
+		case PLAYER_COMMAND_EXECUTED:
 			if (!checkArguments(action, arguments, 2)) break;
 			mcLogger.info(tag + "[PLAYER_COMMAND] " + arguments.get(0) + " used command '" + arguments.get(1) + "'.");
 			break;

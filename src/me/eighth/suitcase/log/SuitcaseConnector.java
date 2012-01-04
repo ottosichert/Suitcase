@@ -16,7 +16,7 @@ public class SuitcaseConnector {
 		}
 	}
 	
-	public void setRating(String sender, String target, boolean rating) {
+	public void setRating(String sender, String target, boolean positive) {
 		if (Suitcase.configKeys.getBoolean("log.database.enable")) {
 			
 		}
@@ -52,7 +52,7 @@ public class SuitcaseConnector {
 		}
 	}
 	
-	public void setWarnings(String sender, String target, boolean warning) {
+	public void setWarnings(String sender, String target, boolean warn) {
 		if (Suitcase.configKeys.getBoolean("log.database.enable")) {
 			
 		}
@@ -63,5 +63,23 @@ public class SuitcaseConnector {
 			
 		}
 	}
-	
+
+	public boolean initLog() {
+		// TODO: check database/file availability
+		return true;
+	}
+
+	public boolean freeLog() {
+		// TODO: dispose log cache and close database/file connection
+		return true;
+	}
+
+	public boolean reloadLog() {
+		if (freeLog() && initLog()) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }
