@@ -150,7 +150,7 @@ public class SuitcaseConsole {
 			// argument format 2 -> 'default value'
 		case PROPERTY_MISSING:
 			if (!checkArguments(action, arguments, 3)) break;
-			mcLogger.warning(plugin.tag + "Missing property '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Set to default: " + arguments.get(2));
+			mcLogger.warning(plugin.tag + "Missing property '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Set to default: '" + arguments.get(2) + "'.");
 			break;
 			// argument format ^
 			// argument format 2 -> 'type'

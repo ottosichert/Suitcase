@@ -28,8 +28,9 @@ public class SuitcaseFile {
 		
 		if (file != null) {
 			fileConfig = YamlConfiguration.loadConfiguration(file);
+			boolean empty = false;
 			if (fileConfig.getKeys(true).size() == 0) {
-				
+				empty = true;
 			}
 			for (int i = 0; i < defaults.size(); i++) {
 				String path = defaults.keySet().toArray()[i].toString();
@@ -37,7 +38,7 @@ public class SuitcaseFile {
 				if (!fileConfig.contains(path)) {
 					// set missing property and log to console if file wasn't empty
 					fileConfig.set(path, defaults.get(path));
-					if (i >= fileConfig.getKeys(true).size()) {
+					if (!empty) {
 						plugin.console.sendAction(actionType.PROPERTY_MISSING, new ArrayList<String>(Arrays.asList(path, filename, defaults.get(path).toString())));
 					}
 				}
