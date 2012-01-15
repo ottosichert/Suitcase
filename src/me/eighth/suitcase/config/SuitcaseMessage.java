@@ -35,7 +35,7 @@ public class SuitcaseMessage {
 		messagesDefault.put("help.optional", "&6All &3arguments &6are optional and there are several &5aliases&6.");
 		// help-command help
 		messagesDefault.put("help.command.help.header", " &7----- &2Help command &7-----");
-		messagesDefault.put("help.command.help.usage", "&5Usage &7>> &3/suitcase help");
+		messagesDefault.put("help.command.help.usage", "&5Usage &7>> &3{command}");
 		messagesDefault.put("help.command.help.aliases", "&5Aliases &7>> &3h&7, &3?");
 		messagesDefault.put("help.command.help.argument.help", "&3help &7>> &6Show a list of all accessible commands.");
 		// info help
@@ -49,7 +49,7 @@ public class SuitcaseMessage {
 		messagesDefault.put("help.command.rate.aliases", "&5Aliases &7>> &3r&7, &3vote&7, &3v");
 		messagesDefault.put("help.command.rate.argument.rate", "&3rate &7>> &6Rate players or view own rating if no name is given.");
 		messagesDefault.put("help.command.rate.argument.name", "&3name &7>> &6Select player.");
-		messagesDefault.put("help.command.rate.argument.rating", "&3rating &7>> &6Give a good &2+ or bad &4- &6rating.");
+		messagesDefault.put("help.command.rate.argument.rating", "&3rating &7>> &6Give a good &2+ &6or bad &4- &6rating.");
 		// warn help
 		messagesDefault.put("help.command.warn.header", " &7----- &2Warn command &7-----");
 		messagesDefault.put("help.command.warn.usage", "&5Usage &7>> &3/suitcase warn name");
@@ -141,7 +141,9 @@ public class SuitcaseMessage {
 	public void sendMessage(CommandSender sender, ArrayList<String> lines) {
 		// parse colors and send message line by line
 		for (String line : lines) {
-			sender.sendMessage(parseColor(line));
+			for (String split : line.split("\\n")) {
+				sender.sendMessage(parseColor(split));
+			}
 		}
 	}
 
