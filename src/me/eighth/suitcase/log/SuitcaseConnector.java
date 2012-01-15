@@ -4,11 +4,17 @@ import me.eighth.suitcase.Suitcase;
 
 public class SuitcaseConnector {
 
+	private Suitcase plugin;
+	
+	public SuitcaseConnector(Suitcase plugin) {
+		this.plugin = plugin;
+	}
+
 	public String getRating(String target) {
-		if (Suitcase.configKeys.getBoolean("log.database.enable")) {
+		if (plugin.config.config.getBoolean("log.database.enable")) {
 			return "db";
 		}
-		else if (Suitcase.configKeys.getBoolean("log.file.enable")) {
+		else if (plugin.config.config.getBoolean("log.file.enable")) {
 			return "file";
 		}
 		else {
@@ -17,10 +23,10 @@ public class SuitcaseConnector {
 	}
 	
 	public void setRating(String sender, String target, boolean positive) {
-		if (Suitcase.configKeys.getBoolean("log.database.enable")) {
+		if (plugin.config.config.getBoolean("log.database.enable")) {
 			
 		}
-		else if (Suitcase.configKeys.getBoolean("log.file.enable")) {
+		else if (plugin.config.config.getBoolean("log.file.enable")) {
 			
 		}
 		else {
@@ -29,10 +35,10 @@ public class SuitcaseConnector {
 	}
 	
 	public boolean hasRated(String sender, String target) {
-		if (Suitcase.configKeys.getBoolean("log.database.enable")) {
+		if (plugin.config.config.getBoolean("log.database.enable")) {
 			return true;
 		}
-		else if (Suitcase.configKeys.getBoolean("log.file.enable")) {
+		else if (plugin.config.config.getBoolean("log.file.enable")) {
 			return true;
 		}
 		else {
@@ -41,10 +47,10 @@ public class SuitcaseConnector {
 	}
 
 	public String getWarnings(String target) {
-		if (Suitcase.configKeys.getBoolean("log.database.enable")) {
+		if (plugin.config.config.getBoolean("log.database.enable")) {
 			return "db";
 		}
-		else if (Suitcase.configKeys.getBoolean("log.file.enable")) {
+		else if (plugin.config.config.getBoolean("log.file.enable")) {
 			return "file";
 		}
 		else {
@@ -53,10 +59,10 @@ public class SuitcaseConnector {
 	}
 	
 	public void setWarnings(String sender, String target, boolean warn) {
-		if (Suitcase.configKeys.getBoolean("log.database.enable")) {
+		if (plugin.config.config.getBoolean("log.database.enable")) {
 			
 		}
-		else if (Suitcase.configKeys.getBoolean("log.file.enable")) {
+		else if (plugin.config.config.getBoolean("log.file.enable")) {
 			
 		}
 		else {

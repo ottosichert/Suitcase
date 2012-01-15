@@ -8,9 +8,8 @@ import me.eighth.suitcase.Suitcase;
 
 public class SuitcaseConsole {
 	
-	// define variables
+	private Suitcase plugin;
 	private final Logger mcLogger = Logger.getLogger("Minecraft");
-	private String tag = "[Suitcase] ";
 	
 	public enum actionType {
 		
@@ -31,7 +30,7 @@ public class SuitcaseConsole {
 		
 		// player command
 		PLAYER_COMMAND_EXECUTED,
-		PLAYER_COMMAND_DENY,
+		PLAYER_COMMAND_DENIED,
 		PLAYER_COMMAND_INVALID,
 		PLAYER_COMMAND_ERROR,
 		
@@ -49,12 +48,16 @@ public class SuitcaseConsole {
 		
 	}
 	
+	public SuitcaseConsole(Suitcase plugin) {
+		this.plugin = plugin;
+	}
+
 	private boolean checkArguments(actionType action, ArrayList<String> arguments, int size) {
 		if (arguments.size() == size) {
 			return true;
 		}
 		else {
-			sendAction(actionType.ARGUMENTS_INVALID, (ArrayList<String>) Arrays.asList(action.toString(), Suitcase.cfMessage.getString(arguments)));
+			sendAction(actionType.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), plugin.message.getString(arguments, true))));
 			return false;
 		}
 	}
@@ -70,51 +73,51 @@ public class SuitcaseConsole {
 			// no arguments
 		case PLUGIN_ENABLE_START:
 			if (!checkArguments(action, arguments, 0)) break;
-			mcLogger.info(tag + Suitcase.pdf.getFullName() + " by " + Suitcase.cfMessage.getString(Suitcase.pdf.getAuthors()) + " enabling...");
+			mcLogger.info(plugin.tag + plugin.name + " " + plugin.getDescription().getFullName() + " by " + plugin.message.getString(plugin.getDescription().getAuthors(), true) + " enabling...");
 			break;
 			// argument format 0 -> 'errorName'
 		case PLUGIN_ENABLE_ERROR:
 			if (!checkArguments(action, arguments, 1)) break;
-			mcLogger.severe(tag + "Error '" + arguments.get(0) + "' occured while enabling plugin!");
+			mcLogger.severe(plugin.tag + "Error '" + arguments.get(0) + "' occured while enabling plugin!");
 			break;
 			// no arguments
 		case PLUGIN_ENABLE_FINISH:
 			if (!checkArguments(action, arguments, 0)) break;
-			mcLogger.info(tag + "Suitcase successfully enabled.");
+			mcLogger.info(plugin.tag + "Suitcase successfully enabled.");
 			break;
 
 			
 			// no arguments
 		case PLUGIN_RELOAD_START:
 			if (!checkArguments(action, arguments, 0)) break;
-			mcLogger.info(tag + "Reloading plugin...");
+			mcLogger.info(plugin.tag + "Reloading plugin...");
 			break;
 			// argument format 0 -> 'errorName'
 		case PLUGIN_RELOAD_ERROR:
 			if (!checkArguments(action, arguments, 1)) break;
-			mcLogger.severe(tag + "Error '" + arguments.get(0) + "' occured while reloading plugin!");
+			mcLogger.severe(plugin.tag + "Error '" + arguments.get(0) + "' occured while reloading plugin!");
 			break;
 			// no arguments
 		case PLUGIN_RELOAD_FINISH:
 			if (!checkArguments(action, arguments, 0)) break;
-			mcLogger.info(tag + "Suitcase successfully reloaded.");
+			mcLogger.info(plugin.tag + "Suitcase successfully reloaded.");
 			break;
 				
 			
 			// no arguments
 		case PLUGIN_DISABLE_START:
 			if (!checkArguments(action, arguments, 0)) break;
-			mcLogger.info(tag + "Disabling plugin...");
+			mcLogger.info(plugin.tag + "Disabling plugin...");
 			break;
 			// argument format 0 -> 'errorName'
 		case PLUGIN_DISABLE_ERROR:
 			if (!checkArguments(action, arguments, 1)) break;
-			mcLogger.severe(tag + "Error '" + arguments.get(0) + "' occured while disabling plugin!");
+			mcLogger.severe(plugin.tag + "Error '" + arguments.get(0) + "' occured while disabling plugin!");
 			break;
 			// no arguments
 		case PLUGIN_DISABLE_FINISH:
 			if (!checkArguments(action, arguments, 0)) break;
-			mcLogger.info(tag + "Suitcase successfully disabled.");
+			mcLogger.info(plugin.tag + "Suitcase successfully disabled.");
 			break;
 			
 
@@ -122,23 +125,23 @@ public class SuitcaseConsole {
 			// argument format 1 -> '/suitcase help rate'
 		case PLAYER_COMMAND_EXECUTED:
 			if (!checkArguments(action, arguments, 2)) break;
-			mcLogger.info(tag + "[PLAYER_COMMAND] " + arguments.get(0) + " used command '" + arguments.get(1) + "'.");
+			mcLogger.info(plugin.tag + "[PLAYER_COMMAND] '" + arguments.get(0) + "' used command '" + arguments.get(1) + "'.");
 			break;
 			// argument format ^
-		case PLAYER_COMMAND_DENY:
+		case PLAYER_COMMAND_DENIED:
 			if (!checkArguments(action, arguments, 2)) break;
-			mcLogger.info(tag + "[PLAYER_COMMAND] " + arguments.get(0) + " was denied command '" + arguments.get(1) + "'.");
+			mcLogger.info(plugin.tag + "[PLAYER_COMMAND] '" + arguments.get(0) + "' was denied command '" + arguments.get(1) + "'.");
 			break;
 			// argument format ^
 		case PLAYER_COMMAND_INVALID:
 			if (!checkArguments(action, arguments, 2)) break;
-			mcLogger.info(tag + "[PLAYER_COMMAND] " + arguments.get(0) + " tried invalid command '" + arguments.get(1) + "'.");
+			mcLogger.info(plugin.tag + "[PLAYER_COMMAND] '" + arguments.get(0) + "' tried invalid command '" + arguments.get(1) + "'.");
 			break;
 			// argument format ^
 			// argument format 2 -> 'errorName'
 		case PLAYER_COMMAND_ERROR:
 			if (!checkArguments(action, arguments, 3)) break;
-			mcLogger.warning(tag + "[PLAYER_COMMAND] " + arguments.get(0) + " caused error '" + arguments.get(2) + "' by executing '" + arguments.get(1) + "'!");
+			mcLogger.warning(plugin.tag + "[PLAYER_COMMAND] '" + arguments.get(0) + "' caused error '" + arguments.get(2) + "' by executing '" + arguments.get(1) + "'!");
 			break;
 			
 			
@@ -147,38 +150,38 @@ public class SuitcaseConsole {
 			// argument format 2 -> 'default value'
 		case PROPERTY_MISSING:
 			if (!checkArguments(action, arguments, 3)) break;
-			mcLogger.warning(tag + "Missing property '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Set to default: " + arguments.get(2));
+			mcLogger.warning(plugin.tag + "Missing property '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Set to default: " + arguments.get(2));
 			break;
 			// argument format ^
 			// argument format 2 -> 'type'
 			// argument format 3 -> 'expected type'
 		case PROPERTY_BAD_TYPE:
 			if (!checkArguments(action, arguments, 4)) break;
-			mcLogger.warning(tag + "Bad type of '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Parsed " + arguments.get(2) + " instead of " + arguments.get(3));
+			mcLogger.warning(plugin.tag + "Bad type of '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Parsed " + arguments.get(2) + " instead of " + arguments.get(3));
 			break;
 			
 			// argument format 0 -> 'filename.ext'
 		case FILE_NOT_FOUND:
 			if (!checkArguments(action, arguments, 1)) break;
-			mcLogger.warning(tag + "File '" + arguments.get(0) + "' was not found. Attempting to create default...");
+			mcLogger.warning(plugin.tag + "File '" + arguments.get(0) + "' was not found. Attempting to create default...");
 			break;
 			// argument format ^
 			// argument format 1 -> 'error type'
 		case FILE_SAVE_ERROR:
 			if (!checkArguments(action, arguments, 2)) break;
-			mcLogger.severe(tag + "Error while saving '" + arguments.get(0) + "'!");
+			mcLogger.severe(plugin.tag + "Error while saving '" + arguments.get(0) + "'!");
 			break;
 			
 			// argument format 0 -> 'ACTION_TYPE' 
 			// argument format 1 -> 'argument1, argument2'
 		case ARGUMENTS_INVALID:
 			if (!checkArguments(action, arguments, 2)) break; // this could cause an infinite loop of errors
-			mcLogger.severe(tag + "Action '" + arguments.get(0) + "' was passed an invalid amount of arguments: '" + arguments.get(1) + "'!");
+			mcLogger.severe(plugin.tag + "Action '" + arguments.get(0) + "' was passed an invalid amount of arguments: '" + arguments.get(1) + "'!");
 			break;
 			// argument format ^
 		case TYPE_NOT_HANDLED:
 			if (!checkArguments(action, arguments, 2)) break;
-			mcLogger.severe(tag + "Type " + action.toString() + " was not handled! Arguments: '" + Suitcase.cfMessage.getString(arguments) + "'");
+			mcLogger.severe(plugin.tag + "Type '" + action.toString() + "' was not handled! Arguments: '" + plugin.message.getString(arguments, true) + "'");
 			break;
 			
 			
@@ -186,8 +189,8 @@ public class SuitcaseConsole {
 		default:
 			arguments.add(0, action.toString());
 			sendAction(actionType.TYPE_NOT_HANDLED, arguments);
-			break;
-		
+			plugin.disable(plugin);
+			return;
 		}
 	}
 	

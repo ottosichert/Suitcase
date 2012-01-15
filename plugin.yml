@@ -1,6 +1,6 @@
-name: Leather Suitcase
-main: me.eight.suitcase.suitcase
-version: 0.1
+name: Suitcase
+main: me.eighth.suitcase.Suitcase
+version: 0.2
 authors: [eighth, HavaTequila]
 website: www.gamez-pla.net
 description: Suitcase is a rating system for players and a warning system for admins with website integration.
