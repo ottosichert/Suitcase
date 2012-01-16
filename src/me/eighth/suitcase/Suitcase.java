@@ -21,7 +21,7 @@ public class Suitcase extends JavaPlugin {
 	
 	private Suitcase plugin = this;
 	public String name = "Leather";
-	public String tag = "[Suitcase] ";
+	public String tag = "[Suitcase] - ";
 	public final SuitcaseConfig config = new SuitcaseConfig(this);
 	public final SuitcaseEvent event = new SuitcaseEvent(this);
 	public final SuitcaseMessage message = new SuitcaseMessage(this);

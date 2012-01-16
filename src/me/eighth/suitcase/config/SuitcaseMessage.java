@@ -16,7 +16,6 @@ public class SuitcaseMessage {
 	
 	private Suitcase plugin;
 	private Map<String, Object> messagesDefault = new HashMap<String, Object>();
-	
 	public FileConfiguration config;
 	
 	public SuitcaseMessage(Suitcase plugin) {
@@ -35,7 +34,7 @@ public class SuitcaseMessage {
 		messagesDefault.put("help.optional", "&6All &3arguments &6are optional and there are several &5aliases&6.");
 		// help-command help
 		messagesDefault.put("help.command.help.header", " &7----- &2Help command &7-----");
-		messagesDefault.put("help.command.help.usage", "&5Usage &7>> &3{command}");
+		messagesDefault.put("help.command.help.usage", "&5Usage &7>> &3/suitcase help");
 		messagesDefault.put("help.command.help.aliases", "&5Aliases &7>> &3h&7, &3?");
 		messagesDefault.put("help.command.help.argument.help", "&3help &7>> &6Show a list of all accessible commands.");
 		// info help
