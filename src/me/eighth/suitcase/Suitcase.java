@@ -19,7 +19,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Suitcase extends JavaPlugin {
 	
-	private Suitcase plugin = this;
 	public String name = "Leather";
 	public String tag = "[Suitcase] - ";
 	public final SuitcaseConfig config = new SuitcaseConfig(this);
@@ -39,17 +38,18 @@ public class Suitcase extends JavaPlugin {
 		console.sendAction(actionType.PLUGIN_DISABLE_START);
 		
 		// save and dispose configuration
+		// if something returns false -> disable anyway
 		if (!config.freeConfig()) {
 			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeConfigError")));
-			return;
 		}
 		if (!message.freeMessages()) {
 			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeMessagesError")));
-			return;
+		}
+		if (!event.freeEvent()) {
+			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeEventError")));
 		}
 		if (!connector.freeLog()) {
 			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeConnectorError")));
-			return;
 		}	
 		
 		// disabling finished, send to log
@@ -67,17 +67,22 @@ public class Suitcase extends JavaPlugin {
 		// load and check configuration
 		if (!config.initConfig()) {
 			console.sendAction(actionType.PLUGIN_ENABLE_ERROR, new ArrayList<String>(Arrays.asList("initConfigError")));
-			disable(plugin);
+			disable();
 			return;
 		}
 		else if (!message.initMessages()) {
 			console.sendAction(actionType.PLUGIN_ENABLE_ERROR, new ArrayList<String>(Arrays.asList("initMessagesError")));
-			disable(plugin);
+			disable();
+			return;
+		}
+		else if (!event.initEvent()) {
+			console.sendAction(actionType.PLUGIN_ENABLE_ERROR, new ArrayList<String>(Arrays.asList("initEventError")));
+			disable();
 			return;
 		}
 		else if (!connector.initLog()) {
 			console.sendAction(actionType.PLUGIN_ENABLE_ERROR, new ArrayList<String>(Arrays.asList("initConnectorError")));
-			disable(plugin);
+			disable();
 			return;
 		}
 		else {		
@@ -86,25 +91,29 @@ public class Suitcase extends JavaPlugin {
 		}
 	}
 	
-	// reload plugin (user command)
-	public void reload(Suitcase plugin) {
+	public void reload() {
 		// plugin reload
 		console.sendAction(actionType.PLUGIN_RELOAD_START);
 		
 		// reload configuration
 		if (!config.reloadConfig()) {
 			console.sendAction(actionType.PLUGIN_RELOAD_ERROR, new ArrayList<String>(Arrays.asList("reloadConfigError")));
-			plugin.disable(plugin);
+			disable();
 			return;
 		}
 		else if (!message.reloadMessages()) {
 			console.sendAction(actionType.PLUGIN_RELOAD_ERROR, new ArrayList<String>(Arrays.asList("reloadMessagesError")));
-			plugin.disable(plugin);
+			disable();
+			return;
+		}
+		else if (!event.reloadEvent()) {
+			console.sendAction(actionType.PLUGIN_RELOAD_ERROR, new ArrayList<String>(Arrays.asList("reloadEventError")));
+			disable();
 			return;
 		}
 		else if (!connector.reloadLog()) {
 			console.sendAction(actionType.PLUGIN_RELOAD_ERROR, new ArrayList<String>(Arrays.asList("reloadConnectorError")));
-			plugin.disable(plugin);
+			disable();
 			return;
 		}
 		else {		
@@ -114,7 +123,7 @@ public class Suitcase extends JavaPlugin {
 	}
 	
 	// disable plugin due to internal error
-	public void disable(Suitcase plugin) {
-		plugin.setEnabled(false);
+	public void disable() {
+		setEnabled(false);
 	}
 }

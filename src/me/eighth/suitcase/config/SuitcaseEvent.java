@@ -18,14 +18,14 @@ public class SuitcaseEvent {
 	public SuitcaseEvent(Suitcase plugin) {
 		this.plugin = plugin;
 
-		eventDefault.put("event.test.condition", "");
-		eventDefault.put("event.test.action", "[test, test2]");
-		eventDefault.put("action.test.execute", "server"); // server/sender/target
-		eventDefault.put("action.test.permission", "op"); // op/target
-		eventDefault.put("action.test.command", "broadcast {sender} has rated {target}.");
-		eventDefault.put("action.test2.execute", "target");
-		eventDefault.put("action.test2.permission", "op");
-		eventDefault.put("action.test2.command", "give {target} cookie 1");
+		eventDefault.put("event.foobar.condition", "{player} rate {sender}");
+		eventDefault.put("event.foobar.action", "foo bar");
+		eventDefault.put("event.blah.condition", "{player} rate {sender}");
+		eventDefault.put("event.blah.action", "foo bar");
+		eventDefault.put("action.foo.execute", "server"); // server/sender/target
+		eventDefault.put("action.foo.command", "broadcast {sender} has rated {target}.");
+		eventDefault.put("action.bar.execute", "target");
+		eventDefault.put("action.bar.command", "msg {sender} &7Thank you!");
 		
 		
 		eventDefault.put("", "");

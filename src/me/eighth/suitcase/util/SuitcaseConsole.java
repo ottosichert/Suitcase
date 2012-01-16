@@ -189,7 +189,7 @@ public class SuitcaseConsole {
 		default:
 			arguments.add(0, action.toString());
 			sendAction(actionType.TYPE_NOT_HANDLED, arguments);
-			plugin.disable(plugin);
+			plugin.disable();
 			return;
 		}
 	}

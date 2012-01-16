@@ -73,7 +73,7 @@ public class SuitcaseFile {
 				file.createNewFile();
 			} catch (IOException e) {
 				plugin.console.sendAction(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, e.toString())));
-				plugin.disable(plugin);
+				plugin.disable();
 				return null;
 			}
 		}

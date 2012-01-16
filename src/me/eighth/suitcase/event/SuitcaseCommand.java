@@ -354,7 +354,7 @@ public class SuitcaseCommand implements CommandExecutor {
 				}
 				else {
 					plugin.console.sendAction(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase reload")));
-					plugin.reload(plugin);
+					plugin.reload();
 					lines.add(plugin.message.config.getString("reload.done"));
 				}
 			}
