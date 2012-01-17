@@ -48,7 +48,7 @@ public class SuitcaseMessages {
 		
 		// command errors
 		defaults.put("error.command.deny", "&4You don't have permission to use {command,&7}&4!");
-		defaults.put("error.command.unknown", "&4Can't find command {command,&7}&4! Try {help,&7} instead.");
+		defaults.put("error.command.unknown", "&4Can't find command {command,&7}&4! Try {help,&7} &4instead.");
 		defaults.put("error.command.console", "{command,&7} &4can't be run by console!");
 		defaults.put("error.command.disabled", "{command,&7} &4is disabled!");
 		defaults.put("error.argument.count", "&4Invalid amount of arguments!");
@@ -61,25 +61,25 @@ public class SuitcaseMessages {
 	}
 	
 	public String parse(String message, String variable, String replacement) {
-		return parse(message, variable, replacement, null);
+		return parse(message, variable, replacement, "");
 	}
 	
 	// parse variable
 	public String parse(String message, String variable, String replacement, String colored) {
-		
 		// cut off everything around outer brackets and remove spaces inside
-		String value = message.replaceAll("^[^\\{]+\\{|\\}[^\\}]+$", "").replaceAll(" ", "");
+		String variables = message.replaceAll("^[^\\{]*\\{|\\}[^\\}]*$", "");
 		String edited = "";
-		for (String var : value.split("\\}.*\\{")) {
+		for (String var : variables.split("\\}.*\\{")) {
 			String[] split = var.split(",");
-			if (split[0] == variable && edited == "") {
+			if (split[0].equals(variable)) {
+				
 				if (split.length > 1) {
-					edited += split[1];
+					edited = split[1];
 				}
 				else {
-					edited += "&f";
+					edited = "&f";
 				}
-				if (split.length > 2) {
+				if (split.length > 2 && colored != "") {
 					edited += replacement.replaceAll("([" + colored + "])", split[2] + "$1" + split[1]) + "&f";
 				}
 				else {
@@ -132,7 +132,7 @@ public class SuitcaseMessages {
 			return list.toString().replaceAll("^\\[|\\]$", "");
 		}
 		else {
-			return list.toString().replaceAll("^\\[|\\]$|,", "");
+			return list.toString().replaceAll("^\\[|\\]$|, ", "");
 		}
 	}
 	

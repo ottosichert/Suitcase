@@ -36,7 +36,7 @@ public class SuitcaseConsole {
 		
 		// config property handling
 		PROPERTY_MISSING,
-		PROPERTY_BAD_TYPE,
+		PROPERTY_REDUNDANT,
 		
 		// file handling
 		FILE_NOT_FOUND,
@@ -44,7 +44,8 @@ public class SuitcaseConsole {
 		
 		// other actions
 		ARGUMENTS_INVALID,
-		TYPE_NOT_HANDLED
+		TYPE_NOT_HANDLED,
+		DEBUG
 		
 	}
 	
@@ -125,23 +126,23 @@ public class SuitcaseConsole {
 			// argument format 1 -> '/suitcase help rate'
 		case PLAYER_COMMAND_EXECUTED:
 			if (!checkArguments(action, arguments, 2)) break;
-			mcLogger.info(plugin.tag + "[PLAYER_COMMAND] '" + arguments.get(0) + "' used command '" + arguments.get(1) + "'.");
+			mcLogger.info(plugin.cmd + "'" + arguments.get(0) + "' used command '" + arguments.get(1) + "'.");
 			break;
 			// argument format ^
 		case PLAYER_COMMAND_DENIED:
 			if (!checkArguments(action, arguments, 2)) break;
-			mcLogger.info(plugin.tag + "[PLAYER_COMMAND] '" + arguments.get(0) + "' was denied command '" + arguments.get(1) + "'.");
+			mcLogger.info(plugin.cmd + "'" + arguments.get(0) + "' was denied command '" + arguments.get(1) + "'.");
 			break;
 			// argument format ^
 		case PLAYER_COMMAND_INVALID:
 			if (!checkArguments(action, arguments, 2)) break;
-			mcLogger.info(plugin.tag + "[PLAYER_COMMAND] '" + arguments.get(0) + "' tried invalid command '" + arguments.get(1) + "'.");
+			mcLogger.info(plugin.cmd + "'" + arguments.get(0) + "' tried invalid command '" + arguments.get(1) + "'.");
 			break;
 			// argument format ^
 			// argument format 2 -> 'errorName'
 		case PLAYER_COMMAND_ERROR:
 			if (!checkArguments(action, arguments, 3)) break;
-			mcLogger.warning(plugin.tag + "[PLAYER_COMMAND] '" + arguments.get(0) + "' caused error '" + arguments.get(2) + "' by executing '" + arguments.get(1) + "'!");
+			mcLogger.warning(plugin.cmd + "'" + arguments.get(0) + "' caused error '" + arguments.get(2) + "' by executing '" + arguments.get(1) + "'!");
 			break;
 			
 			
@@ -153,11 +154,9 @@ public class SuitcaseConsole {
 			mcLogger.warning(plugin.tag + "Missing property '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Set to default: '" + arguments.get(2) + "'.");
 			break;
 			// argument format ^
-			// argument format 2 -> 'type'
-			// argument format 3 -> 'expected type'
-		case PROPERTY_BAD_TYPE:
-			if (!checkArguments(action, arguments, 4)) break;
-			mcLogger.warning(plugin.tag + "Bad type of '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Parsed " + arguments.get(2) + " instead of " + arguments.get(3));
+		case PROPERTY_REDUNDANT:
+			if (!checkArguments(action, arguments, 3)) break;
+			mcLogger.warning(plugin.tag + "Redundant property '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Removing value '" + arguments.get(2) + "'.");
 			break;
 			
 			// argument format 0 -> 'filename.ext'
@@ -184,6 +183,13 @@ public class SuitcaseConsole {
 			mcLogger.severe(plugin.tag + "Type '" + action.toString() + "' was not handled! Arguments: '" + plugin.messages.getString(arguments, true) + "'");
 			break;
 			
+			// argument format * -> 'text'
+		case DEBUG:
+			mcLogger.info(plugin.tag + "### DEBUG ###");
+			for (int i = 0; i < arguments.size(); i++) {
+				mcLogger.info(plugin.tag + "Line " + (i + 1) + ": '" + arguments.get(i) + "'");
+			}
+			break;
 			
 			// type was not handled
 		default:

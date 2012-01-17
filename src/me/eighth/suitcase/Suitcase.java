@@ -21,6 +21,7 @@ public class Suitcase extends JavaPlugin {
 	
 	public final String name = "Leather";
 	public final String tag = "[Suitcase] - ";
+	public final String cmd = "[PLAYER_COMMAND] ";
 	public final SuitcaseConfig config = new SuitcaseConfig(this);
 	public final SuitcaseEvent event = new SuitcaseEvent(this);
 	public final SuitcaseMessages messages = new SuitcaseMessages(this);

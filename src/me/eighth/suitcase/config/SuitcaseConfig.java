@@ -24,8 +24,6 @@ public class SuitcaseConfig {
 		defaults.put("mechanics.full-help", false);
 		defaults.put("mechanics.op-permissions", true);
 		defaults.put("mechanics.rating.enable", true);
-		defaults.put("mechanics.rating.multiple-rating", false);
-		defaults.put("mechanics.rating.interval", "3d");
 		defaults.put("mechanics.rating.minimum", 0);
 		defaults.put("mechanics.rating.maximum", 100);
 		defaults.put("mechanics.rating.default", 0);

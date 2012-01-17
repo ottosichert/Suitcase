@@ -23,36 +23,78 @@ public class SuitcaseFile {
 	public boolean load(String filename, Map<String, Object> defaults) {
 		
 		// get given File and FileConfiguration
-		File file = getFile(filename);
-		FileConfiguration fileConfig;
+		File oldFile = getFile(filename, false);
+		FileConfiguration oldConfig;
 		
-		if (file != null) {
-			fileConfig = YamlConfiguration.loadConfiguration(file);
-			boolean empty = false;
-			if (fileConfig.getKeys(true).size() == 0) {
-				empty = true;
+		if (oldFile != null) {
+			
+			// load FileConfigurations
+			oldConfig = YamlConfiguration.loadConfiguration(oldFile);
+			
+			// check if file is empty
+			if (oldConfig.getKeys(true).size() == 0) {
+				for (String path : defaults.keySet()) {
+					// apply defaults
+					oldConfig.set(path, defaults.get(path));
+				}
 			}
-			for (int i = 0; i < defaults.size(); i++) {
-				String path = defaults.keySet().toArray()[i].toString();
-				// add property if missing
-				if (!fileConfig.contains(path)) {
-					// set missing property and log to console if file wasn't empty
-					fileConfig.set(path, defaults.get(path));
-					if (!empty) {
-						plugin.console.sendAction(actionType.PROPERTY_MISSING, new ArrayList<String>(Arrays.asList(path, filename, defaults.get(path).toString())));
+			else {
+				
+				// load new file and FileConfiguration
+				File newFile = getFile(filename + "~", true);
+				FileConfiguration newConfig;
+				if (newFile != null) {
+					
+					newConfig = YamlConfiguration.loadConfiguration(newFile);
+					
+					// add missing properties
+					for (String path : defaults.keySet()) {
+						if (!oldConfig.contains(path)) {
+							// set missing property and log to console if file wasn't empty
+							newConfig.set(path, defaults.get(path));
+							plugin.console.sendAction(actionType.PROPERTY_MISSING, new ArrayList<String>(Arrays.asList(path, filename, defaults.get(path).toString())));
+						}
+						else {
+							// apply old property
+							newConfig.set(path, oldConfig.get(path));
+						}
 					}
+					
+					// save newFile
+					try {
+						saveFile(newFile, newConfig);
+					} catch (IOException e) {
+						plugin.console.sendAction(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename + "~", e.toString())));
+						return false;
+					}
+					
+					// delete oldFile and load new one
+					oldFile.delete();
+					oldFile = getFile(filename, true);
+					oldConfig = YamlConfiguration.loadConfiguration(oldFile);
+					
+					for (String path : newConfig.getKeys(true)) {
+						// remove redundant property and ensure it isn't a section
+						if (defaults.get(path) != null) {
+							oldConfig.set(path, newConfig.get(path));
+						}
+						else if (!newConfig.isConfigurationSection(path)) {
+							plugin.console.sendAction(actionType.PROPERTY_REDUNDANT, new ArrayList<String>(Arrays.asList(path, filename, newConfig.get(path).toString())));
+						}
+					}
+					
+					// don't forget to remove the temporary file afterwards
+					newFile.delete();
 				}
-				// TODO: Fix this.
-				// compare object types
-				else if (fileConfig.get(path).getClass() != defaults.get(path).getClass()) {
-					// reset value and log to console
-					fileConfig.set(path, defaults.get(path));
-					plugin.console.sendAction(actionType.PROPERTY_BAD_TYPE, new ArrayList<String>(Arrays.asList(path, filename, fileConfig.get(path).getClass().toString(), defaults.get(path).getClass().toString())));
+				else {
+					plugin.console.sendAction(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, "newFileNullError")));
+					return false;
 				}
 			}
+			
 			// save and use verified keys
 			try {
-				saveFile(file, fileConfig);
+				saveFile(oldFile, oldConfig);
 				return true;
 			} catch (IOException e) {
 				plugin.console.sendAction(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, e.toString())));
@@ -60,16 +102,18 @@ public class SuitcaseFile {
 			}
 		}
 		else {
-			plugin.console.sendAction(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, "fileNullError")));
+			plugin.console.sendAction(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, "oldFileNullError")));
 			return false;
 		}
 	}
 
-	private File getFile(String filename) {
+	private File getFile(String filename, boolean suppress) {
 		File file = new File("plugins/Suitcase/" + filename);
 		if (!file.exists()) {
 			try {
-				plugin.console.sendAction(actionType.FILE_NOT_FOUND, new ArrayList<String>(Arrays.asList(filename)));
+				if (!suppress) {
+					plugin.console.sendAction(actionType.FILE_NOT_FOUND, new ArrayList<String>(Arrays.asList(filename)));
+				}
 				new File("plugins/Suitcase").mkdir();
 				file.createNewFile();
 			} catch (IOException e) {
