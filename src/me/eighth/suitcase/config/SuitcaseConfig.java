@@ -12,44 +12,43 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class SuitcaseConfig {
 	
 	private Suitcase plugin;
-	private Map<String, Object> configDefault = new HashMap<String, Object>();
-	
-	public FileConfiguration config;
+	private Map<String, Object> defaults = new HashMap<String, Object>();
+	public FileConfiguration data;
 	
 	
 	public SuitcaseConfig(Suitcase plugin) {
 		this.plugin = plugin;
 		
 		// load default values
-		configDefault.put("mechanics.language", "en");
-		configDefault.put("mechanics.full-help", false);
-		configDefault.put("mechanics.op-permissions", true);
-		configDefault.put("mechanics.rating.enable", true);
-		configDefault.put("mechanics.rating.multiple-rating", false);
-		configDefault.put("mechanics.rating.interval", "3d");
-		configDefault.put("mechanics.rating.minimum", 0);
-		configDefault.put("mechanics.rating.maximum", 100);
-		configDefault.put("mechanics.rating.default", 0);
-		configDefault.put("mechanics.warning.enable", true);
-		configDefault.put("mechanics.warning.maximum", 3);
-		configDefault.put("log.rate", true);
-		configDefault.put("log.warn", true);
-		configDefault.put("log.system", true);
-		configDefault.put("log.database.enable", true);
-		configDefault.put("log.database.type", "MySQL");
-		configDefault.put("log.database.database-name", "minecraft");
-		configDefault.put("log.database.table", "suitcase");
-		configDefault.put("log.database.username", "root");
-		configDefault.put("log.database.password", "root");
-		configDefault.put("log.file.enable", true);
-		configDefault.put("log.file.max-players", 100);
-		configDefault.put("stats.enable", false);
+		defaults.put("mechanics.language", "en");
+		defaults.put("mechanics.full-help", false);
+		defaults.put("mechanics.op-permissions", true);
+		defaults.put("mechanics.rating.enable", true);
+		defaults.put("mechanics.rating.multiple-rating", false);
+		defaults.put("mechanics.rating.interval", "3d");
+		defaults.put("mechanics.rating.minimum", 0);
+		defaults.put("mechanics.rating.maximum", 100);
+		defaults.put("mechanics.rating.default", 0);
+		defaults.put("mechanics.warning.enable", true);
+		defaults.put("mechanics.warning.maximum", 3);
+		defaults.put("log.rate", true);
+		defaults.put("log.warn", true);
+		defaults.put("log.system", true);
+		defaults.put("log.database.enable", true);
+		defaults.put("log.database.type", "MySQL");
+		defaults.put("log.database.database-name", "minecraft");
+		defaults.put("log.database.table", "suitcase");
+		defaults.put("log.database.username", "root");
+		defaults.put("log.database.password", "root");
+		defaults.put("log.file.enable", true);
+		defaults.put("log.file.max-players", 100);
+		defaults.put("stats.enable", false);
 	}
-
+	
 	// get config file
-	public boolean initConfig() {
-		if (plugin.file.loadFile("config.yml", configDefault)) {
-			config = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/config.yml"));
+	public boolean init() {
+		if (plugin.file.load("config.yml", defaults)) {
+			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/config.yml"));
 			return true;
 		}
 		else {
@@ -57,13 +56,13 @@ public class SuitcaseConfig {
 		}
 	}
 	
-	public boolean freeConfig() {
-		config = null;
+	public boolean free() {
+		data = null;
 		return true;
 	}
 	
-	public boolean reloadConfig() {
-		if (freeConfig() && initConfig()) {
+	public boolean reload() {
+		if (free() && init()) {
 			return true;
 		}
 		else {

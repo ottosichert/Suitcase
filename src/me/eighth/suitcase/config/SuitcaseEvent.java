@@ -1,6 +1,8 @@
 package me.eighth.suitcase.config;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,29 +15,35 @@ public class SuitcaseEvent {
 	
 	private Suitcase plugin;
 	private Map<String, Object> eventDefault = new HashMap<String, Object>();
-	public FileConfiguration config;
+	private Map<String, ArrayList<String>> eventTag = new HashMap<String, ArrayList<String>>();
+	public FileConfiguration data;
 	
 	public SuitcaseEvent(Suitcase plugin) {
 		this.plugin = plugin;
-
-		eventDefault.put("event.foobar.condition", "{player} rate {sender}");
-		eventDefault.put("event.foobar.action", "foo bar");
-		eventDefault.put("event.blah.condition", "{player} rate {sender}");
-		eventDefault.put("event.blah.action", "foo bar");
-		eventDefault.put("action.foo.execute", "server"); // server/sender/target
-		eventDefault.put("action.foo.command", "broadcast {sender} has rated {target}.");
-		eventDefault.put("action.bar.execute", "target");
-		eventDefault.put("action.bar.command", "msg {sender} &7Thank you!");
 		
+		// set default events
+		// TODO: Make them optional.
+		eventDefault.put("event.rate.condition", "playerRate && (timeTick >= 1000)");
+		eventDefault.put("event.rate.action", new ArrayList<String>(Arrays.asList("broadcast()", "thanks()")));
+		eventDefault.put("event.warn.condition", "playerWarn");
+		eventDefault.put("event.warn.action", "kick('You have been warned.')");
+		eventDefault.put("action.broadcast.execute", "server"); // all/server/sender/target
+		eventDefault.put("action.broadcast.command", "broadcast {sender} has rated {target}.");
+		eventDefault.put("action.thanks.execute", "target");
+		eventDefault.put("action.thanks.command", "msg {sender} &7Thank you!");
+		eventDefault.put("action.kick.execute", "sender");
+		eventDefault.put("action.kick.command", "kick {target} {0}");
 		
-		eventDefault.put("", "");
-		
+		// define eventTags for event.NAME.condition
+		eventTag.put("playerRate", new ArrayList<String>(Arrays.asList("positive", "negative"))); // 'all' always possible
+		eventTag.put("playerWarn", new ArrayList<String>(Arrays.asList("warn", "forgive")));
+		eventTag.put("pluginStatus", new ArrayList<String>(Arrays.asList("enable", "reload", "disable")));
 	}
 	
 	// get event file
-	public boolean initEvent() {
-		if (plugin.file.loadFile("event.yml", eventDefault)) {
-			config = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/event.yml"));
+	public boolean init() {
+		if (plugin.file.load("event.yml", eventDefault)) {
+			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/event.yml"));
 			return true;
 		}
 		else {
@@ -43,13 +51,13 @@ public class SuitcaseEvent {
 		}
 	}
 	
-	public boolean freeEvent() {
-		config = null;
+	public boolean free() {
+		data = null;
 		return true;
 	}
 	
-	public boolean reloadEvent() {
-		if (freeEvent() && initEvent()) {
+	public boolean reload() {
+		if (free() && init()) {
 			return true;
 		}
 		else {

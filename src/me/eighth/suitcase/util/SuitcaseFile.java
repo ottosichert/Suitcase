@@ -20,7 +20,7 @@ public class SuitcaseFile {
 		this.plugin = plugin;
 	}
 	
-	public boolean loadFile(String filename, Map<String, Object> defaults) {
+	public boolean load(String filename, Map<String, Object> defaults) {
 		
 		// get given File and FileConfiguration
 		File file = getFile(filename);
@@ -42,6 +42,7 @@ public class SuitcaseFile {
 						plugin.console.sendAction(actionType.PROPERTY_MISSING, new ArrayList<String>(Arrays.asList(path, filename, defaults.get(path).toString())));
 					}
 				}
+				// TODO: Fix this.
 				// compare object types
 				else if (fileConfig.get(path).getClass() != defaults.get(path).getClass()) {
 					// reset value and log to console

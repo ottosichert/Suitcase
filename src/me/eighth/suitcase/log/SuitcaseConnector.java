@@ -11,10 +11,10 @@ public class SuitcaseConnector {
 	}
 
 	public String getRating(String target) {
-		if (plugin.config.config.getBoolean("log.database.enable")) {
+		if (plugin.config.data.getBoolean("log.database.enable")) {
 			return "db";
 		}
-		else if (plugin.config.config.getBoolean("log.file.enable")) {
+		else if (plugin.config.data.getBoolean("log.file.enable")) {
 			return "file";
 		}
 		else {
@@ -23,10 +23,10 @@ public class SuitcaseConnector {
 	}
 	
 	public void setRating(String sender, String target, boolean positive) {
-		if (plugin.config.config.getBoolean("log.database.enable")) {
+		if (plugin.config.data.getBoolean("log.database.enable")) {
 			
 		}
-		else if (plugin.config.config.getBoolean("log.file.enable")) {
+		else if (plugin.config.data.getBoolean("log.file.enable")) {
 			
 		}
 		else {
@@ -35,10 +35,10 @@ public class SuitcaseConnector {
 	}
 	
 	public boolean hasRated(String sender, String target) {
-		if (plugin.config.config.getBoolean("log.database.enable")) {
+		if (plugin.config.data.getBoolean("log.database.enable")) {
 			return true;
 		}
-		else if (plugin.config.config.getBoolean("log.file.enable")) {
+		else if (plugin.config.data.getBoolean("log.file.enable")) {
 			return true;
 		}
 		else {
@@ -47,10 +47,10 @@ public class SuitcaseConnector {
 	}
 
 	public String getWarnings(String target) {
-		if (plugin.config.config.getBoolean("log.database.enable")) {
+		if (plugin.config.data.getBoolean("log.database.enable")) {
 			return "db";
 		}
-		else if (plugin.config.config.getBoolean("log.file.enable")) {
+		else if (plugin.config.data.getBoolean("log.file.enable")) {
 			return "file";
 		}
 		else {
@@ -59,10 +59,10 @@ public class SuitcaseConnector {
 	}
 	
 	public void setWarnings(String sender, String target, boolean warn) {
-		if (plugin.config.config.getBoolean("log.database.enable")) {
+		if (plugin.config.data.getBoolean("log.database.enable")) {
 			
 		}
-		else if (plugin.config.config.getBoolean("log.file.enable")) {
+		else if (plugin.config.data.getBoolean("log.file.enable")) {
 			
 		}
 		else {
@@ -70,18 +70,18 @@ public class SuitcaseConnector {
 		}
 	}
 
-	public boolean initLog() {
+	public boolean init() {
 		// TODO: check database/file availability
 		return true;
 	}
 
-	public boolean freeLog() {
+	public boolean free() {
 		// TODO: dispose log cache and close database/file connection
 		return true;
 	}
 
-	public boolean reloadLog() {
-		if (freeLog() && initLog()) {
+	public boolean reload() {
+		if (free() && init()) {
 			return true;
 		}
 		else {
