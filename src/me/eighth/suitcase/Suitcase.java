@@ -38,7 +38,7 @@ public class Suitcase extends JavaPlugin {
 		// plugin startup
 		console.sendAction(actionType.PLUGIN_ENABLE_START);
 		
-		// set commands
+		// set command executors and eventlisteners
 		getCommand("suitcase").setExecutor(command);
 		
 		// load and check configuration

@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 import me.eighth.suitcase.Suitcase;
 
-public class SuitcasePlayer {
+public class SuitcasePlayerListener {
 	
 	private Suitcase plugin;
 	private ArrayList<String> players = new ArrayList<String>();
 	
-	public SuitcasePlayer(Suitcase plugin) {
+	public SuitcasePlayerListener(Suitcase plugin) {
 		this.plugin = plugin;
 	}
 }
