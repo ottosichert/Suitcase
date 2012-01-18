@@ -12,13 +12,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-public class SuitcaseMessages {
+public class SuitcaseMessage {
 	
 	private Suitcase plugin;
 	private Map<String, Object> defaults = new HashMap<String, Object>();
 	public FileConfiguration data;
 	
-	public SuitcaseMessages(Suitcase plugin) {
+	public SuitcaseMessage(Suitcase plugin) {
 		this.plugin = plugin;
 		
 		// help command
@@ -37,8 +37,8 @@ public class SuitcaseMessages {
 		
 		// rate command
 		defaults.put("rate.header", " &7----- {player,2,7} &2rating &7-----");
-		defaults.put("rate.rating", "&5Rating &7>> {rating,6,7}");
-		defaults.put("rate.warnings", "&5Warnings &7>> {warnings,6,7}");
+		defaults.put("rate.rating", "&5Rating &7>> {rating,r,7}");
+		defaults.put("rate.warnings", "&5Warnings &7>> {warnings,r,7}");
 		
 		// basic commands
 		defaults.put("rate.done", "&2You have successfully rated {player,a}&2.");
@@ -74,6 +74,9 @@ public class SuitcaseMessages {
 			if (split[0].equals(variable)) {
 				
 				if (split.length > 1) {
+					if (split[1].equals("r")) {
+						split[1] = String.valueOf(ratingColor(Integer.parseInt(replacement)));
+					}
 					edited = "&" + split[1];
 				}
 				else {
@@ -87,14 +90,14 @@ public class SuitcaseMessages {
 				}
 			}
 		}
-		return message.replaceAll("\\{" + variable + "(,[0-9a-fA-F])*\\}", edited);
+		return message.replaceAll("\\{" + variable + "(,[0-9a-fr])*\\}", edited);
 	}
 	
 	// TODO: use mechanics.language
-	// get messages file
+	// get message file
 	public boolean init() {
-		if (plugin.file.load("messages.yml", defaults)) {
-			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/messages.yml"));
+		if (plugin.file.load("message.yml", defaults)) {
+			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/message.yml"));
 			return true;
 		}
 		else {
@@ -116,12 +119,12 @@ public class SuitcaseMessages {
 		}
 	}
 	
-	// sends help with header and available commands
+	// send split and colored message
 	public void sendMessage(CommandSender sender, ArrayList<String> lines) {
 		// parse colors and send message line by line
 		for (String line : lines) {
 			for (String split : line.split("\\n")) {
-				sender.sendMessage(color(split));
+				sender.sendMessage(messageColor(split));
 			}
 		}
 	}
@@ -136,9 +139,9 @@ public class SuitcaseMessages {
 		}
 	}
 	
-	// returns colored message
+	// return colored message
 	// TODO: Add to parse().
-	private String color(String message) {
+	private String messageColor(String message) {
 		String hex = "0123456789abcdef";
 		if (!message.contains("&")) {
 			return message;
@@ -161,5 +164,27 @@ public class SuitcaseMessages {
 			}
 		}
 		return result;
+	}
+	
+	// return color char of ratings
+	private char ratingColor(int rating) {
+		if (rating > 0 && rating <= plugin.config.data.getInt("mechanics.rating.default") * 2 / 5) {
+			return '4';
+		}
+		else if (rating > plugin.config.data.getInt("mechanics.rating.default") * 2 / 5 && rating <= plugin.config.data.getInt("mechanics.rating.default") * 4 / 5) {
+			return 'c';
+		}
+		else if (rating > plugin.config.data.getInt("mechanics.rating.default") * 4 / 5 && rating <= (plugin.config.data.getInt("mechanics.rating.maximum") - plugin.config.data.getInt("mechanics.rating.default")) / 5 + plugin.config.data.getInt("mechanics.rating.default")) {
+			return 'e';
+		}
+		else if (rating > (plugin.config.data.getInt("mechanics.rating.maximum") - plugin.config.data.getInt("mechanics.rating.default")) * 2 / 5 + plugin.config.data.getInt("mechanics.rating.default") && rating <= (plugin.config.data.getInt("mechanics.rating.maximum") - plugin.config.data.getInt("mechanics.rating.default")) * 3 / 5 + plugin.config.data.getInt("mechanics.rating.default")) {
+			return 'a';
+		}
+		else if (rating > (plugin.config.data.getInt("mechanics.rating.maximum") - plugin.config.data.getInt("mechanics.rating.default")) * 5 / 5 + plugin.config.data.getInt("mechanics.rating.default") && rating <= plugin.config.data.getInt("mechanics.rating.maximum")) {
+			return '2';
+		}
+		else {
+			return 'f';
+		}
 	}
 }

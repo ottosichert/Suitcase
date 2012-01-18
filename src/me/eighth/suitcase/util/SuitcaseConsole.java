@@ -86,7 +86,7 @@ public class SuitcaseConsole {
 			}
 		}
 		else {
-			sendAction(actionType.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), plugin.messages.getString(arguments, true))));
+			sendAction(actionType.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), plugin.message.getString(arguments, true))));
 			return false;
 		}
 	}
@@ -102,7 +102,7 @@ public class SuitcaseConsole {
 			// no arguments
 		case PLUGIN_ENABLE_START:
 			if (checkArguments(action, arguments, 0)) {
-				mcLogger.info(plugin.tag + plugin.name + " " + plugin.getDescription().getFullName() + " by " + plugin.messages.getString(plugin.getDescription().getAuthors(), true) + " enabling...");
+				mcLogger.info(plugin.tag + plugin.name + " " + plugin.getDescription().getFullName() + " by " + plugin.message.getString(plugin.getDescription().getAuthors(), true) + " enabling...");
 			}
 			break;
 			// argument format 0 -> 'errorName'
@@ -227,7 +227,7 @@ public class SuitcaseConsole {
 			// argument format ^
 		case TYPE_NOT_HANDLED:
 			if (checkArguments(action, arguments, 2)) {
-				mcLogger.severe(plugin.tag + "Type '" + action.toString() + "' was not handled! Arguments: '" + plugin.messages.getString(arguments, true) + "'");
+				mcLogger.severe(plugin.tag + "Type '" + action.toString() + "' was not handled! Arguments: '" + plugin.message.getString(arguments, true) + "'");
 			}
 			plugin.disable();
 			break;

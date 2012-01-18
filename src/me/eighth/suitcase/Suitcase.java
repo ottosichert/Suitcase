@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import me.eighth.suitcase.config.SuitcaseConfig;
 import me.eighth.suitcase.config.SuitcaseEvent;
-import me.eighth.suitcase.config.SuitcaseMessages;
+import me.eighth.suitcase.config.SuitcaseMessage;
 import me.eighth.suitcase.event.SuitcaseCommand;
 import me.eighth.suitcase.log.SuitcaseConnector;
 import me.eighth.suitcase.log.SuitcaseDatabase;
@@ -24,7 +24,7 @@ public class Suitcase extends JavaPlugin {
 	public final String cmd = "[PLAYER_COMMAND] ";
 	public final SuitcaseConfig config = new SuitcaseConfig(this);
 	public final SuitcaseEvent event = new SuitcaseEvent(this);
-	public final SuitcaseMessages messages = new SuitcaseMessages(this);
+	public final SuitcaseMessage message = new SuitcaseMessage(this);
 	public final SuitcaseCommand command = new SuitcaseCommand(this);
 	public final SuitcaseConnector connector = new SuitcaseConnector(this);
 	public final SuitcaseDatabase database = new SuitcaseDatabase(this);
@@ -47,8 +47,8 @@ public class Suitcase extends JavaPlugin {
 			disable();
 			return;
 		}
-		else if (!messages.init()) {
-			console.sendAction(actionType.PLUGIN_ENABLE_ERROR, new ArrayList<String>(Arrays.asList("initMessagesError")));
+		else if (!message.init()) {
+			console.sendAction(actionType.PLUGIN_ENABLE_ERROR, new ArrayList<String>(Arrays.asList("initMessageError")));
 			disable();
 			return;
 		}
@@ -78,8 +78,8 @@ public class Suitcase extends JavaPlugin {
 		if (!config.free()) {
 			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeConfigError")));
 		}
-		if (!messages.free()) {
-			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeMessagesError")));
+		if (!message.free()) {
+			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeMessageError")));
 		}
 		if (!event.free()) {
 			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeEventError")));
@@ -102,8 +102,8 @@ public class Suitcase extends JavaPlugin {
 			disable();
 			return;
 		}
-		else if (!messages.reload()) {
-			console.sendAction(actionType.PLUGIN_RELOAD_ERROR, new ArrayList<String>(Arrays.asList("reloadMessagesError")));
+		else if (!message.reload()) {
+			console.sendAction(actionType.PLUGIN_RELOAD_ERROR, new ArrayList<String>(Arrays.asList("reloadMessageError")));
 			disable();
 			return;
 		}

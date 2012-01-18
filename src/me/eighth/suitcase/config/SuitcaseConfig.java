@@ -20,13 +20,12 @@ public class SuitcaseConfig {
 		this.plugin = plugin;
 		
 		// load default values
-		defaults.put("mechanics.language", "en");
+		defaults.put("mechanics.locale", "en_EN");
 		defaults.put("mechanics.full-help", false);
 		defaults.put("mechanics.op-permissions", true);
 		defaults.put("mechanics.rating.enable", true);
-		defaults.put("mechanics.rating.minimum", 0);
-		defaults.put("mechanics.rating.maximum", 100);
-		defaults.put("mechanics.rating.default", 0);
+		defaults.put("mechanics.rating.maximum", 10);
+		defaults.put("mechanics.rating.default", 5);
 		defaults.put("mechanics.warning.enable", true);
 		defaults.put("mechanics.warning.maximum", 3);
 		defaults.put("log.console.command", true);

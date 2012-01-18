@@ -10,19 +10,19 @@ public class SuitcaseConnector {
 		this.plugin = plugin;
 	}
 
-	public String getRating(String target) {
+	public int getRating(String target) {
 		if (plugin.config.data.getBoolean("log.database.enable")) {
-			return "db";
+			return 9;
 		}
 		else if (plugin.config.data.getBoolean("log.file.enable")) {
-			return "file";
+			return 7;
 		}
 		else {
-			return "none";
+			return 5;
 		}
 	}
 	
-	public void setRating(String sender, String target, boolean positive) {
+	public void setRating(String sender, String target, int rating) {
 		if (plugin.config.data.getBoolean("log.database.enable")) {
 			
 		}
@@ -46,19 +46,19 @@ public class SuitcaseConnector {
 		}
 	}
 
-	public String getWarnings(String target) {
+	public int getWarnings(String target) {
 		if (plugin.config.data.getBoolean("log.database.enable")) {
-			return "db";
+			return 2;
 		}
 		else if (plugin.config.data.getBoolean("log.file.enable")) {
-			return "file";
+			return 1;
 		}
 		else {
-			return "none";
+			return 0;
 		}
 	}
 	
-	public void setWarnings(String sender, String target, boolean warn) {
+	public void setWarnings(String sender, String target, boolean increase) {
 		if (plugin.config.data.getBoolean("log.database.enable")) {
 			
 		}
