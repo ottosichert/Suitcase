@@ -88,7 +88,7 @@ public class SuitcaseCommand implements CommandExecutor {
 							// send header, usage and aliases
 							lines.add(plugin.messages.parse(plugin.messages.data.getString("help.header"), "command", arguments.get(1)));
 							lines.add(plugin.messages.parse(plugin.messages.data.getString("help.usage"), "usage", usage.get(arguments.get(1))));
-							lines.add(plugin.messages.parse(plugin.messages.data.getString("help.aliases"), "aliases", plugin.messages.getString(aliases.get(arguments.get(1)), true), ","));
+							lines.add(plugin.messages.parse(plugin.messages.data.getString("help.aliases"), "aliases", plugin.messages.getString(aliases.get(arguments.get(1)), true), "[,]"));
 							// get each argument
 							for (String argument : info.keySet()) {
 								if (usage.get(arguments.get(1)).contains(argument)) {
@@ -106,7 +106,7 @@ public class SuitcaseCommand implements CommandExecutor {
 					else {
 						// can't find help for this command
 						lines.add(plugin.messages.parse(plugin.messages.data.getString("error.argument.help"), "command", "/suitcase " + arguments.get(1)));
-						plugin.console.sendAction(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + arguments.get(1))));
+						plugin.console.sendAction(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help " + arguments.get(1))));
 					}
 				}
 				// full command help
@@ -128,7 +128,7 @@ public class SuitcaseCommand implements CommandExecutor {
 				else {
 					// too many arguments
 					lines.add(plugin.messages.data.getString("error.argument.count"));
-					plugin.console.sendAction(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help " + plugin.messages.getString(new ArrayList<String>(arguments.subList(1, arguments.size() - 1)), false))));
+					plugin.console.sendAction(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.messages.getString(arguments, false))));
 				}
 			}
 			else {
@@ -143,15 +143,15 @@ public class SuitcaseCommand implements CommandExecutor {
 				if (arguments.size() > 1) {
 					// too many arguments
 					lines.add(plugin.messages.data.getString("error.argument.count"));
-					plugin.console.sendAction(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase info " + plugin.messages.getString(new ArrayList<String>(arguments.subList(1, arguments.size() - 1)), false))));
+					plugin.console.sendAction(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.messages.getString(arguments, false))));
 				}
 				else {
 					// send plugin info
 					lines.add(plugin.messages.data.getString("info.header"));
-					lines.add(plugin.messages.parse(plugin.messages.data.getString("info.version"), "version", plugin.name + " " + plugin.getDescription().getFullName(), "v\\."));
-					lines.add(plugin.messages.parse(plugin.messages.data.getString("info.description"), "description", plugin.getDescription().getDescription(), "\\,\\."));
-					lines.add(plugin.messages.parse(plugin.messages.data.getString("info.authors"), "authors", plugin.messages.getString(plugin.getDescription().getAuthors(), true), "\\,"));
-					lines.add(plugin.messages.parse(plugin.messages.data.getString("info.website"), "website", plugin.getDescription().getWebsite(), "\\-\\."));
+					lines.add(plugin.messages.parse(plugin.messages.data.getString("info.version"), "version", plugin.name + " " + plugin.getDescription().getFullName(), " v|\\."));
+					lines.add(plugin.messages.parse(plugin.messages.data.getString("info.description"), "description", plugin.getDescription().getDescription()));
+					lines.add(plugin.messages.parse(plugin.messages.data.getString("info.authors"), "authors", plugin.messages.getString(plugin.getDescription().getAuthors(), true), "\\, "));
+					lines.add(plugin.messages.parse(plugin.messages.data.getString("info.website"), "website", plugin.getDescription().getWebsite(), "[\\-\\.]"));
 					plugin.console.sendAction(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase info")));
 				}
 			}
@@ -242,13 +242,13 @@ public class SuitcaseCommand implements CommandExecutor {
 					else {
 						// too many arguments
 						lines.add(plugin.messages.data.getString("system.argument.count"));
-						plugin.console.sendAction(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + plugin.messages.getString(new ArrayList<String>(arguments.subList(1, arguments.size() - 1)), false))));
+						plugin.console.sendAction(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.messages.getString(arguments, false))));
 					}
 				}
 				else {
 					// rating is not enabled
 					lines.add(plugin.messages.parse(plugin.messages.data.getString("error.command.disabled"), "command", "/suitcase rate"));
-					plugin.console.sendAction(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate")));
+					plugin.console.sendAction(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.messages.getString(arguments, false))));
 				}
 			}
 			else {
@@ -282,7 +282,7 @@ public class SuitcaseCommand implements CommandExecutor {
 						else {
 							// player doesn't exist
 							lines.add(plugin.messages.parse(plugin.messages.data.getString("error.player.name"), "player", arguments.get(1)));
-							plugin.console.sendAction(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + arguments.get(0) + " " + arguments.get(1))));
+							plugin.console.sendAction(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.messages.getString(arguments, false))));
 						}
 					}
 					else {
@@ -294,7 +294,7 @@ public class SuitcaseCommand implements CommandExecutor {
 				else {
 					// warning is not enabled
 					lines.add(plugin.messages.parse(plugin.messages.data.getString("error.command.disabled"), "command", "/suitcase warn"));
-					plugin.console.sendAction(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn")));
+					plugin.console.sendAction(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.messages.getString(arguments, false))));
 				}
 			}
 			else {
@@ -308,7 +308,7 @@ public class SuitcaseCommand implements CommandExecutor {
 			if (plugin.permission.hasPermission(sender, "suitcase.reload")) {
 				if (arguments.size() > 1) {
 					// too many arguments
-					lines.add(plugin.messages.data.getString("system.argument.count"));
+					lines.add(plugin.messages.data.getString("error.argument.count"));
 					plugin.console.sendAction(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.messages.getString(arguments, false))));
 				}
 				else {

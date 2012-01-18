@@ -29,12 +29,13 @@ public class SuitcaseConfig {
 		defaults.put("mechanics.rating.default", 0);
 		defaults.put("mechanics.warning.enable", true);
 		defaults.put("mechanics.warning.maximum", 3);
-		defaults.put("log.rate", true);
-		defaults.put("log.warn", true);
-		defaults.put("log.system", true);
+		defaults.put("log.console.command", true);
+		defaults.put("log.console.file", true);
+		defaults.put("log.console.debug", false);
 		defaults.put("log.database.enable", true);
 		defaults.put("log.database.type", "MySQL");
 		defaults.put("log.database.database-name", "minecraft");
+		defaults.put("log.database.port", "12345");
 		defaults.put("log.database.table", "suitcase");
 		defaults.put("log.database.username", "root");
 		defaults.put("log.database.password", "root");

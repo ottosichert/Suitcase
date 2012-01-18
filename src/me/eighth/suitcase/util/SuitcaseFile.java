@@ -37,6 +37,14 @@ public class SuitcaseFile {
 					// apply defaults
 					oldConfig.set(path, defaults.get(path));
 				}
+				// save and use verified keys
+				try {
+					saveFile(oldFile, oldConfig);
+					return true;
+				} catch (IOException e) {
+					plugin.console.sendAction(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, e.toString())));
+					return false;
+				}
 			}
 			else {
 				
@@ -60,45 +68,30 @@ public class SuitcaseFile {
 						}
 					}
 					
+					for (String path : oldConfig.getKeys(true)) {
+						// remove redundant property and ensure it isn't a section
+						if (!defaults.containsKey(path) && !oldConfig.isConfigurationSection(path)) {
+							plugin.console.sendAction(actionType.PROPERTY_REDUNDANT, new ArrayList<String>(Arrays.asList(path, filename, oldConfig.get(path).toString())));
+						}
+					}
+					
 					// save newFile
 					try {
 						saveFile(newFile, newConfig);
+						// delete oldFile and rename newFile
+						oldFile.delete();
+						newFile.renameTo(getFile(filename, true));
+						return true;
 					} catch (IOException e) {
 						plugin.console.sendAction(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename + "~", e.toString())));
 						return false;
 					}
 					
-					// delete oldFile and load new one
-					oldFile.delete();
-					oldFile = getFile(filename, true);
-					oldConfig = YamlConfiguration.loadConfiguration(oldFile);
-					
-					for (String path : newConfig.getKeys(true)) {
-						// remove redundant property and ensure it isn't a section
-						if (defaults.get(path) != null) {
-							oldConfig.set(path, newConfig.get(path));
-						}
-						else if (!newConfig.isConfigurationSection(path)) {
-							plugin.console.sendAction(actionType.PROPERTY_REDUNDANT, new ArrayList<String>(Arrays.asList(path, filename, newConfig.get(path).toString())));
-						}
-					}
-					
-					// don't forget to remove the temporary file afterwards
-					newFile.delete();
 				}
 				else {
 					plugin.console.sendAction(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, "newFileNullError")));
 					return false;
 				}
-			}
-			
-			// save and use verified keys
-			try {
-				saveFile(oldFile, oldConfig);
-				return true;
-			} catch (IOException e) {
-				plugin.console.sendAction(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, e.toString())));
-				return false;
 			}
 		}
 		else {

@@ -35,7 +35,7 @@ public class SuitcaseEvent {
 		eventDefault.put("action.kick.command", "kick {target} {0}");
 		
 		// define eventTags for event.NAME.condition
-		eventTag.put("playerRate", new ArrayList<String>(Arrays.asList("positive", "negative"))); // 'all' always possible
+		eventTag.put("playerRate", new ArrayList<String>(Arrays.asList("positive", "negative"))); // 'all' is always possible
 		eventTag.put("playerWarn", new ArrayList<String>(Arrays.asList("warn", "forgive")));
 		eventTag.put("pluginStatus", new ArrayList<String>(Arrays.asList("enable", "reload", "disable")));
 	}
