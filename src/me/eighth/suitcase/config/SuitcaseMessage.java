@@ -2,10 +2,12 @@ package me.eighth.suitcase.config;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import me.eighth.suitcase.Suitcase;
+import me.eighth.suitcase.log.SuitcaseConsole.actionType;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -37,8 +39,8 @@ public class SuitcaseMessage {
 		
 		// rate command
 		defaults.put("rate.header", " &7----- {player,2,7} &2rating &7-----");
-		defaults.put("rate.rating", "&5Rating &7>> {rating,r,7}");
-		defaults.put("rate.warnings", "&5Warnings &7>> {warnings,r,7}");
+		defaults.put("rate.rating", "&5Rating &7>> {rating,r}&7/{maxrate,2}");
+		defaults.put("rate.warnings", "&5Warnings &7>> {warnings,w}&7/{maxwarn,2}");
 		
 		// basic commands
 		defaults.put("rate.done", "&2You have successfully rated {player,a}&2.");
@@ -56,8 +58,8 @@ public class SuitcaseMessage {
 		defaults.put("error.argument.help", "&4Can't find help for {command,7}&4!");
 		defaults.put("error.argument.rating", "&4Your entered rating {rating,7} &4is invalid!");
 		defaults.put("error.player.name", "&4Can't find player {player,7}&4!");
-		defaults.put("error.player.immune", "&4Player {player,7} &4can't be rated or warned!");
-		defaults.put("error.player.unrated", "&4You haven't been rated by {player,7} &4yet!");
+		defaults.put("error.player.rate", "&4You can't rate {player,7}&4!");
+		defaults.put("error.player.warn", "&4{player,7} &4can't be warned!");
 	}
 	
 	public String parse(String message, String variable, String replacement) {
@@ -72,10 +74,13 @@ public class SuitcaseMessage {
 		for (String var : variables.split("\\}.*\\{")) {
 			String[] split = var.split(",");
 			if (split[0].equals(variable)) {
-				
+				// set colors
 				if (split.length > 1) {
 					if (split[1].equals("r")) {
-						split[1] = String.valueOf(ratingColor(Integer.parseInt(replacement)));
+						split[1] = ratingColor(Integer.parseInt(replacement));
+					}
+					else if (split[1].equals("w")) {
+						split[1] = warningsColor(Integer.parseInt(replacement));
 					}
 					edited = "&" + split[1];
 				}
@@ -92,15 +97,16 @@ public class SuitcaseMessage {
 		}
 		return message.replaceAll("\\{" + variable + "(,[0-9a-fr])*\\}", edited);
 	}
-	
-	// TODO: use mechanics.language
+
+	// TODO: use mechanics.locale
 	// get message file
 	public boolean init() {
-		if (plugin.file.load("message.yml", defaults)) {
+		if (plugin.file.load("message.yml", defaults, false)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/message.yml"));
 			return true;
 		}
 		else {
+			plugin.con.log(actionType.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseMessage", "FileNotLoaded")));
 			return false;
 		}
 	}
@@ -140,7 +146,6 @@ public class SuitcaseMessage {
 	}
 	
 	// return colored message
-	// TODO: Add to parse().
 	private String messageColor(String message) {
 		String hex = "0123456789abcdef";
 		if (!message.contains("&")) {
@@ -167,24 +172,47 @@ public class SuitcaseMessage {
 	}
 	
 	// return color char of ratings
-	private char ratingColor(int rating) {
-		if (rating > 0 && rating <= plugin.config.data.getInt("mechanics.rating.default") * 2 / 5) {
-			return '4';
+	private String ratingColor(int rating) {
+		if (rating > 0 && rating <= plugin.cfg.data.getInt("mechanics.rating.default") * 2 / 5) {
+			return "4";
 		}
-		else if (rating > plugin.config.data.getInt("mechanics.rating.default") * 2 / 5 && rating <= plugin.config.data.getInt("mechanics.rating.default") * 4 / 5) {
-			return 'c';
+		else if (rating > plugin.cfg.data.getInt("mechanics.rating.default") * 2 / 5 && rating <= plugin.cfg.data.getInt("mechanics.rating.default") * 4 / 5) {
+			return "c";
 		}
-		else if (rating > plugin.config.data.getInt("mechanics.rating.default") * 4 / 5 && rating <= (plugin.config.data.getInt("mechanics.rating.maximum") - plugin.config.data.getInt("mechanics.rating.default")) / 5 + plugin.config.data.getInt("mechanics.rating.default")) {
-			return 'e';
+		else if (rating > plugin.cfg.data.getInt("mechanics.rating.default") * 4 / 5 && rating <= (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) / 5 + plugin.cfg.data.getInt("mechanics.rating.default")) {
+			return "e";
 		}
-		else if (rating > (plugin.config.data.getInt("mechanics.rating.maximum") - plugin.config.data.getInt("mechanics.rating.default")) * 2 / 5 + plugin.config.data.getInt("mechanics.rating.default") && rating <= (plugin.config.data.getInt("mechanics.rating.maximum") - plugin.config.data.getInt("mechanics.rating.default")) * 3 / 5 + plugin.config.data.getInt("mechanics.rating.default")) {
-			return 'a';
+		else if (rating > (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) * 2 / 5 + plugin.cfg.data.getInt("mechanics.rating.default") && rating <= (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) * 3 / 5 + plugin.cfg.data.getInt("mechanics.rating.default")) {
+			return "a";
 		}
-		else if (rating > (plugin.config.data.getInt("mechanics.rating.maximum") - plugin.config.data.getInt("mechanics.rating.default")) * 5 / 5 + plugin.config.data.getInt("mechanics.rating.default") && rating <= plugin.config.data.getInt("mechanics.rating.maximum")) {
-			return '2';
+		else if (rating > (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) * 5 / 5 + plugin.cfg.data.getInt("mechanics.rating.default") && rating <= plugin.cfg.data.getInt("mechanics.rating.maximum")) {
+			return "2";
 		}
 		else {
-			return 'f';
+			return "f";
+		}
+	}
+	
+	// return color char of warnings
+	private String warningsColor(int warnings) {
+		String rating = ratingColor(warnings);
+		if (rating.equals("4")) {
+			return "2";
+		}
+		else if (rating.equals("c")) {
+			return "a";
+		}
+		else if (rating.equals("e")) {
+			return "e";
+		}
+		else if (rating.equals("a")) {
+			return "c";
+		}
+		else if (rating.equals("2")) {
+			return "4";
+		}
+		else {
+			return "f";
 		}
 	}
 }

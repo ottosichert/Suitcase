@@ -19,7 +19,7 @@ public class SuitcasePermission {
 
 	// returns true if sender has permission, otherwise false
 	public boolean hasPermission (CommandSender sender, String permission) {
-		if (plugin.config.data.getBoolean("mechanics.op-permissions")) {
+		if (plugin.cfg.data.getBoolean("mechanics.op-permissions")) {
 			if (sender.isOp()) return true; // OPs have all permissions for suitcase if mechanics.op-permissions is enabled
 			else if (defaultPermissions.contains(permission)) return true; // check if user has default permission
 			else return false; // user doesn't have permission

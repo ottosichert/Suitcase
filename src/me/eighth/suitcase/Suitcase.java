@@ -6,124 +6,98 @@ import java.util.Arrays;
 import me.eighth.suitcase.config.SuitcaseConfig;
 import me.eighth.suitcase.config.SuitcaseEvent;
 import me.eighth.suitcase.config.SuitcaseMessage;
-import me.eighth.suitcase.event.SuitcaseCommand;
+import me.eighth.suitcase.event.SuitcaseCommandExecutor;
+import me.eighth.suitcase.event.SuitcasePlayerListener;
 import me.eighth.suitcase.log.SuitcaseConnector;
+import me.eighth.suitcase.log.SuitcaseConsole;
 import me.eighth.suitcase.log.SuitcaseDatabase;
 import me.eighth.suitcase.log.SuitcaseYMLFile;
-import me.eighth.suitcase.util.SuitcaseConsole;
-import me.eighth.suitcase.util.SuitcaseConsole.actionType;
+import me.eighth.suitcase.log.SuitcaseConsole.actionType;
 import me.eighth.suitcase.util.SuitcaseFile;
 import me.eighth.suitcase.util.SuitcasePermission;
 
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Suitcase extends JavaPlugin {
 	
 	public final String name = "Leather";
 	public final String tag = "[Suitcase] - ";
-	public final String cmd = "[PLAYER_COMMAND] ";
-	public final SuitcaseConfig config = new SuitcaseConfig(this);
+	public final String cmdTag = "[PLAYER_COMMAND] ";
+	public final SuitcaseConfig cfg = new SuitcaseConfig(this);
 	public final SuitcaseEvent event = new SuitcaseEvent(this);
-	public final SuitcaseMessage message = new SuitcaseMessage(this);
-	public final SuitcaseCommand command = new SuitcaseCommand(this);
-	public final SuitcaseConnector connector = new SuitcaseConnector(this);
-	public final SuitcaseDatabase database = new SuitcaseDatabase(this);
-	public final SuitcaseYMLFile YMLfile = new SuitcaseYMLFile(this);
+	public final SuitcaseMessage msg = new SuitcaseMessage(this);
+	public final SuitcaseCommandExecutor command = new SuitcaseCommandExecutor(this);
+	public final SuitcasePlayerListener player = new SuitcasePlayerListener(this);
+	public final SuitcaseConnector con = new SuitcaseConnector(this);
 	public final SuitcaseConsole console = new SuitcaseConsole(this);
+	public final SuitcaseDatabase db = new SuitcaseDatabase(this);
+	public final SuitcaseYMLFile yml = new SuitcaseYMLFile(this);
 	public final SuitcaseFile file = new SuitcaseFile(this);
-	public final SuitcasePermission permission = new SuitcasePermission(this);
+	public final SuitcasePermission perm = new SuitcasePermission(this);
 
 	@Override
 	public void onEnable() {
 		// plugin startup
-		console.sendAction(actionType.PLUGIN_ENABLE_START);
+		con.log(actionType.PLUGIN_ENABLE_START);
 		
-		// set command executors and eventlisteners
+		// set command executors and event listeners
 		getCommand("suitcase").setExecutor(command);
 		
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvent(Event.Type.PLAYER_PRELOGIN, player, Event.Priority.Low, this);
+		pm.registerEvent(Event.Type.PLAYER_JOIN, player, Event.Priority.Low, this);
+		
+		// add online players
+		for (Player player : getServer().getOnlinePlayers()) {
+			con.setRating("CONSOLE", player.getName(), cfg.data.getInt("mechanics.rating.default"));
+		}
+		
 		// load and check configuration
-		if (!config.init()) {
-			console.sendAction(actionType.PLUGIN_ENABLE_ERROR, new ArrayList<String>(Arrays.asList("initConfigError")));
-			disable();
-			return;
-		}
-		else if (!message.init()) {
-			console.sendAction(actionType.PLUGIN_ENABLE_ERROR, new ArrayList<String>(Arrays.asList("initMessageError")));
-			disable();
-			return;
-		}
-		else if (!event.init()) {
-			console.sendAction(actionType.PLUGIN_ENABLE_ERROR, new ArrayList<String>(Arrays.asList("initEventError")));
-			disable();
-			return;
-		}
-		else if (!connector.init()) {
-			console.sendAction(actionType.PLUGIN_ENABLE_ERROR, new ArrayList<String>(Arrays.asList("initConnectorError")));
+		if (!cfg.init() || !msg.init() || !event.init() || !con.init()) {
+			con.log(actionType.PLUGIN_ENABLE_ERROR, new ArrayList<String>(Arrays.asList("initError")));
 			disable();
 			return;
 		}
 		else {		
 			// enabling finished, send to log
-			console.sendAction(actionType.PLUGIN_ENABLE_FINISH);
+			con.log(actionType.PLUGIN_ENABLE_FINISH);
 		}
 	}
 	
 	@Override
 	public void onDisable() {
 		// plugin unload
-		console.sendAction(actionType.PLUGIN_DISABLE_START);
+		con.log(actionType.PLUGIN_DISABLE_START);
 		
 		// save and dispose configuration
-		// if something returns false -> disable anyway
-		if (!config.free()) {
-			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeConfigError")));
+		if (!cfg.free() || !msg.free() || !event.free() || !con.free()) {
+			con.log(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeError")));
 		}
-		if (!message.free()) {
-			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeMessageError")));
-		}
-		if (!event.free()) {
-			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeEventError")));
-		}
-		if (!connector.free()) {
-			console.sendAction(actionType.PLUGIN_DISABLE_ERROR, new ArrayList<String>(Arrays.asList("freeConnectorError")));
-		}	
 		
 		// disabling finished, send to log
-		console.sendAction(actionType.PLUGIN_DISABLE_FINISH);
+		con.log(actionType.PLUGIN_DISABLE_FINISH);
 	}
 	
 	public void reload() {
 		// plugin reload
-		console.sendAction(actionType.PLUGIN_RELOAD_START);
+		con.log(actionType.PLUGIN_RELOAD_START);
 		
 		// reload configuration
-		if (!config.reload()) {
-			console.sendAction(actionType.PLUGIN_RELOAD_ERROR, new ArrayList<String>(Arrays.asList("reloadConfigError")));
-			disable();
-			return;
-		}
-		else if (!message.reload()) {
-			console.sendAction(actionType.PLUGIN_RELOAD_ERROR, new ArrayList<String>(Arrays.asList("reloadMessageError")));
-			disable();
-			return;
-		}
-		else if (!event.reload()) {
-			console.sendAction(actionType.PLUGIN_RELOAD_ERROR, new ArrayList<String>(Arrays.asList("reloadEventError")));
-			disable();
-			return;
-		}
-		else if (!connector.reload()) {
-			console.sendAction(actionType.PLUGIN_RELOAD_ERROR, new ArrayList<String>(Arrays.asList("reloadConnectorError")));
+		if (!cfg.reload() || !msg.reload() || !event.reload() || !con.reload()) {
+			con.log(actionType.PLUGIN_RELOAD_ERROR, new ArrayList<String>(Arrays.asList("reloadError")));
 			disable();
 			return;
 		}
 		else {		
 			// reloading finished, send to log
-			console.sendAction(actionType.PLUGIN_RELOAD_FINISH);
+			con.log(actionType.PLUGIN_RELOAD_FINISH);
 		}
 	}
 	
-	// disable plugin due to internal error
+	// disable plugin due to an internal error
 	public void disable() {
 		setEnabled(false);
 	}

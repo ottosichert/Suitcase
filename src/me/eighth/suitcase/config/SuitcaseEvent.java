@@ -10,6 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import me.eighth.suitcase.Suitcase;
+import me.eighth.suitcase.log.SuitcaseConsole.actionType;
 
 public class SuitcaseEvent {
 	
@@ -47,6 +48,7 @@ public class SuitcaseEvent {
 			return true;
 		}
 		else {
+			plugin.con.log(actionType.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseEvent", "FileNotLoaded")));
 			return false;
 		}
 	}
