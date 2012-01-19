@@ -40,7 +40,7 @@ public class SuitcaseMessage {
 		// rate command
 		defaults.put("rate.header", " &7----- {player,2,7} &2rating &7-----");
 		defaults.put("rate.rating", "&5Rating &7>> {rating,r}&7/{maxrate,2}");
-		defaults.put("rate.warnings", "&5Warnings &7>> {warnings,w}&7/{maxwarn,2}");
+		defaults.put("rate.warnings", "&5Warnings &7>> {warnings,w}&7/{maxwarn,4}");
 		
 		// basic commands
 		defaults.put("rate.done", "&2You have successfully rated {player,a}&2.");
@@ -77,7 +77,7 @@ public class SuitcaseMessage {
 				// set colors
 				if (split.length > 1) {
 					if (split[1].equals("r")) {
-						split[1] = ratingColor(Integer.parseInt(replacement));
+						split[1] = ratingColor(Double.parseDouble(replacement));
 					}
 					else if (split[1].equals("w")) {
 						split[1] = warningsColor(Integer.parseInt(replacement));
@@ -95,7 +95,7 @@ public class SuitcaseMessage {
 				}
 			}
 		}
-		return message.replaceAll("\\{" + variable + "(,[0-9a-fr])*\\}", edited);
+		return message.replaceAll("\\{" + variable + "(,[0-9a-frw])*\\}", edited);
 	}
 
 	// TODO: use mechanics.locale
@@ -172,47 +172,46 @@ public class SuitcaseMessage {
 	}
 	
 	// return color char of ratings
-	private String ratingColor(int rating) {
-		if (rating > 0 && rating <= plugin.cfg.data.getInt("mechanics.rating.default") * 2 / 5) {
+	private String ratingColor(double rating) {
+		if (rating >= 0 && rating < plugin.cfg.data.getInt("mechanics.rating.default") * 2 / 5) {
 			return "4";
 		}
-		else if (rating > plugin.cfg.data.getInt("mechanics.rating.default") * 2 / 5 && rating <= plugin.cfg.data.getInt("mechanics.rating.default") * 4 / 5) {
+		else if (rating >= plugin.cfg.data.getInt("mechanics.rating.default") * 2 / 5 && rating < plugin.cfg.data.getInt("mechanics.rating.default") * 4 / 5) {
 			return "c";
 		}
-		else if (rating > plugin.cfg.data.getInt("mechanics.rating.default") * 4 / 5 && rating <= (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) / 5 + plugin.cfg.data.getInt("mechanics.rating.default")) {
+		else if (rating >= plugin.cfg.data.getInt("mechanics.rating.default") * 4 / 5 && rating <= (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) / 5 + plugin.cfg.data.getInt("mechanics.rating.default")) {
 			return "e";
 		}
-		else if (rating > (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) * 2 / 5 + plugin.cfg.data.getInt("mechanics.rating.default") && rating <= (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) * 3 / 5 + plugin.cfg.data.getInt("mechanics.rating.default")) {
+		else if (rating > (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) / 5 + plugin.cfg.data.getInt("mechanics.rating.default") && rating <= (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) * 3 / 5 + plugin.cfg.data.getInt("mechanics.rating.default")) {
 			return "a";
 		}
-		else if (rating > (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) * 5 / 5 + plugin.cfg.data.getInt("mechanics.rating.default") && rating <= plugin.cfg.data.getInt("mechanics.rating.maximum")) {
+		else if (rating > (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) * 3 / 5 + plugin.cfg.data.getInt("mechanics.rating.default") && rating <= plugin.cfg.data.getInt("mechanics.rating.maximum")) {
 			return "2";
 		}
 		else {
-			return "f";
+			return "7";
 		}
 	}
 	
 	// return color char of warnings
 	private String warningsColor(int warnings) {
-		String rating = ratingColor(warnings);
-		if (rating.equals("4")) {
+		if (warnings >= 0 && warnings < plugin.cfg.data.getInt("mechanics.warnings.maximum") * 1 / 5) {
 			return "2";
 		}
-		else if (rating.equals("c")) {
+		else if (warnings >= plugin.cfg.data.getInt("mechanics.warnings.maximum") * 1 / 5 && warnings < plugin.cfg.data.getInt("mechanics.warnings.maximum") * 2 / 5) {
 			return "a";
 		}
-		else if (rating.equals("e")) {
+		else if (warnings >= plugin.cfg.data.getInt("mechanics.warnings.maximum") * 2 / 5 && warnings <= plugin.cfg.data.getInt("mechanics.warnings.maximum") * 3 / 5) {
 			return "e";
 		}
-		else if (rating.equals("a")) {
+		else if (warnings > plugin.cfg.data.getInt("mechanics.warnings.maximum") * 3 / 5 && warnings <= plugin.cfg.data.getInt("mechanics.warnings.maximum") * 4 / 5) {
 			return "c";
 		}
-		else if (rating.equals("2")) {
+		else if (warnings > plugin.cfg.data.getInt("mechanics.warnings.maximum") * 4 / 5 && warnings <= plugin.cfg.data.getInt("mechanics.warnings.maximum")) {
 			return "4";
 		}
 		else {
-			return "f";
+			return "7";
 		}
 	}
 }

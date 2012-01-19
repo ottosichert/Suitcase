@@ -76,13 +76,13 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 				arguments.add("help");
 			}
 			
-			if (plugin.perm.hasPermission(sender, "suitcase.help")) {
+			if (plugin.perm.hasPermission(sender.getName(), "suitcase.help")) {
 				// check command argument
 				if (arguments.size() == 2) {
 					
 					// send help for that command
 					if (commands.contains(arguments.get(1))) {
-						if (plugin.perm.hasPermission(sender, "suitcase." + arguments.get(1)) || (plugin.perm.hasPermission(sender, "suitcase.warn") && arguments.get(1) == "forgive") || plugin.cfg.data.getBoolean("mechanics.full-help")) {
+						if (plugin.perm.hasPermission(sender.getName(), "suitcase." + arguments.get(1)) || (plugin.perm.hasPermission(sender.getName(), "suitcase.warn") && arguments.get(1) == "forgive") || plugin.cfg.data.getBoolean("mechanics.full-help")) {
 							// send header, usage and aliases
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("help.header"), "command", arguments.get(1)));
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("help.usage"), "usage", usage.get(arguments.get(1))));
@@ -115,7 +115,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 					// parsing permissions for commands
 					for (String cmd : commands) {
 						// command forgive has permission suitcase.warn, otherwise check default permissions
-						if ((cmd == "forgive" && plugin.perm.hasPermission(sender, "suitcase.warn")) || plugin.perm.hasPermission(sender, "suitcase." + cmd) || plugin.cfg.data.getBoolean("mechanics.full-help")) {
+						if ((cmd == "forgive" && plugin.perm.hasPermission(sender.getName(), "suitcase.warn")) || plugin.perm.hasPermission(sender.getName(), "suitcase." + cmd) || plugin.cfg.data.getBoolean("mechanics.full-help")) {
 							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("help.info"), "object", usage.get(cmd)), "info", info.get(cmd)));
 						}
 					}
@@ -138,7 +138,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 		}
 		// /suitcase info
 		else if (aliases.get("info").contains(arguments.get(0))) {
-			if (plugin.perm.hasPermission(sender, "suitcase.info")) {
+			if (plugin.perm.hasPermission(sender.getName(), "suitcase.info")) {
 				if (arguments.size() > 1) {
 					// too many arguments
 					lines.add(plugin.msg.data.getString("error.argument.count"));
@@ -162,7 +162,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 		}
 		// /suitcase rate [player] [rating]
 		else if (aliases.get("rate").contains(arguments.get(0))) {
-			if (plugin.perm.hasPermission(sender, "suitcase.rate")) {
+			if (plugin.perm.hasPermission(sender.getName(), "suitcase.rate")) {
 				// check if rating is enabled
 				if (plugin.cfg.data.getBoolean("mechanics.rating.enable")) {
 					// parse arguments
@@ -173,7 +173,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 						if (sender instanceof Player) {
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.header"), "player", "Your"));
 							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(sender.getName()))), "maxrate", String.valueOf(plugin.cfg.data.getInt("mechanics.rating.maximum"))));
-							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(sender.getName()))), "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warning.maximum"))));
+							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(sender.getName()))), "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warnings.maximum"))));
 							plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate")));
 						}
 						else {
@@ -190,7 +190,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 							// send target's rating and warnings
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.header"), "player", arguments.get(1) + "'s", "\\'"));
 							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(sender.getName()))), "maxrate", String.valueOf(plugin.cfg.data.getInt("mechanics.rating.maximum"))));
-							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(sender.getName()))), "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warning.maximum"))));
+							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(sender.getName()))), "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warnings.maximum"))));
 							plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1))));
 						}
 						else {
@@ -255,9 +255,9 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 		}
 		// /suitcase warn/forgive [player]
 		else if (aliases.get("warn").contains(arguments.get(0)) || aliases.get("forgive").contains(arguments.get(0))) {
-			if (plugin.perm.hasPermission(sender, "suitcase.warn")) {
+			if (plugin.perm.hasPermission(sender.getName(), "suitcase.warn")) {
 				// check if warning is enabled
-				if (plugin.cfg.data.getBoolean("mechanics.warning.enable")) {
+				if (plugin.cfg.data.getBoolean("mechanics.warnings.enable")) {
 					// two arguments: warn/forgive and a player's name
 					if (arguments.size() == 2) {
 						// check if targeted player exists
@@ -311,7 +311,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 		}
 		// /suitcase reload
 		else if (aliases.get("reload").contains(arguments.get(0))) {
-			if (plugin.perm.hasPermission(sender, "suitcase.reload")) {
+			if (plugin.perm.hasPermission(sender.getName(), "suitcase.reload")) {
 				if (arguments.size() > 1) {
 					// too many arguments
 					lines.add(plugin.msg.data.getString("error.argument.count"));

@@ -29,8 +29,8 @@ public class SuitcaseConfig {
 		defaults.put("mechanics.rating.enable", true);
 		defaults.put("mechanics.rating.maximum", 10);
 		defaults.put("mechanics.rating.default", 5);
-		defaults.put("mechanics.warning.enable", true);
-		defaults.put("mechanics.warning.maximum", 3);
+		defaults.put("mechanics.warnings.enable", true);
+		defaults.put("mechanics.warnings.maximum", 3);
 		defaults.put("log.console.command", true);
 		defaults.put("log.console.file", true);
 		defaults.put("log.console.debug", false);

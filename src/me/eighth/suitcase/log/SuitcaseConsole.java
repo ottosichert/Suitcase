@@ -152,7 +152,7 @@ public class SuitcaseConsole {
 			}
 			// no arguments
 		case PLUGIN_DISABLE_FINISH:
-			if (!checkArguments(action, arguments, 0)) {
+			if (checkArguments(action, arguments, 0)) {
 				mcLogger.info(plugin.tag + "Suitcase successfully disabled.");
 				return true;
 			}

@@ -2,6 +2,7 @@ package me.eighth.suitcase.log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 import me.eighth.suitcase.Suitcase;
 import me.eighth.suitcase.log.SuitcaseConsole.actionType;
@@ -14,24 +15,35 @@ public class SuitcaseConnector {
 		this.plugin = plugin;
 	}
 
-	public int getRating(String target) {
-		if (plugin.cfg.data.getBoolean("log.database.enable")) {
-			return 9;
-		}
-		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
-			return plugin.yml.getRating(target);
+	public double getRating(String target) {
+		if (plugin.perm.hasPermission(target, "suitcase.rate")) {
+			if (plugin.cfg.data.getBoolean("log.database.enable")) {
+				return Math.round(new Random().nextDouble() * 100.) / 10.;
+			}
+			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+				return plugin.yml.getRating(target);
+			}
+			else {
+				return 0;
+			}
 		}
 		else {
+			// targeted player must have permission to be rated
 			return 0;
 		}
 	}
 	
 	public boolean setRating(String sender, String target, int rating) {
-		if (plugin.cfg.data.getBoolean("log.database.enable")) {
-			return true;
-		}
-		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
-			return plugin.yml.setRating(sender, target, rating);
+		if (plugin.perm.hasPermission(target, "suitcase.rate")) {
+			if (plugin.cfg.data.getBoolean("log.database.enable")) {
+				return true;
+			}
+			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+				return plugin.yml.setRating(sender, target, rating);
+			}
+			else {
+				return false;
+			}
 		}
 		else {
 			return false;
@@ -47,12 +59,12 @@ public class SuitcaseConnector {
 				return 1;
 			}
 			else {
-				return 0;
+				return 1;
 			}
 		}
 		else {
 			// players with permission to warn can't be warned themselves
-			return 0;
+			return new Random().nextInt(4);
 		}
 	}
 	

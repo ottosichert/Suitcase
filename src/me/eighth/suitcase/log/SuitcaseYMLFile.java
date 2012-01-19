@@ -19,7 +19,7 @@ public class SuitcaseYMLFile {
 		this.plugin = plugin;
 	}
 	
-	protected int getRating(String target) {
+	protected double getRating(String target) {
 		if (data.contains(target)) {
 			return data.getInt(target + "rating");
 		}
@@ -42,7 +42,7 @@ public class SuitcaseYMLFile {
 	}
 	
 	protected boolean init() {
-		if (plugin.file.load("plugins/Suitcase/player.yml")) {
+		if (plugin.file.load("player.yml")) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
 			return true;
 		}

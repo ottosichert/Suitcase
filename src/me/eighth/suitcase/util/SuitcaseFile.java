@@ -89,7 +89,7 @@ public class SuitcaseFile {
 						saveFile(newFile, newConfig);
 						// delete oldFile and rename newFile
 						oldFile.delete();
-						newFile.renameTo(getFile(filename, true));
+						newFile.renameTo(oldFile);
 						return true;
 					} catch (IOException e) {
 						plugin.con.log(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename + "~", e.toString())));
@@ -116,7 +116,7 @@ public class SuitcaseFile {
 				plugin.con.log(actionType.FILE_NOT_FOUND, new ArrayList<String>(Arrays.asList(filename)));
 			}
 			try {
-				new File(file.getPath()).mkdir();
+				new File(("plugins/Suitcase/" + filename).replaceFirst("/[^/]*$", "")).mkdir();
 				file.createNewFile();
 			} catch (IOException e) {
 				plugin.con.log(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, e.toString())));
