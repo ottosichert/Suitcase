@@ -37,32 +37,43 @@ public class SuitcaseConnector {
 			return false;
 		}
 	}
-	
-	public boolean hasRated(String sender, String target) {
-		if (plugin.cfg.data.getBoolean("log.database.enable")) {
-			return true;
-		}
-		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
 
 	public int getWarnings(String target) {
-		if (plugin.cfg.data.getBoolean("log.database.enable")) {
-			return 2;
-		}
-		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
-			return 1;
+		if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
+			if (plugin.cfg.data.getBoolean("log.database.enable")) {
+				return 2;
+			}
+			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+				return 1;
+			}
+			else {
+				return 0;
+			}
 		}
 		else {
+			// players with permission to warn can't be warned themselves
 			return 0;
 		}
 	}
 	
 	public boolean setWarnings(String sender, String target, boolean increase) {
+		if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
+			if (plugin.cfg.data.getBoolean("log.database.enable")) {
+				return true;
+			}
+			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public boolean isRegistered(String name) {
 		if (plugin.cfg.data.getBoolean("log.database.enable")) {
 			return true;
 		}

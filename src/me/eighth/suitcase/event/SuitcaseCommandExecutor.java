@@ -172,8 +172,8 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 						// show rating and warnings
 						if (sender instanceof Player) {
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.header"), "player", "Your"));
-							lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(sender.getName())), "/"));
-							lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(sender.getName())), "/"));
+							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(sender.getName()))), "maxrate", String.valueOf(plugin.cfg.data.getInt("mechanics.rating.maximum"))));
+							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(sender.getName()))), "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warning.maximum"))));
 							plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate")));
 						}
 						else {
@@ -185,23 +185,13 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 					
 					// one argument -> view rating of someone else
 					else if (arguments.size() == 2) {
-						// get player from name
-						Player target = plugin.getServer().getPlayer(arguments.get(1));
-						// check if player exists
-						if (target != null) {
-							// separate executing player from console
-							if (plugin.con.hasRated(target.getName(), sender.getName()) || !(sender instanceof Player)) {
-								// send target's rating and warnings and check whether he has rated the player, who executed the command, or not
-								lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.header"), "player", target.getName() + "'s", "\\'"));
-								lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(target.getName())), "/"));
-								lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(target.getName())), "/"));
-								plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + target.getName())));
-							}
-							else {
-								// player has to rate targeted player first in order to view his rating
-								lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.rate"), "player", target.getName()));
-								plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + target.getName())));
-							}
+						// check if player is registered
+						if (plugin.con.isRegistered(arguments.get(1))) {
+							// send target's rating and warnings
+							lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.header"), "player", arguments.get(1) + "'s", "\\'"));
+							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(sender.getName()))), "maxrate", String.valueOf(plugin.cfg.data.getInt("mechanics.rating.maximum"))));
+							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(sender.getName()))), "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warning.maximum"))));
+							plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1))));
 						}
 						else {
 							// player doesn't exist
@@ -212,27 +202,31 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 					
 					// two arguments -> rate a player
 					else if (arguments.size() == 3) {
-						// get player from name
-						Player target = plugin.getServer().getPlayer(arguments.get(1));
 						// check if player exists
-						if (target != null) {
+						if (plugin.con.isRegistered(arguments.get(1))) {
 							try { // catch NumberFormatException
 								if (Integer.parseInt(arguments.get(2)) >= 0 && Integer.parseInt(arguments.get(2)) <= plugin.cfg.data.getInt("mechanics.rating.maximum")) {
-									plugin.con.setRating(sender.getName(), target.getName(), Integer.parseInt(arguments.get(2)));
-									lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.done"), "player", target.getName()));
-									plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + target.getName() + " " + arguments.get(2))));
+									if (plugin.con.setRating(sender.getName(), arguments.get(1), Integer.parseInt(arguments.get(2)))) {
+										lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.done"), "player", arguments.get(1)));
+										plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
+									}
+									else {
+										// rating failed
+										lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.rate"), "player", arguments.get(1)));
+										plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
+									}
 								}
 								else {
 									// rating not found
 									lines.add(plugin.msg.parse(plugin.msg.data.getString("error.argument.rating"), "rating", arguments.get(2)));
-									plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + target.getName() + " " + arguments.get(2))));
+									plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
 								}
 						    }
 						    catch (NumberFormatException e)
 						    {
 						    	// no number
 								lines.add(plugin.msg.parse(plugin.msg.data.getString("error.argument.rating"), "rating", arguments.get(2)));
-								plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + target.getName() + " " + arguments.get(2))));
+								plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
 						    }
 						}
 						else {
@@ -266,19 +260,29 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 				if (plugin.cfg.data.getBoolean("mechanics.warning.enable")) {
 					// two arguments: warn/forgive and a player's name
 					if (arguments.size() == 2) {
-						// get player from name
-						Player target = plugin.getServer().getPlayer(arguments.get(1));
 						// check if targeted player exists
-						if (target != null) {
+						if (plugin.con.isRegistered(arguments.get(1))) {
 							if (aliases.get("warn").contains(arguments.get(0))) {
-								plugin.con.setWarnings(sender.getName(), target.getName(), true);
-								lines.add(plugin.msg.parse(plugin.msg.data.getString("warn.done"), "player", target.getName()));
-								plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn " + target.getName())));
+								if (plugin.con.setWarnings(sender.getName(), arguments.get(1), true)) {
+									lines.add(plugin.msg.parse(plugin.msg.data.getString("warn.done"), "player", arguments.get(1)));
+									plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn " + arguments.get(1))));
+								}
+								else {
+									// warning failed
+									lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.warn"), "player", arguments.get(1)));
+									plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn " + arguments.get(1))));
+								}
 							}
 							else { // forgive
-								plugin.con.setWarnings(sender.getName(), target.getName(), false);
-								lines.add(plugin.msg.parse(plugin.msg.data.getString("forgive.done"), "player", target.getName()));
-								plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase forgive " + target.getName())));
+								if (plugin.con.setWarnings(sender.getName(), arguments.get(1), false)) {
+									lines.add(plugin.msg.parse(plugin.msg.data.getString("forgive.done"), "player", arguments.get(1)));
+									plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase forgive " + arguments.get(1))));
+								}
+								else {
+									// can't be warned -> can't be forgiven
+									lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.warn"), "player", arguments.get(1)));
+									plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn " + arguments.get(1))));
+								}
 							}
 						}
 						else {

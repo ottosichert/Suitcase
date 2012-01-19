@@ -21,23 +21,7 @@ public class SuitcaseYMLFile {
 	
 	protected int getRating(String target) {
 		if (data.contains(target)) {
-			File playerFile = new File("plugins/Suitcase/player/" + target + ".yml");
-			if (playerFile.exists()) {
-				FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
-				
-				// get rating
-				if (playerData.contains("rating")) {
-					return playerData.getInt("rating");
-				}
-				else {
-					// rating is empty
-					return 0;
-				}
-			}
-			else {
-				// file doesn't exist -> player doesn't exist
-				return 0;
-			}
+			return data.getInt(target + "rating");
 		}
 		else {
 			return 0; // player doesn't exist
@@ -46,6 +30,15 @@ public class SuitcaseYMLFile {
 	
 	protected boolean setRating(String sender, String target, int rating) {
 		return true;
+	}
+	
+	protected boolean isRegistered(String name) {
+		if (data.contains(name)) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	protected boolean init() {
