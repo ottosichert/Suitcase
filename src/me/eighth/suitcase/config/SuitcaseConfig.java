@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.log.SuitcaseConsole.actionType;
+import me.eighth.suitcase.log.SuitcaseConsole.Action;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -48,12 +48,12 @@ public class SuitcaseConfig {
 	
 	// get config file
 	public boolean init() {
-		if (plugin.file.load("config.yml", defaults, false)) {
+		if (plugin.file.load("plugins/Suitcase/config.yml", defaults, false)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/config.yml"));
 			return true;
 		}
 		else {
-			plugin.con.log(actionType.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConfig", "FileNotLoaded")));
+			plugin.con.log(Action.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConfig", "FileNotLoaded")));
 			return false;
 		}
 	}

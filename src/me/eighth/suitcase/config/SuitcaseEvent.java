@@ -10,7 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.log.SuitcaseConsole.actionType;
+import me.eighth.suitcase.log.SuitcaseConsole.Action;
 
 public class SuitcaseEvent {
 	
@@ -43,12 +43,12 @@ public class SuitcaseEvent {
 	
 	// get event file
 	public boolean init() {
-		if (plugin.file.load("event.yml", eventDefault)) {
+		if (plugin.file.load("plugins/Suitcase/event.yml", eventDefault)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/event.yml"));
 			return true;
 		}
 		else {
-			plugin.con.log(actionType.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseEvent", "FileNotLoaded")));
+			plugin.con.log(Action.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseEvent", "FileNotLoaded")));
 			return false;
 		}
 	}

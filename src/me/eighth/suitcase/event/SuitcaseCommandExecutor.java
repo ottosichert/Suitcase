@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.log.SuitcaseConsole.actionType;
+import me.eighth.suitcase.log.SuitcaseConsole.Action;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -93,18 +93,18 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 									lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("help.info"), "object", argument), "info", info.get(argument)));
 								}
 							}
-							plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help " + arguments.get(1))));
+							plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help " + arguments.get(1))));
 						}
 						else {
 							// no permission to that command
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("error.command.deny"), "command", "/suitcase help " + arguments.get(1)));
-							plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help " + arguments.get(1))));
+							plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help " + arguments.get(1))));
 						}
 					}
 					else {
 						// can't find help for this command
 						lines.add(plugin.msg.parse(plugin.msg.data.getString("error.argument.help"), "command", "/suitcase " + arguments.get(1)));
-						plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help " + arguments.get(1))));
+						plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help " + arguments.get(1))));
 					}
 				}
 				// full command help
@@ -122,18 +122,18 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 					
 					// add info message
 					lines.add(plugin.msg.data.getString("help.optional"));
-					plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help")));
+					plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help")));
 				}
 				else {
 					// too many arguments
 					lines.add(plugin.msg.data.getString("error.argument.count"));
-					plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
+					plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
 				}
 			}
 			else {
 				// no permission to help command
 				lines.add(plugin.msg.parse(plugin.msg.data.getString("error.command.deny"), "command", "/suitcase help"));
-				plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help")));
+				plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase help")));
 			}
 		}
 		// /suitcase info
@@ -142,7 +142,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 				if (arguments.size() > 1) {
 					// too many arguments
 					lines.add(plugin.msg.data.getString("error.argument.count"));
-					plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
+					plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
 				}
 				else {
 					// send plugin info
@@ -151,13 +151,13 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 					lines.add(plugin.msg.parse(plugin.msg.data.getString("info.description"), "description", plugin.getDescription().getDescription()));
 					lines.add(plugin.msg.parse(plugin.msg.data.getString("info.authors"), "authors", plugin.msg.getString(plugin.getDescription().getAuthors(), true), "\\, "));
 					lines.add(plugin.msg.parse(plugin.msg.data.getString("info.website"), "website", plugin.getDescription().getWebsite(), "[\\-\\.]"));
-					plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase info")));
+					plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase info")));
 				}
 			}
 			else {
 				// no permission to info command
 				lines.add(plugin.msg.parse(plugin.msg.data.getString("error.command.deny"), "command", "/suitcase info"));
-				plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase info")));
+				plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase info")));
 			}
 		}
 		// /suitcase rate [player] [rating]
@@ -174,12 +174,12 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.header"), "player", "Your"));
 							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(sender.getName()))), "maxrate", String.valueOf(plugin.cfg.data.getInt("mechanics.rating.maximum"))));
 							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(sender.getName()))), "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warnings.maximum"))));
-							plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate")));
+							plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate")));
 						}
 						else {
 							// console has no rating
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("error.command.console"), "command", "/suitcase rate"));
-							plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate")));
+							plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate")));
 						}
 					}
 					
@@ -187,16 +187,23 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 					else if (arguments.size() == 2) {
 						// check if player is registered
 						if (plugin.con.isRegistered(arguments.get(1))) {
-							// send target's rating and warnings
-							lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.header"), "player", arguments.get(1) + "'s", "\\'"));
-							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(sender.getName()))), "maxrate", String.valueOf(plugin.cfg.data.getInt("mechanics.rating.maximum"))));
-							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(sender.getName()))), "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warnings.maximum"))));
-							plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1))));
+							if (!plugin.perm.hasPermission(arguments.get(1), "suitcase.rate")) {
+								// send target's rating and warnings
+								lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.header"), "player", arguments.get(1) + "'s", "\\'"));
+								lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(arguments.get(1)))), "maxrate", String.valueOf(plugin.cfg.data.getInt("mechanics.rating.maximum"))));
+								lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(arguments.get(1)))), "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warnings.maximum"))));
+								plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1))));
+							}
+							else {
+								// player can't be rated
+								lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.rate"), "player", arguments.get(1)));
+								plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1))));
+							}
 						}
 						else {
 							// player doesn't exist
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.name"), "player", arguments.get(1)));
-							plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1))));
+							plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1))));
 						}
 					}
 					
@@ -204,53 +211,60 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 					else if (arguments.size() == 3) {
 						// check if player exists
 						if (plugin.con.isRegistered(arguments.get(1))) {
-							try { // catch NumberFormatException
-								if (Integer.parseInt(arguments.get(2)) >= 0 && Integer.parseInt(arguments.get(2)) <= plugin.cfg.data.getInt("mechanics.rating.maximum")) {
-									if (plugin.con.setRating(sender.getName(), arguments.get(1), Integer.parseInt(arguments.get(2)))) {
-										lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.done"), "player", arguments.get(1)));
-										plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
+							if (!plugin.perm.hasPermission(arguments.get(1), "suitcase.rate")) {
+								try { // catch NumberFormatException
+									if (Integer.parseInt(arguments.get(2)) >= 0 && Integer.parseInt(arguments.get(2)) <= plugin.cfg.data.getInt("mechanics.rating.maximum")) {
+										if (plugin.con.setRating(sender.getName(), arguments.get(1), Integer.parseInt(arguments.get(2)))) {
+											lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.done"), "player", arguments.get(1)));
+											plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
+										}
+										else {
+											// rating failed
+											lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.rate"), "player", arguments.get(1)));
+											plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
+										}
 									}
 									else {
-										// rating failed
-										lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.rate"), "player", arguments.get(1)));
-										plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
+										// rating not found
+										lines.add(plugin.msg.parse(plugin.msg.data.getString("error.argument.rating"), "rating", arguments.get(2)));
+										plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
 									}
 								}
-								else {
-									// rating not found
+								catch (NumberFormatException e)
+								{
+									// no number
 									lines.add(plugin.msg.parse(plugin.msg.data.getString("error.argument.rating"), "rating", arguments.get(2)));
-									plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
+									plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
 								}
-						    }
-						    catch (NumberFormatException e)
-						    {
-						    	// no number
-								lines.add(plugin.msg.parse(plugin.msg.data.getString("error.argument.rating"), "rating", arguments.get(2)));
-								plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
-						    }
+							}
+							else {
+								// player can't be rated
+								lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.rate"), "player", arguments.get(1)));
+								plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1))));
+							}
 						}
 						else {
 							// player doesn't exist
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.name"), "player", arguments.get(1)));
-							plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
+							plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2))));
 						}
 					}
 					else {
 						// too many arguments
 						lines.add(plugin.msg.data.getString("error.argument.count"));
-						plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
+						plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
 					}
 				}
 				else {
 					// rating is not enabled
 					lines.add(plugin.msg.parse(plugin.msg.data.getString("error.command.disabled"), "command", "/suitcase rate"));
-					plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
+					plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
 				}
 			}
 			else {
 				// player doesn't have permission
 				lines.add(plugin.msg.parse(plugin.msg.data.getString("error.command.deny"), "command", "/suitcase rate"));
-				plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate")));
+				plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase rate")));
 			}
 		}
 		// /suitcase warn/forgive [player]
@@ -265,48 +279,48 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 							if (aliases.get("warn").contains(arguments.get(0))) {
 								if (plugin.con.setWarnings(sender.getName(), arguments.get(1), true)) {
 									lines.add(plugin.msg.parse(plugin.msg.data.getString("warn.done"), "player", arguments.get(1)));
-									plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn " + arguments.get(1))));
+									plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn " + arguments.get(1))));
 								}
 								else {
 									// warning failed
 									lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.warn"), "player", arguments.get(1)));
-									plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn " + arguments.get(1))));
+									plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn " + arguments.get(1))));
 								}
 							}
 							else { // forgive
 								if (plugin.con.setWarnings(sender.getName(), arguments.get(1), false)) {
 									lines.add(plugin.msg.parse(plugin.msg.data.getString("forgive.done"), "player", arguments.get(1)));
-									plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase forgive " + arguments.get(1))));
+									plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase forgive " + arguments.get(1))));
 								}
 								else {
 									// can't be warned -> can't be forgiven
 									lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.warn"), "player", arguments.get(1)));
-									plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn " + arguments.get(1))));
+									plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn " + arguments.get(1))));
 								}
 							}
 						}
 						else {
 							// player doesn't exist
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("error.player.name"), "player", arguments.get(1)));
-							plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
+							plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
 						}
 					}
 					else {
 						// invalid amount of arguments
 						lines.add(plugin.msg.data.getString("error.argument.count"));
-						plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
+						plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
 					}
 				}
 				else {
 					// warning is not enabled
 					lines.add(plugin.msg.parse(plugin.msg.data.getString("error.command.disabled"), "command", "/suitcase warn"));
-					plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
+					plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
 				}
 			}
 			else {
 				// player isn't allowed to warn
 				lines.add(plugin.msg.parse(plugin.msg.data.getString("error.command.deny"), "command", "/suitcase warn"));
-				plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn")));
+				plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase warn")));
 			}
 		}
 		// /suitcase reload
@@ -315,10 +329,10 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 				if (arguments.size() > 1) {
 					// too many arguments
 					lines.add(plugin.msg.data.getString("error.argument.count"));
-					plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
+					plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
 				}
 				else {
-					plugin.con.log(actionType.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase reload")));
+					plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase reload")));
 					plugin.reload();
 					lines.add(plugin.msg.data.getString("reload.done"));
 				}
@@ -326,13 +340,13 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 			else {
 				// no permission
 				lines.add(plugin.msg.parse(plugin.msg.data.getString("error.command.deny"), "command", "/suitcase reload"));
-				plugin.con.log(actionType.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase reload")));
+				plugin.con.log(Action.PLAYER_COMMAND_DENIED, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase reload")));
 			}
 		}
 		// command not found
 		else {
 			lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("error.command.unknown"), "command", "/suitcase " + plugin.msg.getString(arguments, false)), "help", "/suitcase help"));
-			plugin.con.log(actionType.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
+			plugin.con.log(Action.PLAYER_COMMAND_INVALID, new ArrayList<String>(Arrays.asList(sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false))));
 		}
 		
 		// send edited message at the end

@@ -19,15 +19,6 @@ public class SuitcaseDatabase {
 		
 		return true;
 	}
-
-	protected boolean reload() {
-		if (free() && init()) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
 	
 	// TODO: Hibernate database interface for MySQL, h2 and some others
 }

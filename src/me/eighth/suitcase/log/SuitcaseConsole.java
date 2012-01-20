@@ -12,9 +12,9 @@ public class SuitcaseConsole {
 	
 	private Suitcase plugin;
 	private final Logger mcLogger = Logger.getLogger("Minecraft");
-	private Map<actionType, String> dependences = new HashMap<actionType, String>();
+	private Map<Action, String> dependences = new HashMap<Action, String>();
 	
-	public enum actionType {
+	public enum Action {
 		
 		// plugin startup
 		PLUGIN_ENABLE_START,
@@ -47,6 +47,7 @@ public class SuitcaseConsole {
 		
 		// internal objects
 		INIT_ERROR,
+		FREE_ERROR,
 		
 		// debug
 		DEBUG,
@@ -58,18 +59,18 @@ public class SuitcaseConsole {
 		this.plugin = plugin;
 		
 		// set dependences and always show errors
-		dependences.put(actionType.PLAYER_COMMAND_EXECUTED, "command");
-		dependences.put(actionType.PLAYER_COMMAND_DENIED, "command");
-		dependences.put(actionType.PLAYER_COMMAND_INVALID, "command");
+		dependences.put(Action.PLAYER_COMMAND_EXECUTED, "command");
+		dependences.put(Action.PLAYER_COMMAND_DENIED, "command");
+		dependences.put(Action.PLAYER_COMMAND_INVALID, "command");
 		
-		dependences.put(actionType.PROPERTY_MISSING, "file"); // error for 'config.yml' will always be shown
-		dependences.put(actionType.PROPERTY_REDUNDANT, "file");
-		dependences.put(actionType.FILE_NOT_FOUND, "file");
+		dependences.put(Action.PROPERTY_MISSING, "file"); // error for 'config.yml' will always be shown
+		dependences.put(Action.PROPERTY_REDUNDANT, "file");
+		dependences.put(Action.FILE_NOT_FOUND, "file");
 		
-		dependences.put(actionType.DEBUG, "debug");
+		dependences.put(Action.DEBUG, "debug");
 	}
 
-	private boolean checkArguments(actionType action, ArrayList<String> arguments, int size) {
+	private boolean checkArguments(Action action, ArrayList<String> arguments, int size) {
 		if (arguments.size() == size) {
 			if (dependences.containsKey(action)) {
 				if (plugin.cfg.data != null && plugin.cfg.data.contains("log.console." + dependences.get(action))) {
@@ -89,12 +90,12 @@ public class SuitcaseConsole {
 			}
 		}
 		else {
-			sendAction(actionType.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), plugin.msg.getString(arguments, true))));
+			sendAction(Action.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), plugin.msg.getString(arguments, true))));
 			return false;
 		}
 	}
 	
-	protected boolean sendAction(actionType action, ArrayList<String> arguments) {
+	protected boolean sendAction(Action action, ArrayList<String> arguments) {
 		// log actions to console
 		switch (action) {
 		
@@ -224,6 +225,13 @@ public class SuitcaseConsole {
 				mcLogger.severe(plugin.tag + "Error '" + arguments.get(1) + "' occured while initiating class '" + arguments.get(0) + "'!");
 				return true;
 			}
+			// argument format 0 -> 'free-class'
+			// argument format 1 -> 'error type'
+		case FREE_ERROR:
+			if (checkArguments(action, arguments, 2)) {
+				mcLogger.severe(plugin.tag + "Error '" + arguments.get(1) + "' occured while freeing class '" + arguments.get(0) + "'!");
+				return true;
+			}
 			
 			
 			// argument format * -> 'text'
@@ -256,7 +264,7 @@ public class SuitcaseConsole {
 			// type was not handled
 		default:
 			arguments.add(0, action.toString());
-			return sendAction(actionType.TYPE_NOT_HANDLED, arguments);
+			return sendAction(Action.TYPE_NOT_HANDLED, arguments);
 		}
 	}
 	

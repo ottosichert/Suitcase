@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.log.SuitcaseConsole.actionType;
+import me.eighth.suitcase.log.SuitcaseConsole.Action;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -58,7 +58,7 @@ public class SuitcaseMessage {
 		defaults.put("error.argument.help", "&4Can't find help for {command,7}&4!");
 		defaults.put("error.argument.rating", "&4Your entered rating {rating,7} &4is invalid!");
 		defaults.put("error.player.name", "&4Can't find player {player,7}&4!");
-		defaults.put("error.player.rate", "&4You can't rate {player,7}&4!");
+		defaults.put("error.player.rate", "&4{player,7} &4doesn't have a rating!&4!");
 		defaults.put("error.player.warn", "&4{player,7} &4can't be warned!");
 	}
 	
@@ -101,12 +101,12 @@ public class SuitcaseMessage {
 	// TODO: use mechanics.locale
 	// get message file
 	public boolean init() {
-		if (plugin.file.load("message.yml", defaults, false)) {
+		if (plugin.file.load("plugins/Suitcase/message.yml", defaults, false)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/message.yml"));
 			return true;
 		}
 		else {
-			plugin.con.log(actionType.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseMessage", "FileNotLoaded")));
+			plugin.con.log(Action.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseMessage", "FileNotLoaded")));
 			return false;
 		}
 	}

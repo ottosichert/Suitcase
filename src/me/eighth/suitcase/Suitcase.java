@@ -9,7 +9,7 @@ import me.eighth.suitcase.log.SuitcaseConnector;
 import me.eighth.suitcase.log.SuitcaseConsole;
 import me.eighth.suitcase.log.SuitcaseDatabase;
 import me.eighth.suitcase.log.SuitcaseYMLFile;
-import me.eighth.suitcase.log.SuitcaseConsole.actionType;
+import me.eighth.suitcase.log.SuitcaseConsole.Action;
 import me.eighth.suitcase.util.SuitcaseFile;
 import me.eighth.suitcase.util.SuitcasePermission;
 
@@ -20,25 +20,30 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Suitcase extends JavaPlugin {
 	
+	// constants
 	public final String name = "Leather";
 	public final String tag = "[Suitcase] ";
 	public final String cmdTag = "[PLAYER_COMMAND] ";
+	// config
 	public final SuitcaseConfig cfg = new SuitcaseConfig(this);
 	public final SuitcaseEvent event = new SuitcaseEvent(this);
 	public final SuitcaseMessage msg = new SuitcaseMessage(this);
+	// event
 	private final SuitcaseCommandExecutor command = new SuitcaseCommandExecutor(this);
 	private final SuitcasePlayerListener player = new SuitcasePlayerListener(this);
+	// log
 	public final SuitcaseConnector con = new SuitcaseConnector(this);
 	public final SuitcaseConsole console = new SuitcaseConsole(this);
 	public final SuitcaseDatabase db = new SuitcaseDatabase(this);
 	public final SuitcaseYMLFile yml = new SuitcaseYMLFile(this);
+	// util
 	public final SuitcaseFile file = new SuitcaseFile(this);
 	public final SuitcasePermission perm = new SuitcasePermission(this);
 
 	@Override
 	public void onEnable() {
 		// plugin startup
-		con.log(actionType.PLUGIN_ENABLE_START);
+		con.log(Action.PLUGIN_ENABLE_START);
 		
 		// set command executors and event listeners
 		getCommand("suitcase").setExecutor(command);
@@ -46,7 +51,6 @@ public class Suitcase extends JavaPlugin {
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_PRELOGIN, player, Event.Priority.Low, this);
 		pm.registerEvent(Event.Type.PLAYER_JOIN, player, Event.Priority.Low, this);
-		
 		
 		// load and check configuration
 		if (!cfg.init()) {
@@ -68,17 +72,24 @@ public class Suitcase extends JavaPlugin {
 		
 		// add online players
 		for (Player player : getServer().getOnlinePlayers()) {
-			con.setRating("CONSOLE", player.getName(), cfg.data.getInt("mechanics.rating.default"));
+			if (con.isRegistered(player.getName())) {
+				if (!con.register(player.getName())) {
+					
+				}
+				else {
+					
+				}
+			}
 		}
 		
 		// enabling finished, send to log
-		con.log(actionType.PLUGIN_ENABLE_FINISH);
+		con.log(Action.PLUGIN_ENABLE_FINISH);
 	}
 	
 	@Override
 	public void onDisable() {
 		// plugin unload
-		con.log(actionType.PLUGIN_DISABLE_START);
+		con.log(Action.PLUGIN_DISABLE_START);
 		
 		// save and dispose configuration
 		if (!cfg.free()) {
@@ -95,12 +106,12 @@ public class Suitcase extends JavaPlugin {
 		}
 		
 		// disabling finished, send to log
-		con.log(actionType.PLUGIN_DISABLE_FINISH);
+		con.log(Action.PLUGIN_DISABLE_FINISH);
 	}
 	
 	public void reload() {
 		// plugin reload
-		con.log(actionType.PLUGIN_RELOAD_START);
+		con.log(Action.PLUGIN_RELOAD_START);
 		
 		// reload configuration
 		if (!cfg.reload()) {
@@ -121,7 +132,7 @@ public class Suitcase extends JavaPlugin {
 		}
 		
 		// reloading finished, send to log
-		con.log(actionType.PLUGIN_RELOAD_FINISH);
+		con.log(Action.PLUGIN_RELOAD_FINISH);
 	}
 	
 	// disable plugin due to an internal error

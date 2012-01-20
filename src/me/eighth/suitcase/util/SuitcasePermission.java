@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import me.eighth.suitcase.Suitcase;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class SuitcasePermission {
@@ -23,14 +24,21 @@ public class SuitcasePermission {
 			return true;
 		}
 		else {
-			Player player = plugin.getServer().getPlayer(sender);
-			if (plugin.cfg.data.getBoolean("mechanics.op-permissions")) {
-				if (player.isOp()) return true; // OPs have all permissions for suitcase if mechanics.op-permissions is enabled
-				else if (defaultPermissions.contains(permission)) return true; // check if user has default permission
-				else return false; // user doesn't have permission
+			OfflinePlayer player = plugin.getServer().getOfflinePlayer(sender);
+			// TODO: get offline player
+			if (player != null) {
+				if (plugin.cfg.data.getBoolean("mechanics.op-permissions")) {
+					if (player.isOp()) return true; // OPs have all permissions for suitcase if mechanics.op-permissions is enabled
+					else if (defaultPermissions.contains(permission)) return true; // check if user has default permission
+					else return false; // user doesn't have permission
+				}
+				else {
+					return false;
+				}
 			}
-			else if (player.hasPermission(permission) || player.hasPermission("suitcase.*") || player.hasPermission("*")) return true; // check regular permissions (including super permissions)
-			else return false;
+			else {
+				return false;
+			}
 		}
 	}
 }

@@ -11,7 +11,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.log.SuitcaseConsole.actionType;
+import me.eighth.suitcase.log.SuitcaseConsole.Action;
 
 public class SuitcaseFile {
 
@@ -25,8 +25,24 @@ public class SuitcaseFile {
 		return load(filename, new HashMap<String, Object>());
 	}
 	
+	public boolean load(String filename, FileConfiguration defaults) {
+		Map<String, Object> defaultsMap = new HashMap<String, Object>();
+		for (String key : defaults.getKeys(true)) {
+			defaultsMap.put(key, defaults.get(key));
+		}
+		return load(filename, defaultsMap, true);
+	}
+	
 	public boolean load(String filename, Map<String, Object> defaults) {
 		return load(filename, defaults, true);
+	}
+
+	public boolean load(String filename, FileConfiguration defaults, boolean optional) {
+		Map<String, Object> defaultsMap = new HashMap<String, Object>();
+		for (String key : defaults.getKeys(true)) {
+		defaultsMap.put(key, defaults.get(key));
+		}
+		return load(filename, defaultsMap, optional);
 	}
 	
 	public boolean load(String filename, Map<String, Object> defaults, boolean optional) {
@@ -51,7 +67,7 @@ public class SuitcaseFile {
 					saveFile(oldFile, oldConfig);
 					return true;
 				} catch (IOException e) {
-					plugin.con.log(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, e.toString())));
+					plugin.con.log(Action.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, e.toString())));
 					return false;
 				}
 			}
@@ -68,7 +84,7 @@ public class SuitcaseFile {
 					for (String path : defaults.keySet()) {
 						if (!oldConfig.contains(path) && !optional) {
 							// set missing property and log to console if file wasn't empty
-							plugin.con.log(actionType.PROPERTY_MISSING, new ArrayList<String>(Arrays.asList(path, filename, defaults.get(path).toString())));
+							plugin.con.log(Action.PROPERTY_MISSING, new ArrayList<String>(Arrays.asList(path, filename, defaults.get(path).toString())));
 							newConfig.set(path, defaults.get(path));
 						}
 						else {
@@ -80,7 +96,7 @@ public class SuitcaseFile {
 					for (String path : oldConfig.getKeys(true)) {
 						// look for redundant properties and ensure they aren't sections
 						if (!defaults.containsKey(path) && !oldConfig.isConfigurationSection(path) && !optional) {
-							plugin.con.log(actionType.PROPERTY_REDUNDANT, new ArrayList<String>(Arrays.asList(path, filename, oldConfig.get(path).toString())));
+							plugin.con.log(Action.PROPERTY_REDUNDANT, new ArrayList<String>(Arrays.asList(path, filename, oldConfig.get(path).toString())));
 						}
 					}
 					
@@ -92,34 +108,34 @@ public class SuitcaseFile {
 						newFile.renameTo(oldFile);
 						return true;
 					} catch (IOException e) {
-						plugin.con.log(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename + "~", e.toString())));
+						plugin.con.log(Action.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename + "~", e.toString())));
 						return false;
 					}
 					
 				}
 				else {
-					plugin.con.log(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, "newFileNullError")));
+					plugin.con.log(Action.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, "newFileNullError")));
 					return false;
 				}
 			}
 		}
 		else {
-			plugin.con.log(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, "oldFileNullError")));
+			plugin.con.log(Action.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, "oldFileNullError")));
 			return false;
 		}
 	}
 
 	private File getFile(String filename, boolean suppress) {
-		File file = new File("plugins/Suitcase/" + filename);
+		File file = new File(filename);
 		if (!file.exists()) {
 			if (!suppress) {
-				plugin.con.log(actionType.FILE_NOT_FOUND, new ArrayList<String>(Arrays.asList(filename)));
+				plugin.con.log(Action.FILE_NOT_FOUND, new ArrayList<String>(Arrays.asList(filename)));
 			}
 			try {
-				new File(("plugins/Suitcase/" + filename).replaceFirst("/[^/]*$", "")).mkdir();
+				new File(filename.replaceFirst("/[^/]*$", "")).mkdir();
 				file.createNewFile();
 			} catch (IOException e) {
-				plugin.con.log(actionType.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, e.toString())));
+				plugin.con.log(Action.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, e.toString())));
 				plugin.disable();
 				return null;
 			}

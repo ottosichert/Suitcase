@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.log.SuitcaseConsole.actionType;
+import me.eighth.suitcase.log.SuitcaseConsole.Action;
 
 public class SuitcaseConnector {
 
@@ -56,7 +56,7 @@ public class SuitcaseConnector {
 				return 2;
 			}
 			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
-				return 1;
+				return plugin.yml.getWarnings(target);
 			}
 			else {
 				return 1;
@@ -68,13 +68,13 @@ public class SuitcaseConnector {
 		}
 	}
 	
-	public boolean setWarnings(String sender, String target, boolean increase) {
+	public boolean setWarnings(String sender, String target, boolean warning) {
 		if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
 			if (plugin.cfg.data.getBoolean("log.database.enable")) {
 				return true;
 			}
 			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
-				return true;
+				return plugin.yml.setWarnings(sender, target, warning);
 			}
 			else {
 				return false;
@@ -85,47 +85,71 @@ public class SuitcaseConnector {
 		}
 	}
 	
-	public boolean isRegistered(String name) {
+	public boolean isRegistered(String target) {
 		if (plugin.cfg.data.getBoolean("log.database.enable")) {
 			return true;
 		}
 		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
-			return true;
+			return plugin.yml.isRegistered(target);
 		}
 		else {
 			return false;
 		}
 	}
 	
-	public boolean log(actionType action) {
+	public boolean register(String target) {
+		if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
+			if (plugin.cfg.data.getBoolean("log.database.enable")) {
+				return true;
+			}
+			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+				return plugin.yml.register(target);
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public boolean log(Action action) {
 		return log(action, new ArrayList<String>());
 	}
 	
-	public boolean log(actionType action, ArrayList<String> arguments) {
+	public boolean log(Action action, ArrayList<String> arguments) {
 		return plugin.console.sendAction(action, arguments);
 	}
 	
 	public boolean init() {
-		if (plugin.yml.init() && plugin.db.init()) {
-			return true;
+		if (plugin.cfg.data.getBoolean("log.database.enable")) {
+			return plugin.db.init();
+		}
+		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+			return plugin.yml.init();
 		}
 		else {
-			plugin.con.log(actionType.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConnector", "FileNotLoaded")));
+			plugin.con.log(Action.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConnector", "NoLogMethodEnabled")));
 			return false;
 		}
 	}
 
 	public boolean free() {
-		if (plugin.yml.free() && plugin.db.free()) {
-			return true;
+		if (plugin.cfg.data.getBoolean("log.database.enable")) {
+			return plugin.db.free();
+		}
+		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+			return plugin.yml.free();
 		}
 		else {
+			plugin.con.log(Action.FREE_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConnector", "NoLogMethodEnabled")));
 			return false;
 		}
 	}
 
 	public boolean reload() {
-		if (free() && init() && plugin.yml.reload() && plugin.db.reload()) {
+		if (free() && init()) {
 			return true;
 		}
 		else {
