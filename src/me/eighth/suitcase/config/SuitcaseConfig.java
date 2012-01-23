@@ -1,8 +1,6 @@
 package me.eighth.suitcase.config;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +32,7 @@ public class SuitcaseConfig {
 		defaults.put("log.console.command", true);
 		defaults.put("log.console.file", true);
 		defaults.put("log.console.debug", false);
-		defaults.put("log.database.enable", true);
+		defaults.put("log.database.enable", false);
 		defaults.put("log.database.type", "MySQL");
 		defaults.put("log.database.database-name", "minecraft");
 		defaults.put("log.database.port", "12345");
@@ -42,7 +40,6 @@ public class SuitcaseConfig {
 		defaults.put("log.database.username", "root");
 		defaults.put("log.database.password", "root");
 		defaults.put("log.file.enable", true);
-		defaults.put("log.file.max-players", 100);
 		defaults.put("stats.enable", false);
 	}
 	
@@ -53,7 +50,7 @@ public class SuitcaseConfig {
 			return true;
 		}
 		else {
-			plugin.con.log(Action.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConfig", "FileNotLoaded")));
+			plugin.con.log(Action.INIT_ERROR, "SuitcaseConfig", "FileNotLoaded");
 			return false;
 		}
 	}

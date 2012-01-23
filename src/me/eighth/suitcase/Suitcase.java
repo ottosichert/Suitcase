@@ -23,7 +23,7 @@ public class Suitcase extends JavaPlugin {
 	// constants
 	public final String name = "Leather";
 	public final String tag = "[Suitcase] ";
-	public final String cmdTag = "[PLAYER_COMMAND] ";
+	public final String cmd = "[PLAYER_COMMAND] ";
 	// config
 	public final SuitcaseConfig cfg = new SuitcaseConfig(this);
 	public final SuitcaseEvent event = new SuitcaseEvent(this);
@@ -72,12 +72,9 @@ public class Suitcase extends JavaPlugin {
 		
 		// add online players
 		for (Player player : getServer().getOnlinePlayers()) {
-			if (con.isRegistered(player.getName())) {
-				if (!con.register(player.getName())) {
-					
-				}
-				else {
-					
+			if (!con.isRegistered(player.getName())) {
+				if (con.register(player.getName())) {
+					con.log(Action.PLAYER_REGISTER, player.getName());
 				}
 			}
 		}
@@ -134,6 +131,11 @@ public class Suitcase extends JavaPlugin {
 		// reloading finished, send to log
 		con.log(Action.PLUGIN_RELOAD_FINISH);
 	}
+	
+	public void reset() {
+		// reset configuration and player ratings
+	}
+	
 	
 	// disable plugin due to an internal error
 	public void disable() {

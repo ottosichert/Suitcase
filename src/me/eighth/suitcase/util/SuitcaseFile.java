@@ -26,11 +26,7 @@ public class SuitcaseFile {
 	}
 	
 	public boolean load(String filename, FileConfiguration defaults) {
-		Map<String, Object> defaultsMap = new HashMap<String, Object>();
-		for (String key : defaults.getKeys(true)) {
-			defaultsMap.put(key, defaults.get(key));
-		}
-		return load(filename, defaultsMap, true);
+		return load(filename, defaults, true);
 	}
 	
 	public boolean load(String filename, Map<String, Object> defaults) {

@@ -48,7 +48,7 @@ public class SuitcaseEvent {
 			return true;
 		}
 		else {
-			plugin.con.log(Action.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseEvent", "FileNotLoaded")));
+			plugin.con.log(Action.INIT_ERROR, "SuitcaseEvent", "FileNotLoaded");
 			return false;
 		}
 	}

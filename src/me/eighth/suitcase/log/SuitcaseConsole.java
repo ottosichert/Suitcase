@@ -37,6 +37,10 @@ public class SuitcaseConsole {
 		PLAYER_COMMAND_INVALID,
 		PLAYER_COMMAND_ERROR,
 		
+		// registration
+		PLAYER_REGISTER,
+		PLAYER_UNREGISTER,
+		
 		// config property/path handling
 		PROPERTY_MISSING,
 		PROPERTY_REDUNDANT,
@@ -46,6 +50,7 @@ public class SuitcaseConsole {
 		FILE_SAVE_ERROR,
 		
 		// internal objects
+		RESET,
 		INIT_ERROR,
 		FREE_ERROR,
 		
@@ -163,33 +168,47 @@ public class SuitcaseConsole {
 			// argument format 1 -> '/suitcase help rate'
 		case PLAYER_COMMAND_EXECUTED:
 			if (checkArguments(action, arguments, 2)) {
-				mcLogger.info(plugin.cmdTag + "'" + arguments.get(0) + "' used command '" + arguments.get(1) + "'.");
+				mcLogger.info(plugin.cmd + "'" + arguments.get(0) + "' used command '" + arguments.get(1) + "'.");
 				return true;
 			}
 			// argument format ^
 		case PLAYER_COMMAND_DENIED:
 			if (checkArguments(action, arguments, 2)) {
-				mcLogger.info(plugin.cmdTag + "'" + arguments.get(0) + "' was denied command '" + arguments.get(1) + "'.");
+				mcLogger.info(plugin.cmd + "'" + arguments.get(0) + "' was denied command '" + arguments.get(1) + "'.");
 				return true;
 			}
 			// argument format ^
 		case PLAYER_COMMAND_INVALID:
 			if (checkArguments(action, arguments, 2)) {
-				mcLogger.info(plugin.cmdTag + "'" + arguments.get(0) + "' tried invalid command '" + arguments.get(1) + "'.");
+				mcLogger.info(plugin.cmd + "'" + arguments.get(0) + "' tried invalid command '" + arguments.get(1) + "'.");
 				return true;
 			}
 			// argument format ^
 			// argument format 2 -> 'errorName'
 		case PLAYER_COMMAND_ERROR:
 			if (checkArguments(action, arguments, 3)) {
-				mcLogger.warning(plugin.cmdTag + "'" + arguments.get(0) + "' caused error '" + arguments.get(2) + "' by executing '" + arguments.get(1) + "'!");
+				mcLogger.severe(plugin.cmd + "'" + arguments.get(0) + "' caused error '" + arguments.get(2) + "' by executing '" + arguments.get(1) + "'!");
+				return true;
+			}
+			
+
+			// argument format 0 -> 'player'
+		case PLAYER_REGISTER:
+			if (checkArguments(action, arguments, 1)) {
+				mcLogger.info(plugin.tag + "Player '" + arguments.get(0) + "' was successfully registered!");
+				return true;
+			}
+			// argument format ^
+		case PLAYER_UNREGISTER:
+			if (checkArguments(action, arguments, 1)) {
+				mcLogger.info(plugin.tag + "Player '" + arguments.get(0) + "' was successfully unregistered!");
 				return true;
 			}
 			
 			
 			// argument format 0 -> 'path.property'
 			// argument format 1 -> 'filename.ext'
-			// argument format 2 -> 'default value'
+			// argument format 2 -> 'value'
 		case PROPERTY_MISSING:
 			if (checkArguments(action, arguments, 3)) {
 				mcLogger.warning(plugin.tag + "Missing property '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Set to default: '" + arguments.get(2) + "'.");
@@ -217,7 +236,13 @@ public class SuitcaseConsole {
 				return true;
 			}
 			
-			
+
+			// no arguments
+		case RESET:
+			if (checkArguments(action, arguments, 0)) {
+				mcLogger.severe(plugin.tag + "Resetting configuration and player data...");
+				return true;
+			}
 			// argument format 0 -> 'init-class'
 			// argument format 1 -> 'error type'
 		case INIT_ERROR:

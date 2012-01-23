@@ -2,7 +2,6 @@ package me.eighth.suitcase.config;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +21,11 @@ public class SuitcaseMessage {
 	
 	public SuitcaseMessage(Suitcase plugin) {
 		this.plugin = plugin;
+		
+		// variable usage: {var,1,2}
+		// var: variable name, will be replaced, e.g. 'Hello! How are you?'
+		// 1 (r and w will scale with rating/warnings): color of text, e.g. '&1Hello! &1How are you?'
+		// 2 (only available for some variables): color of special characters, e.g. ! and ?: '&1Hello&2! &1How are you&2?'
 		
 		// help command
 		defaults.put("help.header", " &7----- &2Suitcase {command,2}&7-----");
@@ -47,6 +51,8 @@ public class SuitcaseMessage {
 		defaults.put("warn.done", "&2You have successfully warned {player,a}&2.");
 		defaults.put("forgive.done", "&2You have successfully forgiven {player,a}&2.");
 		defaults.put("reload.done", "&2Suitcase reloaded.");
+		defaults.put("reset.done", "&2Configuration and ratings reset.");
+		defaults.put("reset.confirm", "&2To reset Suitcase, re-enter this command.");
 		
 		// command errors
 		defaults.put("error.command.deny", "&4You don't have permission to use {command,7}&4!");
@@ -60,6 +66,7 @@ public class SuitcaseMessage {
 		defaults.put("error.player.name", "&4Can't find player {player,7}&4!");
 		defaults.put("error.player.rate", "&4{player,7} &4doesn't have a rating!&4!");
 		defaults.put("error.player.warn", "&4{player,7} &4can't be warned!");
+		defaults.put("error.player.self", "&4You can't rate yourself!");
 	}
 	
 	public String parse(String message, String variable, String replacement) {
@@ -106,7 +113,7 @@ public class SuitcaseMessage {
 			return true;
 		}
 		else {
-			plugin.con.log(Action.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseMessage", "FileNotLoaded")));
+			plugin.con.log(Action.INIT_ERROR, "SuitcaseMessage", "FileNotLoaded");
 			return false;
 		}
 	}

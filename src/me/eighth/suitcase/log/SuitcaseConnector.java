@@ -18,18 +18,18 @@ public class SuitcaseConnector {
 	public double getRating(String target) {
 		if (plugin.perm.hasPermission(target, "suitcase.rate")) {
 			if (plugin.cfg.data.getBoolean("log.database.enable")) {
-				return Math.round(new Random().nextDouble() * 100.) / 10.;
+				return Math.round(new Random().nextDouble() * 100.0) / 10.0;
 			}
 			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
 				return plugin.yml.getRating(target);
 			}
 			else {
-				return 0;
+				return 0.0;
 			}
 		}
 		else {
 			// targeted player must have permission to be rated
-			return 0;
+			return 0.0;
 		}
 	}
 	
@@ -68,13 +68,13 @@ public class SuitcaseConnector {
 		}
 	}
 	
-	public boolean setWarnings(String sender, String target, boolean warning) {
+	public boolean setWarnings(String target, boolean warning) {
 		if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
 			if (plugin.cfg.data.getBoolean("log.database.enable")) {
 				return true;
 			}
 			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
-				return plugin.yml.setWarnings(sender, target, warning);
+				return plugin.yml.setWarnings(target, warning);
 			}
 			else {
 				return false;
@@ -98,16 +98,11 @@ public class SuitcaseConnector {
 	}
 	
 	public boolean register(String target) {
-		if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
-			if (plugin.cfg.data.getBoolean("log.database.enable")) {
-				return true;
-			}
-			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
-				return plugin.yml.register(target);
-			}
-			else {
-				return false;
-			}
+		if (plugin.cfg.data.getBoolean("log.database.enable")) {
+			return true;
+		}
+		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+			return plugin.yml.register(target);
 		}
 		else {
 			return false;
@@ -118,8 +113,24 @@ public class SuitcaseConnector {
 		return log(action, new ArrayList<String>());
 	}
 	
+	public boolean log(Action action, String...arguments) {
+		return log(action, new ArrayList<String>(Arrays.asList(arguments)));
+	}
+	
 	public boolean log(Action action, ArrayList<String> arguments) {
 		return plugin.console.sendAction(action, arguments);
+	}
+	
+	public boolean reset() {
+		if (plugin.cfg.data.getBoolean("log.database.enable")) {
+			return true;
+		}
+		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+			return plugin.yml.reset();
+		}
+		else {
+			return false;
+		}
 	}
 	
 	public boolean init() {
