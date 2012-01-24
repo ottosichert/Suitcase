@@ -5,6 +5,7 @@ import me.eighth.suitcase.config.SuitcaseEvent;
 import me.eighth.suitcase.config.SuitcaseMessage;
 import me.eighth.suitcase.event.SuitcaseCommandExecutor;
 import me.eighth.suitcase.event.SuitcasePlayerListener;
+import me.eighth.suitcase.log.SuitcaseBroadcast;
 import me.eighth.suitcase.log.SuitcaseConnector;
 import me.eighth.suitcase.log.SuitcaseConsole;
 import me.eighth.suitcase.log.SuitcaseDatabase;
@@ -22,8 +23,9 @@ public class Suitcase extends JavaPlugin {
 	
 	// constants
 	public final String name = "Leather";
-	public final String tag = "[Suitcase] ";
-	public final String cmd = "[PLAYER_COMMAND] ";
+	public final String pluginTag = "[Suitcase] ";
+	public final String playerTag = "[PLAYER_COMMAND] ";
+	public final String consoleTag = "[CONSOLE_COMMAND] ";
 	// config
 	public final SuitcaseConfig cfg = new SuitcaseConfig(this);
 	public final SuitcaseEvent event = new SuitcaseEvent(this);
@@ -32,6 +34,7 @@ public class Suitcase extends JavaPlugin {
 	private final SuitcaseCommandExecutor command = new SuitcaseCommandExecutor(this);
 	private final SuitcasePlayerListener player = new SuitcasePlayerListener(this);
 	// log
+	public final SuitcaseBroadcast broad = new SuitcaseBroadcast(this);
 	public final SuitcaseConnector con = new SuitcaseConnector(this);
 	public final SuitcaseConsole console = new SuitcaseConsole(this);
 	public final SuitcaseDatabase db = new SuitcaseDatabase(this);

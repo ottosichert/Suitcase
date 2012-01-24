@@ -69,7 +69,12 @@ public class SuitcaseMessage {
 		defaults.put("error.player.warn", "&4{player,7} &4can't be warned!");
 		defaults.put("error.player.self", "&4You can't rate yourself!");
 		
-		// join message
+		// broadcast
+		defaults.put("broadcast.warn", "&7* {player,6} &6was warned! &7*");
+		defaults.put("broadcast.forgive", "&7* {player,6} &6was forgiven! &7*");
+		defaults.put("broadcast.reset", "&7* &6Suitcase has been reset. &7*");
+		
+		// join message(s)
 		// TODO: Add random message feature
 		defaults.put("join", new ArrayList<String>(Arrays.asList("&7* &6Welcome, {player,6}&6! &7*", "&7* &6Rating: {rating,r} &7* &6Warnings: {warnings,w} &7*")));
 	}
@@ -123,7 +128,7 @@ public class SuitcaseMessage {
 	}
 
 	public void reset() {
-		File dataFile = new File("plugins/Suitcase/message" + plugin.cfg.data.getString("mechanics.locale") + ".yml");
+		File dataFile = new File("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml");
 		dataFile.delete();
 		if (plugin.file.load(dataFile.getPath(), defaults, true)) {
 			data = YamlConfiguration.loadConfiguration(dataFile);
@@ -136,8 +141,8 @@ public class SuitcaseMessage {
 	// TODO: use mechanics.locale
 	// get message file
 	public boolean init() {
-		if (plugin.file.load("plugins/Suitcase/message" + plugin.cfg.data.getString("mechanics.locale") + ".yml", defaults, false)) {
-			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/message" + plugin.cfg.data.getString("mechanics.locale") + ".yml"));
+		if (plugin.file.load("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml", defaults, false)) {
+			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml"));
 			return true;
 		}
 		else {

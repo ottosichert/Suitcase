@@ -302,6 +302,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 								if (plugin.con.setWarnings(arguments.get(1), true)) {
 									lines.add(plugin.msg.parse(plugin.msg.data.getString("warn.done"), "player", arguments.get(1)));
 									plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase warn " + arguments.get(1));
+									plugin.con.broadcast(plugin.msg.parse(plugin.msg.data.getString("broadcast.warn"), "player", arguments.get(1)));
 								}
 								else {
 									// warning failed
@@ -313,6 +314,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 								if (plugin.con.setWarnings(arguments.get(1), false)) {
 									lines.add(plugin.msg.parse(plugin.msg.data.getString("forgive.done"), "player", arguments.get(1)));
 									plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase forgive " + arguments.get(1));
+									plugin.con.broadcast(plugin.msg.parse(plugin.msg.data.getString("broadcast.forgive"), "player", arguments.get(1)));
 								}
 								else {
 									// can't be warned -> can't be forgiven
@@ -380,6 +382,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 						plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase reset");
 						plugin.reset();
 						lines.add(plugin.msg.data.getString("reset.done"));
+						plugin.con.broadcast(plugin.msg.data.getString("broadcast.reset"));
 					}
 					else {
 						reset = sender.getName();

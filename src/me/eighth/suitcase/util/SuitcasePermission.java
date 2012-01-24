@@ -11,7 +11,7 @@ public class SuitcasePermission {
 	
 	private Suitcase plugin;
 	
-	private ArrayList<String> defaultPermissions = new ArrayList<String>(Arrays.asList("suitcase.help", "suitcase.info", "suitcase.rate"));
+	private ArrayList<String> defaultPermissions = new ArrayList<String>(Arrays.asList("suitcase.help", "suitcase.broadcast", "suitcase.rate"));
 	
 	public SuitcasePermission(Suitcase plugin) {
 		this.plugin = plugin;

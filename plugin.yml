@@ -17,15 +17,18 @@ permissions:
   suitcase.*:
     description: Gives access to all Suitcase commands
     children:
+      suitcase.broadcast: true
       suitcase.help: true
       suitcase.rate: true
       suitcase.warn: true
       suitcase.admin: true
   suitcase.help:
     description: Shows command help and info
+  suitcase.broadcast:
+    description: Views Suitcase broadcast messages
   suitcase.rate:
     description: Rates other players or view rating
   suitcase.warn:
     description: Warns or forgives players
   suitcase.admin:
-    description: Gives permission to reload or reset Suitcase
+    description: Reloads or resets Suitcase

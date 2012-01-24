@@ -121,6 +121,14 @@ public class SuitcaseConnector {
 		return plugin.console.sendAction(action, arguments);
 	}
 	
+	public void broadcast(String...lines) {
+		broadcast(new ArrayList<String>(Arrays.asList(lines)));
+	}
+	
+	public void broadcast(ArrayList<String> lines) {
+		plugin.broad.broadcastMessage(lines);
+	}
+	
 	public void reset() {
 		if (plugin.cfg.data.getBoolean("log.database.enable")) {
 			
