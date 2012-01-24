@@ -44,7 +44,7 @@ public class SuitcaseFile {
 	public boolean load(String filename, Map<String, Object> defaults, boolean optional) {
 		
 		// get given File and FileConfiguration
-		File oldFile = getFile(filename, false);
+		File oldFile = getFile(filename, optional);
 		FileConfiguration oldConfig;
 		
 		if (oldFile != null) {

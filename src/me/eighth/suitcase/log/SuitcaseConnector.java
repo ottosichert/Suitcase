@@ -121,15 +121,12 @@ public class SuitcaseConnector {
 		return plugin.console.sendAction(action, arguments);
 	}
 	
-	public boolean reset() {
+	public void reset() {
 		if (plugin.cfg.data.getBoolean("log.database.enable")) {
-			return true;
+			
 		}
-		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
-			return plugin.yml.reset();
-		}
-		else {
-			return false;
+		if (plugin.cfg.data.getBoolean("log.file.enable")) {
+			plugin.yml.reset();
 		}
 	}
 	

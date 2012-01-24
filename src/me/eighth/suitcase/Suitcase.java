@@ -88,22 +88,26 @@ public class Suitcase extends JavaPlugin {
 		// plugin unload
 		con.log(Action.PLUGIN_DISABLE_START);
 		
-		// save and dispose configuration
-		if (!cfg.free()) {
-			return;
-		}
-		else if (!msg.free()) {
+		// save and dispose configuration in reverse order
+		if (!con.free()) {
 			return;
 		}
 		else if (!event.free()) {
 			return;
 		}
-		else if (!con.free()) {
+		else if (!msg.free()) {
+			return;
+		}
+		else if (!cfg.free()) {
 			return;
 		}
 		
 		// disabling finished, send to log
 		con.log(Action.PLUGIN_DISABLE_FINISH);
+	}
+	
+	public void debug(String...arguments) {
+		con.log(Action.DEBUG, arguments);
 	}
 	
 	public void reload() {
@@ -133,9 +137,12 @@ public class Suitcase extends JavaPlugin {
 	}
 	
 	public void reset() {
-		// reset configuration and player ratings
+		// reset player ratings
+		cfg.reset();
+		msg.reset();
+		event.reset();
+		con.reset();
 	}
-	
 	
 	// disable plugin due to an internal error
 	public void disable() {

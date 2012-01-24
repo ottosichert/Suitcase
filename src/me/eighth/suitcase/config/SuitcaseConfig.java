@@ -43,6 +43,16 @@ public class SuitcaseConfig {
 		defaults.put("stats.enable", false);
 	}
 	
+	public void reset() {
+		new File("plugins/Suitcase/config.yml").delete();
+		if (plugin.file.load("plugins/Suitcase/config.yml", defaults, true)) {
+			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/config.yml"));
+		}
+		else {
+			plugin.con.log(Action.FILE_SAVE_ERROR, "message.yml", "FileNotLoaded");
+		}
+	}
+	
 	// get config file
 	public boolean init() {
 		if (plugin.file.load("plugins/Suitcase/config.yml", defaults, false)) {

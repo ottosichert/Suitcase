@@ -101,11 +101,8 @@ public class SuitcaseYMLFile {
 				dataMap.put(key + ".warnings", data.get(key + ".warnings"));
 			}
 		}
-		// remove player file if it exists
-		File playerFile = new File("plugins/Suitcase/players/" + target + ".yml");
-		if (playerFile.exists()) {
-			playerFile.delete();
-		}
+		// remove player file
+		new File("plugins/Suitcase/players/" + target + ".yml").delete();
 		// save file and use new FileConfig
 		if (plugin.file.load("plugins/Suitcase/player.yml", dataMap)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
@@ -155,9 +152,18 @@ public class SuitcaseYMLFile {
 		}
 	}
 	
-	protected boolean reset() {
-		
-		return true;
+	protected void reset() {
+		// clear 'player.yml' and 'players/'
+		new File("plugins/Suitcase/player.yml").delete();
+		new File("plugins/Suitcase/players/").delete();
+		if (plugin.file.load("plugins/Suitcase/player.yml")) {
+			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
+			plugin.con.log(Action.RESET);
+		}
+		else {
+			// saving new empty file failed
+			plugin.con.log(Action.FILE_SAVE_ERROR, "player.yml", "FileNotLoaded");
+		}
 	}
 	
 	protected boolean init() {

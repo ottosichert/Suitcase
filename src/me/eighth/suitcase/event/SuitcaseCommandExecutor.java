@@ -98,11 +98,11 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 							// send header, usage and aliases
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("help.header"), "command", arguments.get(1)));
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("help.usage"), "usage", usage.get(arguments.get(1))));
-							lines.add(plugin.msg.parse(plugin.msg.data.getString("help.aliases"), "aliases", plugin.msg.getString(aliases.get(arguments.get(1)), true), "[,]"));
+							lines.add(plugin.msg.parse(plugin.msg.data.getString("help.aliases"), "aliases", plugin.msg.getString(aliases.get(arguments.get(1)), true), ","));
 							// get each argument
 							for (String argument : info.keySet()) {
 								if (usage.get(arguments.get(1)).contains(argument)) {
-									lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("help.info"), "object", argument), "info", info.get(argument)));
+									lines.add(plugin.msg.parse(plugin.msg.data.getString("help.info"), "object", argument, "", "info", info.get(argument)));
 								}
 							}
 							plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase help " + arguments.get(1));
@@ -128,7 +128,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 					for (String cmd : aliases.keySet()) {
 						// check permissions
 						if (plugin.perm.hasPermission(sender.getName(), permission.get(cmd)) || plugin.cfg.data.getBoolean("mechanics.full-help")) {
-							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("help.info"), "object", usage.get(cmd)), "info", info.get(cmd)));
+							lines.add(plugin.msg.parse(plugin.msg.data.getString("help.info"), "object", usage.get(cmd), "", "info", info.get(cmd)));
 						}
 					}
 					
@@ -184,8 +184,8 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 						// show rating and warnings
 						if (sender instanceof Player) {
 							lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.header"), "player", "Your"));
-							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(sender.getName()))), "maxrate", String.valueOf(plugin.cfg.data.getInt("mechanics.rating.maximum"))));
-							lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(sender.getName()))), "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warnings.maximum"))));
+							lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(sender.getName())), "", "maxrate", String.valueOf(plugin.cfg.data.getInt("mechanics.rating.maximum"))));
+							lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(sender.getName())), "", "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warnings.maximum"))));
 							plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase rate");
 						}
 						else {
@@ -202,8 +202,8 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 							if (!plugin.perm.hasPermission(arguments.get(1), permission.get("rate"))) {
 								// send target's rating and warnings
 								lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.header"), "player", arguments.get(1) + "'s", "\\'"));
-								lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(arguments.get(1)))), "maxrate", String.valueOf(plugin.cfg.data.getInt("mechanics.rating.maximum"))));
-								lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(arguments.get(1)))), "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warnings.maximum"))));
+								lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.rating"), "rating", String.valueOf(plugin.con.getRating(arguments.get(1))), "", "maxrate", String.valueOf(plugin.cfg.data.getInt("mechanics.rating.maximum"))));
+								lines.add(plugin.msg.parse(plugin.msg.data.getString("rate.warnings"), "warnings", String.valueOf(plugin.con.getWarnings(arguments.get(1))), "", "maxwarn",  String.valueOf(plugin.cfg.data.getInt("mechanics.warnings.maximum"))));
 								plugin.con.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase rate " + arguments.get(1));
 							}
 							else {
@@ -395,7 +395,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 		}
 		// command not found
 		else {
-			lines.add(plugin.msg.parse(plugin.msg.parse(plugin.msg.data.getString("error.command.unknown"), "command", "/suitcase " + plugin.msg.getString(arguments, false)), "help", "/suitcase help"));
+			lines.add(plugin.msg.parse(plugin.msg.data.getString("error.command.unknown"), "command", "/suitcase " + plugin.msg.getString(arguments, false), "", "help", "/suitcase help"));
 			plugin.con.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase " + plugin.msg.getString(arguments, false));
 		}
 		

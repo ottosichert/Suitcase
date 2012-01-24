@@ -2,6 +2,7 @@ package me.eighth.suitcase.config;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class SuitcaseMessage {
 		// 2 (only available for some variables): color of special characters, e.g. ! and ?: '&1Hello&2! &1How are you&2?'
 		
 		// help command
-		defaults.put("help.header", " &7----- &2Suitcase {command,2}&7-----");
+		defaults.put("help.header", " &7----- &2Suitcase {command,2} &7-----");
 		defaults.put("help.usage", "&5Usage &7>> {usage,3,b}");
 		defaults.put("help.aliases", "&5Aliases &7>> {aliases,3,7}");
 		defaults.put("help.info", "{object,3} &7>> {info,6}");
@@ -52,7 +53,7 @@ public class SuitcaseMessage {
 		defaults.put("forgive.done", "&2You have successfully forgiven {player,a}&2.");
 		defaults.put("reload.done", "&2Suitcase reloaded.");
 		defaults.put("reset.done", "&2Configuration and ratings reset.");
-		defaults.put("reset.confirm", "&2To reset Suitcase, re-enter this command.");
+		defaults.put("reset.confirm", "&2Re-enter this command to reset Suitcase.");
 		
 		// command errors
 		defaults.put("error.command.deny", "&4You don't have permission to use {command,7}&4!");
@@ -67,14 +68,30 @@ public class SuitcaseMessage {
 		defaults.put("error.player.rate", "&4{player,7} &4doesn't have a rating!&4!");
 		defaults.put("error.player.warn", "&4{player,7} &4can't be warned!");
 		defaults.put("error.player.self", "&4You can't rate yourself!");
+		
+		// join message
+		// TODO: Add random message feature
+		defaults.put("join", new ArrayList<String>(Arrays.asList("&7* &6Welcome, {player,6}&6! &7*", "&7* &6Rating: {rating,r} &7* &6Warnings: {warnings,w} &7*")));
 	}
 	
-	public String parse(String message, String variable, String replacement) {
+	public String parse(String message, String...arguments) {
+		for (int i = 1; i < arguments.length; i += 3) {
+			if (i + 1 == arguments.length) {
+				message = parse(message, arguments[i - 1], arguments[i]);
+			}
+			else {
+				message = parse(message, arguments[i - 1], arguments[i], arguments[i + 1]);
+			}
+		}
+		return message;
+	}
+	
+	private String parse(String message, String variable, String replacement) {
 		return parse(message, variable, replacement, "");
 	}
 	
 	// parse variable
-	public String parse(String message, String variable, String replacement, String regex) {
+	private String parse(String message, String variable, String replacement, String regex) {
 		// cut off everything around outer brackets and remove spaces inside
 		String variables = message.replaceAll("^[^\\{]*\\{|\\}[^\\}]*$", "");
 		String edited = "";
@@ -105,11 +122,22 @@ public class SuitcaseMessage {
 		return message.replaceAll("\\{" + variable + "(,[0-9a-frw])*\\}", edited);
 	}
 
+	public void reset() {
+		File dataFile = new File("plugins/Suitcase/message" + plugin.cfg.data.getString("mechanics.locale") + ".yml");
+		dataFile.delete();
+		if (plugin.file.load(dataFile.getPath(), defaults, true)) {
+			data = YamlConfiguration.loadConfiguration(dataFile);
+		}
+		else {
+			plugin.con.log(Action.FILE_SAVE_ERROR, dataFile.getName(), "FileNotLoaded");
+		}
+	}
+	
 	// TODO: use mechanics.locale
 	// get message file
 	public boolean init() {
-		if (plugin.file.load("plugins/Suitcase/message.yml", defaults, false)) {
-			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/message.yml"));
+		if (plugin.file.load("plugins/Suitcase/message" + plugin.cfg.data.getString("mechanics.locale") + ".yml", defaults, false)) {
+			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/message" + plugin.cfg.data.getString("mechanics.locale") + ".yml"));
 			return true;
 		}
 		else {
