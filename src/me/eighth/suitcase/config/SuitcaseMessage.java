@@ -75,8 +75,7 @@ public class SuitcaseMessage {
 		defaults.put("broadcast.reset", "&7* &6Suitcase has been reset. &7*");
 		
 		// join message(s)
-		// TODO: Add random message feature
-		defaults.put("join", new ArrayList<String>(Arrays.asList("&7* &6Welcome, {player,6}&6! &7*", "&7* &6Rating: {rating,r} &7* &6Warnings: {warnings,w} &7*")));
+		defaults.put("join", "&7* &6Welcome, {player,6}&6! &7*\n&7* &6Rating: {rating,r} &7* &6Warnings: {warnings,w} &7*");
 	}
 	
 	public String parse(String message, String...arguments) {
@@ -163,6 +162,10 @@ public class SuitcaseMessage {
 		else {
 			return false;
 		}
+	}
+	
+	public void sendMessage(CommandSender sender, String...lines) {
+		sendMessage(sender, new ArrayList<String>(Arrays.asList(lines)));
 	}
 	
 	// send split and colored message

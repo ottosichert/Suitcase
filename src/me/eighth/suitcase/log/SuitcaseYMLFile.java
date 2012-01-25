@@ -20,25 +20,17 @@ public class SuitcaseYMLFile {
 	}
 	
 	private boolean calculateRating(String target) {
-		if (isRegistered(target)) {
-			FileConfiguration playerData = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/players/" + target + ".yml"));
-			int totalRating = 0;
-			int count = 0;
-			for (String ratingPlayers : playerData.getKeys(false)) {
-				totalRating += playerData.getInt(ratingPlayers);
-				count++;
-			}
-			
-			// add default
-			totalRating += plugin.cfg.data.getInt("mechanics.rating.default");
+		FileConfiguration playerData = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/players/" + target + ".yml"));
+		// add default
+		int totalRating = plugin.cfg.data.getInt("mechanics.rating.default");
+		int count = 1;
+		for (String ratingPlayers : playerData.getKeys(false)) {
+			totalRating += playerData.getInt(ratingPlayers);
 			count++;
-			
-			data.set(target + ".rating", Math.round(Double.valueOf(totalRating) / Double.valueOf(count) * 100.0 ) / 10.0);
-			return true;
 		}
-		else {
-			return false;
-		}
+		
+		data.set(target + ".rating", Math.round(Double.valueOf(totalRating) / Double.valueOf(count) * 100.0 ) / 10.0);
+		return true;
 	}
 	
 	protected double getRating(String target) {

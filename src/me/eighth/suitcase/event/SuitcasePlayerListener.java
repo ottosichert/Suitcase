@@ -1,7 +1,5 @@
 package me.eighth.suitcase.event;
 
-import java.util.ArrayList;
-
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerPreLoginEvent;
@@ -25,10 +23,6 @@ public class SuitcasePlayerListener extends PlayerListener {
 	
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		ArrayList<String> lines = new ArrayList<String>();
-		for (int i = 0; i < plugin.msg.data.getStringList("join").size(); i++) {
-			lines.add(plugin.msg.parse(plugin.msg.data.getStringList("join").get(i), "player", event.getPlayer().getName(), "", "rating", String.valueOf(plugin.con.getRating(event.getPlayer().getName())), "", "warnings", String.valueOf(plugin.con.getWarnings(event.getPlayer().getName()))));
-		}
-		plugin.msg.sendMessage(event.getPlayer(), lines);
+		plugin.msg.sendMessage(event.getPlayer(), plugin.msg.parse(plugin.msg.data.getString("join"), "player", event.getPlayer().getName(), "", "rating", String.valueOf(plugin.con.getRating(event.getPlayer().getName())), "", "warnings", String.valueOf(plugin.con.getWarnings(event.getPlayer().getName()))));
 	}
 }
