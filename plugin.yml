@@ -11,7 +11,6 @@ commands:
   suitcase:
     description: Rate and warn players.
     aliases: [sc, suit]
-    permission: suitcase
     
 permissions:
   suitcase.*:

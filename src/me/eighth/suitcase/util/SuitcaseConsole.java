@@ -1,4 +1,4 @@
-package me.eighth.suitcase.log;
+package me.eighth.suitcase.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,10 +10,16 @@ import me.eighth.suitcase.Suitcase;
 
 public class SuitcaseConsole {
 	
+	/** Suitcase instance */
 	private Suitcase plugin;
+	
+	/** Minecraft logger */
 	private final Logger mcLogger = Logger.getLogger("Minecraft");
+	
+	/** Message types linked to logger settings */
 	private Map<Action, String> dependences = new HashMap<Action, String>();
 	
+	/** Provides different plugin actions to be logged */
 	public enum Action {
 		
 		// plugin startup
@@ -60,6 +66,7 @@ public class SuitcaseConsole {
 		TYPE_NOT_HANDLED
 	}
 	
+	/** Minecraft console logger with different levels */
 	public SuitcaseConsole(Suitcase plugin) {
 		this.plugin = plugin;
 		
@@ -97,19 +104,28 @@ public class SuitcaseConsole {
 			}
 		}
 		else {
-			sendAction(Action.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), plugin.msg.getString(arguments, true))));
+			log(Action.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), plugin.getString(arguments, true))));
 			return false;
 		}
 	}
 	
-	protected boolean sendAction(Action action, ArrayList<String> arguments) {
+
+	public boolean log(Action action) {
+		return log(action, new ArrayList<String>());
+	}
+	
+	public boolean log(Action action, String...arguments) {
+		return log(action, new ArrayList<String>(Arrays.asList(arguments)));
+	}
+	
+	public boolean log(Action action, ArrayList<String> arguments) {
 		// log actions to console
 		switch (action) {
 		
 			// no arguments
 		case PLUGIN_ENABLE_START:
 			if (checkArguments(action, arguments, 0)) {
-				mcLogger.info(plugin.pluginTag + plugin.name + " " + plugin.getDescription().getFullName() + " by " + plugin.msg.getString(plugin.getDescription().getAuthors(), true) + " enabling...");
+				mcLogger.info(plugin.pluginTag + plugin.name + " " + plugin.getDescription().getFullName() + " by " + plugin.getString(plugin.getDescription().getAuthors(), true) + " enabling...");
 			}
 			return true;
 			// argument format 0 -> 'errorName'
@@ -308,7 +324,7 @@ public class SuitcaseConsole {
 			// argument format ^
 		case TYPE_NOT_HANDLED:
 			if (checkArguments(action, arguments, arguments.size())) {
-				mcLogger.severe(plugin.pluginTag + "Type '" + arguments.get(0) + "' was not handled! Arguments: '" + plugin.msg.getString(arguments, true) + "'");
+				mcLogger.severe(plugin.pluginTag + "Type '" + arguments.get(0) + "' was not handled! Arguments: '" + plugin.getString(arguments, true) + "'");
 			}
 			plugin.disable();
 			return false;
@@ -317,7 +333,7 @@ public class SuitcaseConsole {
 			// type was not handled
 		default:
 			arguments.add(0, action.toString());
-			return sendAction(Action.TYPE_NOT_HANDLED, arguments);
+			return log(Action.TYPE_NOT_HANDLED, arguments);
 		}
 	}
 	

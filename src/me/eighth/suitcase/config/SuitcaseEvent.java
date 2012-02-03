@@ -10,20 +10,27 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.log.SuitcaseConsole.Action;
+import me.eighth.suitcase.util.SuitcaseConsole.Action;
 
 public class SuitcaseEvent {
 	
+	/** Suitcase instance */
 	private Suitcase plugin;
+	
+	/** Stores default events */
 	private Map<String, Object> defaults = new HashMap<String, Object>();
+	
+	/** Map of all callable events and its arguments */
 	private Map<String, ArrayList<String>> eventTag = new HashMap<String, ArrayList<String>>();
+	
+	/** Allocate ~/Suitcase/event.yml */
 	public FileConfiguration data;
 	
+	/** Event system file interface */
 	public SuitcaseEvent(Suitcase plugin) {
 		this.plugin = plugin;
 		
 		// set default events
-		// TODO: Make them optional.
 		defaults.put("event.rate.condition", "playerRate && (timeTick >= 1000)");
 		defaults.put("event.rate.action", new ArrayList<String>(Arrays.asList("broadcast()", "thanks()")));
 		defaults.put("event.warn.condition", "playerWarn");
@@ -47,10 +54,10 @@ public class SuitcaseEvent {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/event.yml"));
 		}
 		else {
-			plugin.con.log(Action.FILE_SAVE_ERROR, "event.yml", "FileNotLoaded");
+			plugin.console.log(Action.FILE_SAVE_ERROR, "event.yml", "FileNotLoaded");
 		}
 	}
-	
+
 	// get event file
 	public boolean init() {
 		if (plugin.file.load("plugins/Suitcase/event.yml", defaults)) {
@@ -58,16 +65,16 @@ public class SuitcaseEvent {
 			return true;
 		}
 		else {
-			plugin.con.log(Action.INIT_ERROR, "SuitcaseEvent", "FileNotLoaded");
+			plugin.console.log(Action.INIT_ERROR, "SuitcaseEvent", "FileNotLoaded");
 			return false;
 		}
 	}
-	
+
 	public boolean free() {
 		data = null;
 		return true;
 	}
-	
+
 	public boolean reload() {
 		if (free() && init()) {
 			return true;
@@ -76,5 +83,4 @@ public class SuitcaseEvent {
 			return false;
 		}
 	}
-	
 }

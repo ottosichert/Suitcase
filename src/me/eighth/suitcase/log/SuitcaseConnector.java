@@ -5,12 +5,14 @@ import java.util.Arrays;
 import java.util.Random;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.log.SuitcaseConsole.Action;
+import me.eighth.suitcase.util.SuitcaseConsole.Action;
 
 public class SuitcaseConnector {
-
+	
+	/** Suitcase instance */
 	private Suitcase plugin;
 	
+	/** Database and YAML file interface for player data */
 	public SuitcaseConnector(Suitcase plugin) {
 		this.plugin = plugin;
 	}
@@ -109,24 +111,32 @@ public class SuitcaseConnector {
 		}
 	}
 	
-	public boolean log(Action action) {
-		return log(action, new ArrayList<String>());
+	public boolean getBoolean(String path) {
+		return Boolean.parseBoolean(getString(path));
 	}
 	
-	public boolean log(Action action, String...arguments) {
-		return log(action, new ArrayList<String>(Arrays.asList(arguments)));
+	public int getInt(String path) {
+		return Integer.parseInt(getString(path));
 	}
 	
-	public boolean log(Action action, ArrayList<String> arguments) {
-		return plugin.console.sendAction(action, arguments);
+	public double getDouble(String path) {
+		return Double.parseDouble(getString(path));
 	}
 	
-	public void broadcast(String...lines) {
-		broadcast(new ArrayList<String>(Arrays.asList(lines)));
+	public String getString(String path) {
+		return get(path).toString();
 	}
 	
-	public void broadcast(ArrayList<String> lines) {
-		plugin.broad.broadcastMessage(lines);
+	public Object get(String key) {
+		if (plugin.cfg.data.getBoolean("log.database.enable")) {
+			return null;
+		}
+		if (plugin.cfg.data.getBoolean("log.file.enable")) {
+			return plugin.yml.data.get(key);
+		}
+		else {
+			return null;
+		}
 	}
 	
 	public void reset() {
@@ -146,7 +156,7 @@ public class SuitcaseConnector {
 			return plugin.yml.init();
 		}
 		else {
-			plugin.con.log(Action.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConnector", "NoLogMethodEnabled")));
+			plugin.console.log(Action.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConnector", "NoLogMethodEnabled")));
 			return false;
 		}
 	}
@@ -159,7 +169,7 @@ public class SuitcaseConnector {
 			return plugin.yml.free();
 		}
 		else {
-			plugin.con.log(Action.FREE_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConnector", "NoLogMethodEnabled")));
+			plugin.console.log(Action.FREE_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConnector", "NoLogMethodEnabled")));
 			return false;
 		}
 	}

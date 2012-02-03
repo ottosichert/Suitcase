@@ -6,6 +6,7 @@ public class SuitcaseDatabase {
 	
 	// private Suitcase plugin;
 	
+	/** Database interface for player data */
 	public SuitcaseDatabase(Suitcase plugin) {
 		// this.plugin = plugin;
 	}

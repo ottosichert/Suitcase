@@ -1,13 +1,11 @@
 package me.eighth.suitcase.config;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.log.SuitcaseConsole.Action;
+import me.eighth.suitcase.util.SuitcaseConsole.Action;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -16,36 +14,44 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 public class SuitcaseMessage {
 	
+	/** Suitcase instance */
 	private Suitcase plugin;
+	
+	/** Stores default messages */
 	private Map<String, Object> defaults = new HashMap<String, Object>();
+
+	/** Allocate ~/Suitcase/message-xx_XX.yml */
 	public FileConfiguration data;
 	
+	/** Player interface messages (supports different languages) */
 	public SuitcaseMessage(Suitcase plugin) {
 		this.plugin = plugin;
 		
-		// variable usage: {var,1,2}
-		// var: variable name, will be replaced, e.g. 'Hello! How are you?'
-		// 1 (r and w will scale with rating/warnings): color of text, e.g. '&1Hello! &1How are you?'
-		// 2 (only available for some variables): color of special characters, e.g. ! and ?: '&1Hello&2! &1How are you&2?'
+		// {variable,1,2}
+		// variable: variable name, will be replaced, e.g. 'Hello! How are you?'
+		// 1 (r and w will scale with amount rating/warnings): color of text, e.g. '&1Hello! How are you?'
+		// 2 (not available for all variables): color of special characters, e.g. ! and ?: '&1Hello&2! &1How are you&2?'
 		
 		// help command
 		defaults.put("help.header", " &7----- &2Suitcase {command,2} &7-----");
-		defaults.put("help.usage", "&5Usage &7>> {usage,3,b}");
-		defaults.put("help.aliases", "&5Aliases &7>> {aliases,3,7}");
+		defaults.put("help.usage", "&5Usage &7>> {usage,3}");
+		defaults.put("help.aliases", "&5Aliases &7>> {aliases,3,7,(,)}");
 		defaults.put("help.info", "{object,3} &7>> {info,6}");
 		defaults.put("help.optional", "&6All arguments are optional and there are several aliases.");
 		
 		// info command
 		defaults.put("info.header", " &7----- &2About Suitcase &7-----");
-		defaults.put("info.version", "&5Version &7>> {version,6,7}");
+		defaults.put("info.version", "&5Version &7>> {version,6,7,( v|\\.)}");
 		defaults.put("info.description", "&5Description &7>> {description,6}");
-		defaults.put("info.authors", "&5Authors &7>> {authors,6,7}");
-		defaults.put("info.website", "&5Website &7>> {website,6,7}");
+		defaults.put("info.authors", "&5Authors &7>> {authors,6,7,(, )}");
+		defaults.put("info.website", "&5Website &7>> {website,6,7,([\\-\\.])}");
 		
 		// rate command
-		defaults.put("rate.header", " &7----- {player,2,7} &2rating &7-----");
+		defaults.put("rate.header", " &7----- {player,2,7,(\\')} &2stats &7-----");
 		defaults.put("rate.rating", "&5Rating &7>> {rating,r}&7/{maxrate,2}");
 		defaults.put("rate.warnings", "&5Warnings &7>> {warnings,w}&7/{maxwarn,4}");
+		defaults.put("rate.no-rating", "&5Rating &7>> &6No rating.");
+		defaults.put("rate.no-warnings", "&5Warnings &7>> &6No warnings.");
 		
 		// basic commands
 		defaults.put("rate.done", "&2You have successfully rated {player,a}&2.");
@@ -65,7 +71,7 @@ public class SuitcaseMessage {
 		defaults.put("error.argument.help", "&4Can't find help for {command,7}&4!");
 		defaults.put("error.argument.rating", "&4Your entered rating {rating,7} &4is invalid!");
 		defaults.put("error.player.name", "&4Can't find player {player,7}&4!");
-		defaults.put("error.player.rate", "&4{player,7} &4doesn't have a rating!&4!");
+		defaults.put("error.player.rate", "&4{player,7} &4doesn't have a rating!");
 		defaults.put("error.player.warn", "&4{player,7} &4can't be warned!");
 		defaults.put("error.player.self", "&4You can't rate yourself!");
 		
@@ -75,69 +81,154 @@ public class SuitcaseMessage {
 		defaults.put("broadcast.reset", "&7* &6Suitcase has been reset. &7*");
 		
 		// join message(s)
-		defaults.put("join", "&7* &6Welcome, {player,6}&6! &7*\n&7* &6Rating: {rating,r} &7* &6Warnings: {warnings,w} &7*");
+		defaults.put("join", "&7* &6Welcome, {player,6}&6! &7*&n&7* &6Rating: {rating,r} &7* &6Warnings: {warnings,w} &7*");
 	}
 	
-	public String parse(String message, String...arguments) {
-		for (int i = 1; i < arguments.length; i += 3) {
-			if (i + 1 == arguments.length) {
-				message = parse(message, arguments[i - 1], arguments[i]);
+	/** Sends a message to a player, based on a key, chat colors and variables to be replaced */
+	public void send(CommandSender sender, String key, String...arguments) {
+		
+		// get the message for the given key
+		plugin.debug(key);
+		String message = data.getString(key);
+		
+		String variable, replacement, result;
+		char firstChar;
+		String[] split;
+		
+		// group arguments to pairs, the name of a variable and its replacement
+		for (int i = 2; i <= arguments.length; i += 2) {
+			
+			// get variable and its replacement
+			variable = arguments[i - 2];
+			replacement = arguments[i - 1];
+			
+			// get each possible variable and replace it
+			for (String value : message.replaceAll("^[^\\{]*(?<!\\\\)\\{|(?<!\\\\)\\}[^\\}]*$", "").split("(?<!\\\\)\\}.*(?<!\\\\)\\{")) {
+				
+				// separate variable name and colors
+				split = value.split(",", 4);
+				
+				// check if variable is valid
+				if (split[0].equals(variable)) {
+					
+					// set colors and replace variable
+					switch (split.length) {
+
+					// no colors
+					case 1:
+						message = message.replaceAll("(?<!\\\\)\\{" + variable + "\\}", replacement);
+						break;
+					
+					// invalid amount of arguments
+					case 3:
+						break;
+						
+					// two or four (maximum)
+					default:
+						// set rating color
+						if (split[1].equals("r")) {
+							Double rating = Double.parseDouble(replacement);
+							if (rating >= 0 && rating < plugin.cfg.data.getDouble("mechanics.rating.default") * 2 / 5) {
+								split[1] =  "4";
+							}
+							else if (rating >= plugin.cfg.data.getDouble("mechanics.rating.default") * 2 / 5 && rating < plugin.cfg.data.getDouble("mechanics.rating.default") * 4 / 5) {
+								split[1] =  "c";
+							}
+							else if (rating >= plugin.cfg.data.getDouble("mechanics.rating.default") * 4 / 5 && rating <= (plugin.cfg.data.getDouble("mechanics.rating.maximum") - plugin.cfg.data.getDouble("mechanics.rating.default")) / 5 + plugin.cfg.data.getDouble("mechanics.rating.default")) {
+								split[1] =  "e";
+							}
+							else if (rating > (plugin.cfg.data.getDouble("mechanics.rating.maximum") - plugin.cfg.data.getDouble("mechanics.rating.default")) / 5 + plugin.cfg.data.getDouble("mechanics.rating.default") && rating <= (plugin.cfg.data.getDouble("mechanics.rating.maximum") - plugin.cfg.data.getDouble("mechanics.rating.default")) * 3 / 5 + plugin.cfg.data.getDouble("mechanics.rating.default")) {
+								split[1] =  "a";
+							}
+							else if (rating > (plugin.cfg.data.getDouble("mechanics.rating.maximum") - plugin.cfg.data.getDouble("mechanics.rating.default")) * 3 / 5 + plugin.cfg.data.getDouble("mechanics.rating.default") && rating <= plugin.cfg.data.getDouble("mechanics.rating.maximum")) {
+								split[1] =  "2";
+							}
+							else {
+								split[1] =  "7";
+							}
+						}
+						
+						// set warnings color
+						else if (split[1].equals("w")) {
+							int warnings = Integer.parseInt(replacement);
+							if (warnings >= 0 && warnings < plugin.cfg.data.getInt("mechanics.warnings.maximum") * 1 / 5) {
+								split[1] =  "2";
+							}
+							else if (warnings >=  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 1 / 5 && warnings <  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 2 / 5) {
+								split[1] =  "a";
+							}
+							else if (warnings >=  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 2 / 5 && warnings <=  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 3 / 5) {
+								split[1] =  "e";
+							}
+							else if (warnings >  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 3 / 5 && warnings <=  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 4 / 5) {
+								split[1] =  "c";
+							}
+							else if (warnings >  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 4 / 5 && warnings <=  plugin.cfg.data.getInt("mechanics.warnings.maximum")) {
+								split[1] =  "4";
+							}
+							else {
+								split[1] =  "7";
+							}
+						}
+						
+						// replace variable
+						replacement = "&" + split[1] + replacement;
+						if (split.length == 2) {
+							message = message.replaceAll("(?<!\\\\)\\{" + variable + ",[0-9a-frw]\\}", replacement);
+						}
+						
+						// split.length == 4
+						else {
+							message = message.replaceAll("(?<!\\\\)\\{" + variable + ",[0-9a-frw],[0-9a-f],\\(.*\\)}", replacement.replaceAll(split[3], "&" + split[2] + "$1&" + split[1]));
+						}
+						break;
+					}
+				}
+			}
+		}
+		
+		// replace \{ with {
+		message = message.replaceAll("\\\\\\{", "{");
+		
+		// send message to player
+		String hex = "0123456789abcdef";
+		for (String line : message.split("&n")) {
+			if (line.contains("&")) {
+				split = line.split("&");
+				result = split[0];
+				for (int i = 1; i < split.length; i++) {
+					if (split[i] != null) {
+						firstChar = split[i].toCharArray()[0];
+						if (hex.contains(String.valueOf(firstChar))) {
+							result += ChatColor.getByCode(hex.indexOf(firstChar)) + split[i].substring(1);
+						}
+						else {
+							result += "&" + split[i];
+						}
+					}
+					else {
+						result += "&";
+					}
+				}
 			}
 			else {
-				message = parse(message, arguments[i - 1], arguments[i], arguments[i + 1]);
+				result = line;
 			}
+			sender.sendMessage(result);
 		}
-		return message;
 	}
 	
-	private String parse(String message, String variable, String replacement) {
-		return parse(message, variable, replacement, "");
-	}
-	
-	// parse variable
-	private String parse(String message, String variable, String replacement, String regex) {
-		// cut off everything around outer brackets and remove spaces inside
-		String variables = message.replaceAll("^[^\\{]*\\{|\\}[^\\}]*$", "");
-		String edited = "";
-		for (String var : variables.split("\\}.*\\{")) {
-			String[] split = var.split(",");
-			if (split[0].equals(variable)) {
-				// set colors
-				if (split.length > 1) {
-					if (split[1].equals("r")) {
-						split[1] = ratingColor(Double.parseDouble(replacement));
-					}
-					else if (split[1].equals("w")) {
-						split[1] = warningsColor(Integer.parseInt(replacement));
-					}
-					edited = "&" + split[1];
-				}
-				else {
-					edited = "&f";
-				}
-				if (split.length > 2 && regex != "") {
-					edited += replacement.replaceAll("(" + regex + ")", "&" + split[2] + "$1&" + split[1]) + "&f";
-				}
-				else {
-					edited += replacement;
-				}
-			}
-		}
-		return message.replaceAll("\\{" + variable + "(,[0-9a-frw])*\\}", edited);
-	}
-
 	public void reset() {
 		File dataFile = new File("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml");
 		dataFile.delete();
-		if (plugin.file.load(dataFile.getPath(), defaults, true)) {
+		if (plugin.file.load("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml", defaults, true)) {
 			data = YamlConfiguration.loadConfiguration(dataFile);
 		}
 		else {
-			plugin.con.log(Action.FILE_SAVE_ERROR, dataFile.getName(), "FileNotLoaded");
+			plugin.console.log(Action.FILE_SAVE_ERROR, dataFile.getName(), "FileNotLoaded");
 		}
 	}
-	
-	// TODO: use mechanics.locale
+
 	// get message file
 	public boolean init() {
 		if (plugin.file.load("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml", defaults, false)) {
@@ -145,116 +236,22 @@ public class SuitcaseMessage {
 			return true;
 		}
 		else {
-			plugin.con.log(Action.INIT_ERROR, "SuitcaseMessage", "FileNotLoaded");
+			plugin.console.log(Action.INIT_ERROR, "SuitcaseMessage", "FileNotLoaded");
 			return false;
 		}
 	}
-	
+
 	public boolean free() {
 		data = null;
 		return true;
 	}
-	
+
 	public boolean reload() {
 		if (free() && init()) {
 			return true;
 		}
 		else {
 			return false;
-		}
-	}
-	
-	public void sendMessage(CommandSender sender, String...lines) {
-		sendMessage(sender, new ArrayList<String>(Arrays.asList(lines)));
-	}
-	
-	// send split and colored message
-	public void sendMessage(CommandSender sender, ArrayList<String> lines) {
-		// parse colors and send message line by line
-		for (String line : lines) {
-			for (String split : line.split("\\n")) {
-				sender.sendMessage(messageColor(split));
-			}
-		}
-	}
-
-	// get string from ArrayList and remove brackets
-	public String getString(ArrayList<String> list, boolean commas) {
-		if (commas) {
-			return list.toString().replaceAll("^\\[|\\]$", "");
-		}
-		else {
-			return list.toString().replaceAll("^\\[|\\]$|, ", " ").trim();
-		}
-	}
-	
-	// return colored message
-	private String messageColor(String message) {
-		String hex = "0123456789abcdef";
-		if (!message.contains("&")) {
-			return message;
-		}
-		String[] split = message.split("&");
-		String result = split[0];
-		String firstChar = "";
-		for (int i = 1; i < split.length; i++) {
-			if (split[i] != null) {
-				firstChar = split[i].substring(0, 1).toLowerCase();
-				if (hex.contains(firstChar)) {
-					result += ChatColor.getByCode(hex.indexOf(firstChar)) + split[i].substring(1);
-				}
-				else {
-					result += "&" + split[i];
-				}
-			}
-			else {
-				result += "&";
-			}
-		}
-		return result;
-	}
-	
-	// return color char of ratings
-	private String ratingColor(double rating) {
-		if (rating >= 0 && rating < plugin.cfg.data.getInt("mechanics.rating.default") * 2 / 5) {
-			return "4";
-		}
-		else if (rating >= plugin.cfg.data.getInt("mechanics.rating.default") * 2 / 5 && rating < plugin.cfg.data.getInt("mechanics.rating.default") * 4 / 5) {
-			return "c";
-		}
-		else if (rating >= plugin.cfg.data.getInt("mechanics.rating.default") * 4 / 5 && rating <= (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) / 5 + plugin.cfg.data.getInt("mechanics.rating.default")) {
-			return "e";
-		}
-		else if (rating > (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) / 5 + plugin.cfg.data.getInt("mechanics.rating.default") && rating <= (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) * 3 / 5 + plugin.cfg.data.getInt("mechanics.rating.default")) {
-			return "a";
-		}
-		else if (rating > (plugin.cfg.data.getInt("mechanics.rating.maximum") - plugin.cfg.data.getInt("mechanics.rating.default")) * 3 / 5 + plugin.cfg.data.getInt("mechanics.rating.default") && rating <= plugin.cfg.data.getInt("mechanics.rating.maximum")) {
-			return "2";
-		}
-		else {
-			return "7";
-		}
-	}
-	
-	// return color char of warnings
-	private String warningsColor(int warnings) {
-		if (warnings >= 0 && warnings < plugin.cfg.data.getInt("mechanics.warnings.maximum") * 1 / 5) {
-			return "2";
-		}
-		else if (warnings >= plugin.cfg.data.getInt("mechanics.warnings.maximum") * 1 / 5 && warnings < plugin.cfg.data.getInt("mechanics.warnings.maximum") * 2 / 5) {
-			return "a";
-		}
-		else if (warnings >= plugin.cfg.data.getInt("mechanics.warnings.maximum") * 2 / 5 && warnings <= plugin.cfg.data.getInt("mechanics.warnings.maximum") * 3 / 5) {
-			return "e";
-		}
-		else if (warnings > plugin.cfg.data.getInt("mechanics.warnings.maximum") * 3 / 5 && warnings <= plugin.cfg.data.getInt("mechanics.warnings.maximum") * 4 / 5) {
-			return "c";
-		}
-		else if (warnings > plugin.cfg.data.getInt("mechanics.warnings.maximum") * 4 / 5 && warnings <= plugin.cfg.data.getInt("mechanics.warnings.maximum")) {
-			return "4";
-		}
-		else {
-			return "7";
 		}
 	}
 }

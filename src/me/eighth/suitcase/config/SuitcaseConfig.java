@@ -4,19 +4,24 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.log.SuitcaseConsole.Action;
-
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import me.eighth.suitcase.Suitcase;
+import me.eighth.suitcase.util.SuitcaseConsole.Action;
+
 public class SuitcaseConfig {
 	
+	/** Suitcase instance */
 	private Suitcase plugin;
+	
+	/** Stores default config.yml */
 	private Map<String, Object> defaults = new HashMap<String, Object>();
+	
+	/** Allocate ~/Suitcase/config.yml */
 	public FileConfiguration data;
 	
-	
+	/** File interface of basic plugin settings */
 	public SuitcaseConfig(Suitcase plugin) {
 		this.plugin = plugin;
 		
@@ -25,8 +30,8 @@ public class SuitcaseConfig {
 		defaults.put("mechanics.full-help", false);
 		defaults.put("mechanics.op-permissions", true);
 		defaults.put("mechanics.rating.enable", true);
-		defaults.put("mechanics.rating.maximum", 10);
-		defaults.put("mechanics.rating.default", 5);
+		defaults.put("mechanics.rating.maximum", 10.0);
+		defaults.put("mechanics.rating.default", 5.0);
 		defaults.put("mechanics.warnings.enable", true);
 		defaults.put("mechanics.warnings.maximum", 3);
 		defaults.put("log.console.command", true);
@@ -49,10 +54,10 @@ public class SuitcaseConfig {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/config.yml"));
 		}
 		else {
-			plugin.con.log(Action.FILE_SAVE_ERROR, "message.yml", "FileNotLoaded");
+			plugin.console.log(Action.FILE_SAVE_ERROR, "message.yml", "FileNotLoaded");
 		}
 	}
-	
+
 	// get config file
 	public boolean init() {
 		if (plugin.file.load("plugins/Suitcase/config.yml", defaults, false)) {
@@ -60,16 +65,16 @@ public class SuitcaseConfig {
 			return true;
 		}
 		else {
-			plugin.con.log(Action.INIT_ERROR, "SuitcaseConfig", "FileNotLoaded");
+			plugin.console.log(Action.INIT_ERROR, "SuitcaseConfig", "FileNotLoaded");
 			return false;
 		}
 	}
-	
+
 	public boolean free() {
 		data = null;
 		return true;
 	}
-	
+
 	public boolean reload() {
 		if (free() && init()) {
 			return true;
