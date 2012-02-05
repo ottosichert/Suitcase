@@ -125,7 +125,12 @@ public class Suitcase extends JavaPlugin {
 		console.log(Action.PLUGIN_DISABLE_FINISH);
 	}
 	
-	/** Gets string from ArrayList and removes brackets */
+	/** 
+	 * Gets string from ArrayList and removes brackets 
+	 * 
+	 * @param list An ArrayList of Strings to be converted to a single String
+	 * @param commas Separate String with commas
+	 */
 	public String getString(ArrayList<String> list, boolean commas) {
 		if (commas) {
 			return list.toString().replaceAll("^\\[|\\]$", "");
@@ -135,7 +140,10 @@ public class Suitcase extends JavaPlugin {
 		}
 	}
 	
-	/** Send a debug message to console */
+	/**
+	 * Send a debug message to console
+	 * @param arguments Debug information
+	 */
 	public void debug(String...arguments) {
 		console.log(Action.DEBUG, arguments);
 	}

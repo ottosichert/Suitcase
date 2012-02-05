@@ -12,11 +12,18 @@ public class SuitcaseConnector {
 	/** Suitcase instance */
 	private Suitcase plugin;
 	
-	/** Database and YAML file interface for player data */
+	/**
+	 * Database and YAML file interface for player data
+	 * @param plugin Instance of Suitcase
+	 */
 	public SuitcaseConnector(Suitcase plugin) {
 		this.plugin = plugin;
 	}
-
+	
+	/**
+	 * Returns the rating of a player
+	 * @param target Selected player
+	 */
 	public double getRating(String target) {
 		if (plugin.perm.hasPermission(target, "suitcase.rate")) {
 			if (plugin.cfg.data.getBoolean("log.database.enable")) {
@@ -35,6 +42,12 @@ public class SuitcaseConnector {
 		}
 	}
 	
+	/**
+	 * Sets the rating of a player
+	 * @param sender Rating player
+	 * @param target Rated player
+	 * @param rating Rating for this player
+	 */
 	public boolean setRating(String sender, String target, int rating) {
 		if (plugin.perm.hasPermission(target, "suitcase.rate")) {
 			if (plugin.cfg.data.getBoolean("log.database.enable")) {
@@ -51,7 +64,11 @@ public class SuitcaseConnector {
 			return false;
 		}
 	}
-
+	
+	/**
+	 * Returns the amount of warnings of a player
+	 * @param target Selected player
+	 */
 	public int getWarnings(String target) {
 		if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
 			if (plugin.cfg.data.getBoolean("log.database.enable")) {
@@ -70,6 +87,11 @@ public class SuitcaseConnector {
 		}
 	}
 	
+	/**
+	 * Increases the warning counter of a player by one or resets it
+	 * @param target Warned player
+	 * @param warning True if player is warned or false if player is forgiven
+	 */
 	public boolean setWarnings(String target, boolean warning) {
 		if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
 			if (plugin.cfg.data.getBoolean("log.database.enable")) {
@@ -87,6 +109,10 @@ public class SuitcaseConnector {
 		}
 	}
 	
+	/**
+	 * Check if a player is registered
+	 * @param target Selected player
+	 */
 	public boolean isRegistered(String target) {
 		if (plugin.cfg.data.getBoolean("log.database.enable")) {
 			return true;
@@ -99,6 +125,10 @@ public class SuitcaseConnector {
 		}
 	}
 	
+	/**
+	 * Registers a player
+	 * @param target Selected player
+	 */
 	public boolean register(String target) {
 		if (plugin.cfg.data.getBoolean("log.database.enable")) {
 			return true;
@@ -111,34 +141,7 @@ public class SuitcaseConnector {
 		}
 	}
 	
-	public boolean getBoolean(String path) {
-		return Boolean.parseBoolean(getString(path));
-	}
-	
-	public int getInt(String path) {
-		return Integer.parseInt(getString(path));
-	}
-	
-	public double getDouble(String path) {
-		return Double.parseDouble(getString(path));
-	}
-	
-	public String getString(String path) {
-		return get(path).toString();
-	}
-	
-	public Object get(String key) {
-		if (plugin.cfg.data.getBoolean("log.database.enable")) {
-			return null;
-		}
-		if (plugin.cfg.data.getBoolean("log.file.enable")) {
-			return plugin.yml.data.get(key);
-		}
-		else {
-			return null;
-		}
-	}
-	
+	/** Resets all player ratings and warnings */
 	public void reset() {
 		if (plugin.cfg.data.getBoolean("log.database.enable")) {
 			
@@ -148,6 +151,7 @@ public class SuitcaseConnector {
 		}
 	}
 	
+	/** Initializes file or database logger */
 	public boolean init() {
 		if (plugin.cfg.data.getBoolean("log.database.enable")) {
 			return plugin.db.init();
@@ -160,7 +164,8 @@ public class SuitcaseConnector {
 			return false;
 		}
 	}
-
+	
+	/** Disposes file or closes database connection */
 	public boolean free() {
 		if (plugin.cfg.data.getBoolean("log.database.enable")) {
 			return plugin.db.free();
@@ -173,7 +178,8 @@ public class SuitcaseConnector {
 			return false;
 		}
 	}
-
+	
+	/** Reloads file or database connection */
 	public boolean reload() {
 		if (free() && init()) {
 			return true;

@@ -20,10 +20,13 @@ public class SuitcaseMessage {
 	/** Stores default messages */
 	private Map<String, Object> defaults = new HashMap<String, Object>();
 
-	/** Allocate ~/Suitcase/message-xx_XX.yml */
+	/** Allocates ~/Suitcase/message-xx_XX.yml */
 	public FileConfiguration data;
 	
-	/** Player interface messages (supports different languages) */
+	/**
+	 * Player interface messages (supports different languages)
+	 * @param plugin Instance of Suitcase
+	 */
 	public SuitcaseMessage(Suitcase plugin) {
 		this.plugin = plugin;
 		
@@ -84,7 +87,12 @@ public class SuitcaseMessage {
 		defaults.put("join", "&7* &6Welcome, {player,6}&6! &7*&n&7* &6Rating: {rating,r} &7* &6Warnings: {warnings,w} &7*");
 	}
 	
-	/** Sends a message to a player, based on a key, chat colors and variables to be replaced */
+	/**
+	 * Sends a message to a player, based on a key, chat colors and variables to be replaced
+	 * @param sender Display message to this sender
+	 * @param key YAML key of message configuration file
+	 * @param arguments Variables and their replacement
+	 */
 	public void send(CommandSender sender, String key, String...arguments) {
 		
 		// get the message for the given key
@@ -218,6 +226,7 @@ public class SuitcaseMessage {
 		}
 	}
 	
+	/** Resets message configuration */
 	public void reset() {
 		File dataFile = new File("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml");
 		dataFile.delete();
@@ -228,8 +237,8 @@ public class SuitcaseMessage {
 			plugin.console.log(Action.FILE_SAVE_ERROR, dataFile.getName(), "FileNotLoaded");
 		}
 	}
-
-	// get message file
+	
+	/** Gets and reads message configuration */
 	public boolean init() {
 		if (plugin.file.load("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml", defaults, false)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml"));
@@ -240,12 +249,14 @@ public class SuitcaseMessage {
 			return false;
 		}
 	}
-
+	
+	/** Disposes message configuration */
 	public boolean free() {
 		data = null;
 		return true;
 	}
-
+	
+	/** Reloads message configuration */
 	public boolean reload() {
 		if (free() && init()) {
 			return true;

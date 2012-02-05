@@ -9,21 +9,30 @@ import org.bukkit.OfflinePlayer;
 
 public class SuitcasePermission {
 	
+	/** Suitcase instance */
 	private Suitcase plugin;
 	
-	private ArrayList<String> defaultPermissions = new ArrayList<String>(Arrays.asList("suitcase.help", "suitcase.broadcast", "suitcase.rate"));
+	/** Stores default permissions for players if mechanics.op-permissions is enabled */
+	private ArrayList<String> defaultPermissions;
 	
+	/**
+	 * Handles player and console permissions
+	 * @param plugin Instance of Suitcase
+	 */
 	public SuitcasePermission(Suitcase plugin) {
 		this.plugin = plugin;
+		
+		// load default permissions
+		defaultPermissions = new ArrayList<String>(Arrays.asList("suitcase.help", "suitcase.broadcast", "suitcase.rate"));
 	}
 	
 	// returns true if sender has permission, otherwise false
 	public boolean hasPermission(String sender, String permission) {
-		if (sender.equals("CONSOLE")) {
+		if (sender.equals("CONSOLE")) { // console has permission to all commands
 			return true;
 		}
 		else {
-			OfflinePlayer player = plugin.getServer().getOfflinePlayer(sender);
+			OfflinePlayer player = plugin.getServer().getOfflinePlayer(sender); // we need permissions for offline players as well
 			if (player != null) {
 				if (plugin.cfg.data.getBoolean("mechanics.op-permissions")) {
 					if (player.isOp()) {

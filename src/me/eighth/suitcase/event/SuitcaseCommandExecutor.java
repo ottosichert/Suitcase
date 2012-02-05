@@ -21,7 +21,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 	/** All available command aliases */
 	private Map<String, ArrayList<String>> aliases = new HashMap<String, ArrayList<String>>();
 	
-	/** Usage of all commands */
+	/** Stores usage of all commands */
 	private Map<String, String> usage = new HashMap<String, String>();
 	
 	/** Short information about commands or arguments */
@@ -33,7 +33,10 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 	/** Plugin reset confirmation */
 	private String reset = "";
 	
-	/** Command handler for all /suitcase commands */
+	/**
+	 * Command handler for all suitcase commands
+	 * @param plugin Instance of Suitcase
+	 */
 	public SuitcaseCommandExecutor(Suitcase plugin) {
 		this.plugin = plugin;
 		

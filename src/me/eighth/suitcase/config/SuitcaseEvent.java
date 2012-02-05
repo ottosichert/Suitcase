@@ -23,10 +23,13 @@ public class SuitcaseEvent {
 	/** Map of all callable events and its arguments */
 	private Map<String, ArrayList<String>> eventTag = new HashMap<String, ArrayList<String>>();
 	
-	/** Allocate ~/Suitcase/event.yml */
+	/** Allocates ~/Suitcase/event.yml */
 	public FileConfiguration data;
 	
-	/** Event system file interface */
+	/**
+	 * Event system file interface
+	 * @param plugin Instance of Suitcase
+	 */
 	public SuitcaseEvent(Suitcase plugin) {
 		this.plugin = plugin;
 		
@@ -48,6 +51,7 @@ public class SuitcaseEvent {
 		eventTag.put("pluginStatus", new ArrayList<String>(Arrays.asList("enable", "reload", "disable")));
 	}
 	
+	/** Resets event configuration */
 	public void reset() {
 		new File("plugins/Suitcase/event.yml").delete();
 		if (plugin.file.load("plugins/Suitcase/event.yml", defaults, true)) {
@@ -58,7 +62,7 @@ public class SuitcaseEvent {
 		}
 	}
 
-	// get event file
+	/** Gets and reads event configuration */
 	public boolean init() {
 		if (plugin.file.load("plugins/Suitcase/event.yml", defaults)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/event.yml"));
@@ -69,12 +73,14 @@ public class SuitcaseEvent {
 			return false;
 		}
 	}
-
+	
+	/** Disposes event configuration */
 	public boolean free() {
 		data = null;
 		return true;
 	}
-
+	
+	/** Reloads event configuration */
 	public boolean reload() {
 		if (free() && init()) {
 			return true;

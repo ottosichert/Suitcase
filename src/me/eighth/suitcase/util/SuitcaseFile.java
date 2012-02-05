@@ -14,25 +14,34 @@ import me.eighth.suitcase.Suitcase;
 import me.eighth.suitcase.util.SuitcaseConsole.Action;
 
 public class SuitcaseFile {
-
+	
+	/** Suitcase instance */
 	private Suitcase plugin;
 	
+	/**
+	 * Provides an interface for YAML configuration files
+	 * @param plugin Instance of Suitcase
+	 */
 	public SuitcaseFile(Suitcase plugin) {
 		this.plugin = plugin;
 	}
 	
+	/** Loads a file and merges its value with its defaults */
 	public boolean load(String filename) {
 		return load(filename, new HashMap<String, Object>());
 	}
 	
+	/** Loads a file and merges its value with its defaults */
 	public boolean load(String filename, FileConfiguration defaults) {
 		return load(filename, defaults, true);
 	}
 	
+	/** Loads a file and merges its value with its defaults */
 	public boolean load(String filename, Map<String, Object> defaults) {
 		return load(filename, defaults, true);
 	}
-
+	
+	/** Loads a file and merges its value with its defaults */
 	public boolean load(String filename, FileConfiguration defaults, boolean optional) {
 		Map<String, Object> defaultsMap = new HashMap<String, Object>();
 		for (String key : defaults.getKeys(true)) {
@@ -44,10 +53,13 @@ public class SuitcaseFile {
 		return load(filename, defaultsMap, optional);
 	}
 	
+	/** Loads a file and merges its value with its defaults */
 	public boolean load(String filename, Map<String, Object> defaults, boolean optional) {
 		
-		// get given File and FileConfiguration
+		/** Gets the old file */
 		File oldFile = getFile(filename, optional);
+		
+		/** Gets the configuration of the old file */
 		FileConfiguration oldConfig;
 		
 		if (oldFile != null) {
@@ -72,9 +84,12 @@ public class SuitcaseFile {
 			}
 			else {
 				
-				// load new file and FileConfiguration
+				/** Gets the temporary file */
 				File newFile = getFile(filename + "~", true);
+				
+				/** Gets an empty configuration */
 				FileConfiguration newConfig;
+				
 				if (newFile != null) {
 					
 					newConfig = YamlConfiguration.loadConfiguration(newFile);
@@ -123,7 +138,8 @@ public class SuitcaseFile {
 			return false;
 		}
 	}
-
+	
+	/** Returns a File for a file name */
 	private File getFile(String filename, boolean suppress) {
 		File file = new File(filename);
 		if (!file.exists()) {
@@ -131,6 +147,7 @@ public class SuitcaseFile {
 				plugin.console.log(Action.FILE_NOT_FOUND, new ArrayList<String>(Arrays.asList(filename)));
 			}
 			try {
+				// create parent directory
 				new File(filename.replaceFirst("/[^/]*$", "")).mkdir();
 				file.createNewFile();
 			} catch (IOException e) {
@@ -142,6 +159,7 @@ public class SuitcaseFile {
 		return file;
 	}
 	
+	/** Saves a FileConfiguration to a File */
 	private void saveFile(File file, FileConfiguration fileConfig) throws IOException {
 		fileConfig.save(file);
 	}

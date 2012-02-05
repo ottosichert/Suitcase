@@ -18,10 +18,13 @@ public class SuitcaseConfig {
 	/** Stores default config.yml */
 	private Map<String, Object> defaults = new HashMap<String, Object>();
 	
-	/** Allocate ~/Suitcase/config.yml */
+	/** Allocates ~/Suitcase/config.yml */
 	public FileConfiguration data;
 	
-	/** File interface of basic plugin settings */
+	/**
+	 * File interface of basic plugin settings
+	 * @param plugin Instance of Suitcase
+	 */
 	public SuitcaseConfig(Suitcase plugin) {
 		this.plugin = plugin;
 		
@@ -48,6 +51,7 @@ public class SuitcaseConfig {
 		defaults.put("stats.enable", false);
 	}
 	
+	/** Resets plugin configuration */
 	public void reset() {
 		new File("plugins/Suitcase/config.yml").delete();
 		if (plugin.file.load("plugins/Suitcase/config.yml", defaults, true)) {
@@ -58,7 +62,7 @@ public class SuitcaseConfig {
 		}
 	}
 
-	// get config file
+	/** Gets and reads plugin configuration file */
 	public boolean init() {
 		if (plugin.file.load("plugins/Suitcase/config.yml", defaults, false)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/config.yml"));
@@ -69,12 +73,14 @@ public class SuitcaseConfig {
 			return false;
 		}
 	}
-
+	
+	/** Disposes plugin configuration */
 	public boolean free() {
 		data = null;
 		return true;
 	}
-
+	
+	/** Reloads plugin configuration */
 	public boolean reload() {
 		if (free() && init()) {
 			return true;
