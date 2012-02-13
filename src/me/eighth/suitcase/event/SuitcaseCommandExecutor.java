@@ -30,9 +30,6 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 	/** Permissions linked to commands */
 	private Map<String, String> permission = new HashMap<String, String>();
 	
-	/** Plugin reset confirmation */
-	private String reset = "";
-	
 	/**
 	 * Command handler for all suitcase commands
 	 * @param plugin Instance of Suitcase
@@ -50,9 +47,9 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 		aliases.put("reset", new ArrayList<String>(Arrays.asList("reset", "s")));
 
 		// command usages
-		usage.put("help", "/suitcase help command");
+		usage.put("help", "/suitcase help [command]");
 		usage.put("info", "/suitcase info");
-		usage.put("rate", "/suitcase rate name rating");
+		usage.put("rate", "/suitcase rate [name] [rating]");
 		usage.put("warn", "/suitcase warn name");
 		usage.put("forgive", "/suitcase forgive name");
 		usage.put("reload", "/suitcase reload");
@@ -60,15 +57,15 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 		
 		// argument/command information
 		info.put("help", "Shows help for commands.");
-		info.put("info", "View current version and authors.");
-		info.put("rate", "Rate or view rating of players.");
-		info.put("warn", "Warn a player.");
-		info.put("forgive", "Reset a player's warning counter.");
-		info.put("reload", "Reload this plugin.");
-		info.put("reset", "Reset configuration and player ratings.");
-		info.put("command", "View help for a specific command.");
-		info.put("name", "Select a player by name.");
-		info.put("rating", "Give a rating.");
+		info.put("info", "Views current version and authors.");
+		info.put("rate", "Rates or views rating of players.");
+		info.put("warn", "Warns a player.");
+		info.put("forgive", "Resets a player's warning counter.");
+		info.put("reload", "Reloads this plugin.");
+		info.put("reset", "Resets configuration and player ratings.");
+		info.put("command", "Views help for a specific command.");
+		info.put("name", "Selects a player by name.");
+		info.put("rating", "Sets a rating.");
 		
 		// link permissions
 		permission.put("help", "suitcase.help");
@@ -87,365 +84,480 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 		// args[1] -> player or command name
 		// args[2] -> rating
 		
-		/** List of all lowercased arguments */
 		ArrayList<String> arguments = new ArrayList<String>();
 		for (String arg : args) {
-			arguments.add(arg.toLowerCase());
+			arguments.add(arg);
 		}
 		
-		// /suitcase help [command]
-		if (arguments.size() == 0 || aliases.get("help").contains(arguments.get(0))) {
-			
-			// set first argument to help if no arguments are given
-			if (arguments.size() == 0) {
-				arguments.add("help");
+		// add default command
+		if (arguments.size() == 0) {
+			arguments.add("help");
+		}
+		String full = "/suitcase " + Suitcase.getStringFromList(arguments, "");
+		
+		if (isAlias("help", arguments.get(0))) {
+			if (arguments.size() == 1) {
+				// /suitcase help
+				help(sender);
 			}
-			
-			if (plugin.perm.hasPermission(sender.getName(), permission.get("help"))) {
-				// check command argument
-				if (arguments.size() == 2) {
-					
-					// send help for that command
-					if (aliases.keySet().contains(arguments.get(1))) {
-						if (plugin.perm.hasPermission(sender.getName(), permission.get(arguments.get(1))) || plugin.cfg.data.getBoolean("mechanics.full-help")) {
-							// send header, usage and aliases
-							plugin.msg.send(sender, "help.header", "command", arguments.get(1));
-							plugin.msg.send(sender, "help.usage", "usage", usage.get(arguments.get(1)));
-							plugin.msg.send(sender, "help.aliases", "aliases", plugin.getString(aliases.get(arguments.get(1)), true));
-							// get each argument
-							for (String argument : info.keySet()) {
-								if (usage.get(arguments.get(1)).contains(argument)) {
-									plugin.msg.send(sender, "help.info", "object", argument, "info", info.get(argument));
-								}
-							}
-							plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase help " + arguments.get(1));
-						}
-						else {
-							// no permission to that command
-							plugin.msg.send(sender, "error.command.deny", "command", "/suitcase help " + arguments.get(1));
-							plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase help " + arguments.get(1));
-						}
-					}
-					else {
-						// can't find help for this command
-						plugin.msg.send(sender, "error.argument.help", "command", "/suitcase " + arguments.get(1));
-						plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase help " + arguments.get(1));
-					}
-				}
-				// full command help
-				else if (arguments.size() == 1) {
-					// add header
-					plugin.msg.send(sender, "help.header", "command", "help");
-					
-					// parsing permissions for commands
-					for (String cmd : aliases.keySet()) {
-						// check permissions
-						if (plugin.perm.hasPermission(sender.getName(), permission.get(cmd)) || plugin.cfg.data.getBoolean("mechanics.full-help")) {
-							plugin.msg.send(sender, "help.info", "object", usage.get(cmd), "info", info.get(cmd));
-						}
-					}
-					
-					// add info message
-					plugin.msg.send(sender, "help.optional");
-					plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase help");
+			else if (arguments.size() == 2) {
+				if (aliases.keySet().contains(arguments.get(1))) {
+					// /suitcase help command
+					help(sender, arguments.get(1));
 				}
 				else {
-					// too many arguments
-					plugin.msg.send(sender, "error.argument.count");
-					plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase " + plugin.getString(arguments, false));
+					// invalid sub-command
+					plugin.msg.send(sender, "error.argument.invalid", "argument", arguments.get(1));
+					plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
 				}
 			}
 			else {
-				// no permission to help command
-				plugin.msg.send(sender, "error.command.deny", "command", "/suitcase help");
-				plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase help");
+				// too many arguments
+				plugin.msg.send(sender, "error.argument.amount", "command", "help");
+				plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
 			}
 		}
-		// /suitcase info
-		else if (aliases.get("info").contains(arguments.get(0))) {
-			if (plugin.perm.hasPermission(sender.getName(), permission.get("info"))) {
-				if (arguments.size() > 1) {
-					// too many arguments
-					plugin.msg.send(sender, "error.argument.count");
-					plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase " + plugin.getString(arguments, false));
+		else if (isAlias("info", arguments.get(0))) {
+			if (arguments.size() == 1) {
+				// /suitcase info
+				info(sender);
+			}
+			else {
+				// too many arguments
+				plugin.msg.send(sender, "error.argument.amount", "command", "info");
+				plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
+			}
+		}
+		else if (isAlias("rate", arguments.get(0))) {
+			if (arguments.size() == 1) {
+				// /suitcase rate
+				rate(sender);
+			}
+			else if (arguments.size() == 2) {
+				// /suitcase rate player
+				rate(sender, arguments.get(1));
+			}
+			else if (arguments.size() == 3) {
+				try {
+					// /suitcase rate player rating
+					rate(sender, arguments.get(1), Integer.valueOf(arguments.get(2)));
 				}
-				else {
-					// send plugin info
-					plugin.msg.send(sender, "info.header");
-					plugin.msg.send(sender, "info.version", "version", plugin.name + " " + plugin.getDescription().getFullName());
-					plugin.msg.send(sender, "info.description", "description", plugin.getDescription().getDescription());
-					plugin.msg.send(sender, "info.authors", "authors", plugin.getString(plugin.getDescription().getAuthors(), true));
-					plugin.msg.send(sender, "info.website", "website", plugin.getDescription().getWebsite());
-					plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase info");
+				catch (NumberFormatException e)
+				{
+					// invalid rating
+					plugin.msg.send(sender, "error.argument.rating", "rating", arguments.get(2));
+					plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
 				}
 			}
 			else {
-				// no permission to info command
-				plugin.msg.send(sender, "error.command.deny", "command", "/suitcase info");
-				plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase info");
+				// too many arguments
+				plugin.msg.send(sender, "error.argument.amount", "command", "rate");
+				plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
 			}
 		}
-		// /suitcase rate [player] [rating]
-		else if (aliases.get("rate").contains(arguments.get(0))) {
-			if (plugin.perm.hasPermission(sender.getName(), permission.get("rate"))) {
-				// check if rating is enabled
-				if (plugin.cfg.data.getBoolean("mechanics.rating.enable")) {
-					// parse arguments
-					
-					// no arguments or your name -> view one's own rating
-					if (arguments.size() == 1 || (arguments.size() == 2 && arguments.get(1).equals(sender.getName()))) {
-						// show rating and warnings
-						if (sender instanceof Player) {
-							// send target's rating and warnings
-							plugin.msg.send(sender, "rate.header", "player", "Your");
-							
-							// check if sender can be rated
-							if (plugin.perm.hasPermission(sender.getName(), permission.get("rate"))) {
-								plugin.msg.send(sender, "rate.rating", "rating", String.valueOf(plugin.con.getRating(sender.getName())), "maxrate", plugin.cfg.data.getString("mechanics.rating.maximum"));
-							}
-							else {
-								plugin.msg.send(sender, "rate.no-rating");
-							}
-							
-							// check if sender can be warned
-							if (!plugin.perm.hasPermission(sender.getName(), permission.get("warn"))) {
-								plugin.msg.send(sender, "rate.warnings", "warnings", String.valueOf(plugin.con.getWarnings(sender.getName())), "maxwarn",  plugin.cfg.data.getString("mechanics.warnings.maximum"));
-							}
-							else {
-								plugin.msg.send(sender, "rate.no-warnings");
-							}
-							plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase rate");
-						}
-						else {
-							// console has no rating
-							plugin.msg.send(sender, "error.command.console", "command", "/suitcase rate");
-							plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase rate");
-						}
-					}
-					
-					// one argument -> view rating of someone else
-					else if (arguments.size() == 2) {
-						// check if player is registered
-						if (plugin.con.isRegistered(arguments.get(1))) {
-
-							// send target's rating and warnings
-							plugin.msg.send(sender, "rate.header", "player", arguments.get(1) + "'s");
-							
-							// check if target can be rated
-							if (plugin.perm.hasPermission(arguments.get(1), permission.get("rate"))) {
-								plugin.msg.send(sender, "rate.rating", "rating", String.valueOf(plugin.con.getRating(arguments.get(1))), "maxrate", plugin.cfg.data.getString("mechanics.rating.maximum"));
-							}
-							else {
-								plugin.msg.send(sender, "rate.no-rating");
-							}
-							
-							// check if target can be warned
-							if (!plugin.perm.hasPermission(arguments.get(1), permission.get("warn"))) {
-								plugin.msg.send(sender, "rate.warnings", "warnings", String.valueOf(plugin.con.getWarnings(arguments.get(1))), "maxwarn",  plugin.cfg.data.getString("mechanics.warnings.maximum"));
-							}
-							else {
-								plugin.msg.send(sender, "rate.no-warnings");
-							}
-							
-							plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase rate " + arguments.get(1));
-						}
-						else {
-							// player doesn't exist
-							plugin.msg.send(sender, "error.player.name", "player", arguments.get(1));
-							plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase rate " + arguments.get(1));
-						}
-					}
-					
-					// two arguments -> rate a player
-					else if (arguments.size() == 3) {
-						// arguments.get(1) shouldn't be the sender's name
-						if (!arguments.get(1).equals(sender.getName())) {
-							// check if player exists
-							if (plugin.con.isRegistered(arguments.get(1))) {
-								// target must have permission suitcase.rate to be rated
-								if (plugin.perm.hasPermission(arguments.get(1), permission.get("rate"))) {
-									try { // catch NumberFormatException
-										if (Integer.parseInt(arguments.get(2)) >= 0 && Integer.parseInt(arguments.get(2)) <= plugin.cfg.data.getInt("mechanics.rating.maximum")) {
-											if (plugin.con.setRating(sender.getName(), arguments.get(1), Integer.parseInt(arguments.get(2)))) {
-												plugin.msg.send(sender, "rate.done", "player", arguments.get(1));
-												plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2));
-											}
-											else {
-												// rating failed
-												plugin.msg.send(sender, "error.player.rate", "player", arguments.get(1));
-												plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2));
-											}
-										}
-										else {
-											// rating not found
-											plugin.msg.send(sender, "error.argument.rating", "rating", arguments.get(2));
-											plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2));
-										}
-									}
-									catch (NumberFormatException e)
-									{
-										// no number
-										plugin.msg.send(sender, "error.argument.rating", "rating", arguments.get(2));
-										plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2));
-									}
-								}
-								else {
-									// player can't be rated
-									plugin.msg.send(sender, "error.player.rate", "player", arguments.get(1));
-									plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase rate " + arguments.get(1));
-								}
-							}
-							else {
-								// player doesn't exist
-								plugin.msg.send(sender, "error.player.name", "player", arguments.get(1));
-								plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2));
-							}
-						}
-						else {
-							// player can't rate himself
-							plugin.msg.send(sender, "error.player.self");
-							plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase rate " + arguments.get(1) + " " + arguments.get(2));
-						}
-					}
-					else {
-						// too many arguments
-						plugin.msg.send(sender, "error.argument.count");
-						plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase " + plugin.getString(arguments, false));
-					}
-				}
-				else {
-					// rating is not enabled
-					plugin.msg.send(sender, "error.command.disabled", "command", "/suitcase rate");
-					plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase " + plugin.getString(arguments, false));
-				}
+		else if (isAlias("warn", arguments.get(0))) {
+			if (arguments.size() < 2) {
+				// missing argument player
+				plugin.msg.send(sender, "error.argument.missing", "argument", "player");
+				plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
+			}
+			else if (arguments.size() == 2) {
+				// /suitcase warn player
+				warn(sender, arguments.get(1));
 			}
 			else {
-				// player doesn't have permission
-				plugin.msg.send(sender, "error.command.deny", "command", "/suitcase rate");
-				plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase rate");
+				// too many arguments
+				plugin.msg.send(sender, "error.argument.amount", "command", "warn");
+				plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
 			}
 		}
-		// /suitcase warn/forgive [player]
-		else if (aliases.get("warn").contains(arguments.get(0)) || aliases.get("forgive").contains(arguments.get(0))) {
-			if (plugin.perm.hasPermission(sender.getName(), permission.get("warn"))) {
-				// we don't have to check if the given player is the sender himself because he has the permission to warn
-				// check if warning is enabled
-				if (plugin.cfg.data.getBoolean("mechanics.warnings.enable")) {
-					// two arguments: warn/forgive and a player's name
-					if (arguments.size() == 2) {
-						// check if targeted player exists
-						if (plugin.con.isRegistered(arguments.get(1))) {
-							if (aliases.get("warn").contains(arguments.get(0))) {
-								if (plugin.con.setWarnings(arguments.get(1), true)) {
-									plugin.msg.send(sender, "warn.done", "player", arguments.get(1));
-									plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase warn " + arguments.get(1));
-									plugin.broad.send("broadcast.warn", "player", arguments.get(1));
-								}
-								else {
-									// warning failed
-									plugin.msg.send(sender, "error.player.warn", "player", arguments.get(1));
-									plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase warn " + arguments.get(1));
-								}
-							}
-							else { // forgive
-								if (plugin.con.setWarnings(arguments.get(1), false)) {
-									plugin.msg.send(sender, "forgive.done", "player", arguments.get(1));
-									plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase forgive " + arguments.get(1));
-									plugin.broad.send("broadcast.forgive", "player", arguments.get(1));
-								}
-								else {
-									// can't be warned -> can't be forgiven
-									plugin.msg.send(sender, "error.player.warn", "player", arguments.get(1));
-									plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase warn " + arguments.get(1));
-								}
-							}
-						}
-						else {
-							// player doesn't exist
-							plugin.msg.send(sender, "error.player.name", "player", arguments.get(1));
-							plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase " + plugin.getString(arguments, false));
-						}
-					}
-					else {
-						// invalid amount of arguments
-						plugin.msg.send(sender, "error.argument.count");
-						plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase " + plugin.getString(arguments, false));
-					}
-				}
-				else {
-					// warning is not enabled
-					plugin.msg.send(sender, "error.command.disabled", "command", "/suitcase warn");
-					plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase " + plugin.getString(arguments, false));
-				}
+		else if (isAlias("forgive", arguments.get(0))) {
+			if (arguments.size() < 2) {
+				// missing argument player
+				plugin.msg.send(sender, "error.argument.missing", "argument", "player");
+				plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
+			}
+			else if (arguments.size() == 2) {
+				// /suitcase forgive player
+				forgive(sender, arguments.get(1));
 			}
 			else {
-				// player isn't allowed to warn
-				plugin.msg.send(sender, "error.command.deny", "command", "/suitcase warn");
-				plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase warn");
+				// too many arguments
+				plugin.msg.send(sender, "error.argument.amount", "command", "forgive");
+				plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
 			}
 		}
-		// /suitcase reload
-		else if (aliases.get("reload").contains(arguments.get(0))) {
-			if (plugin.perm.hasPermission(sender.getName(), permission.get("reload"))) {
-				if (arguments.size() > 1) {
-					// too many arguments
-					plugin.msg.send(sender, "error.argument.count");
-					plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase " + plugin.getString(arguments, false));
-				}
-				else {
-					// be sure that we reload the plugin after we sent a message to console and before we send a message to the executing player or console
-					plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase reload");
-					plugin.reload();
-					plugin.msg.send(sender, "reload.done");
-				}
+		else if (isAlias("reload", arguments.get(0))) {
+			if (arguments.size() == 1) {
+				// /suitcase reload
+				reload(sender);
 			}
 			else {
-				// no permission
-				plugin.msg.send(sender, "error.command.deny", "command", "/suitcase reload");
-				plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase reload");
+				// too many arguments
+				plugin.msg.send(sender, "error.argument.amount", "command", "reload");
+				plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
 			}
 		}
-		// /suitcase reset
-		else if (aliases.get("reset").contains(arguments.get(0))) {
-			if (plugin.perm.hasPermission(sender.getName(), permission.get("reset"))) {
-				if (arguments.size() > 1) {
-					// too many arguments
-					plugin.msg.send(sender, "error.argument.count");
-					plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase " + plugin.getString(arguments, false));
-				}
-				else {
-					if (reset.equals(sender.getName())) {
-						// delete all files
-						plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase reset");
-						plugin.reset();
-						plugin.msg.send(sender, "reset.done");
-						plugin.broad.send("broadcast.reset");
-						reset = "";
-					}
-					else {
-						reset = sender.getName();
-						plugin.msg.send(sender, "reset.confirm");
-					}
-				}
+		else if (isAlias("reset", arguments.get(0))) {
+			if (arguments.size() == 1) {
+				// /suitcase reset
+				reset(sender);
 			}
 			else {
-				// no permission
-				plugin.msg.send(sender, "error.command.deny", "command", "/suitcase reset");
-				plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase reset");
+				// too many arguments
+				plugin.msg.send(sender, "error.argument.amount", "command", "reset");
+				plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
 			}
 		}
-		// command not found
 		else {
-			plugin.msg.send(sender, "error.command.unknown", "command", "/suitcase " + plugin.getString(arguments, false), "help", "/suitcase help");
-			plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), "/suitcase " + plugin.getString(arguments, false));
+		// command not found
+			plugin.msg.send(sender, "error.command.unknown", "command", full);
+			plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
 		}
 		
-		// clear reset variable if entered another command
+		// clear reset variable if another command was entered by that player
 		if (!aliases.get("reset").contains(arguments.get(0)) && reset.equals(sender.getName())) {
 			reset = ""; 
 		}
 		
-		// always return true, because we handle wrong commands/arguments
+		// always return true
 		return true;
+	}
+	
+	/**
+	 * Returns true if command contains alias
+	 * @param command Suitcase command
+	 * @param alias Entered alias
+	 */
+	private boolean isAlias(String command, String alias) {
+		return aliases.get(command).contains(alias.toLowerCase());
+	}
+	
+	/**
+	 * Executes /suitcase help
+	 * @param sender Command sender
+	 */
+	public void help(CommandSender sender) {
+		String full = "/suitcase help";
+		// check permission
+		if (plugin.perm.hasPermission(sender.getName(), permission.get("help"))) {
+			// send full help
+			plugin.msg.send(sender, "help.header", "command", "help");
+			// parse permissions for each command
+			for (String cmd : aliases.keySet()) {
+				if (plugin.perm.hasPermission(sender.getName(), permission.get(cmd)) || plugin.cfg.getBoolean("mechanics.full-help")) {
+					plugin.msg.send(sender, "help.info", "object", usage.get(cmd), "info", info.get(cmd));
+				}
+			}
+			plugin.msg.send(sender, "help.optional");
+			plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), full);
+		}
+		else {
+			plugin.msg.send(sender, "error.command.deny", "command", full);
+			plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), full);
+		}
+	}
+
+	/**
+	 * Executes /suitcase help command
+	 * @param sender Command sender
+	 * @param command Sub-command
+	 */
+	public void help(CommandSender sender, String command) {
+		String full = "/suitcase help " + command;
+		if (plugin.perm.hasPermission(sender.getName(), permission.get("help"))) {
+			// send help for given command
+			if (plugin.perm.hasPermission(sender.getName(), permission.get(command)) || plugin.cfg.getBoolean("mechanics.full-help")) {
+				// send header, usage and aliases
+				plugin.msg.send(sender, "help.header", "command", command);
+				plugin.msg.send(sender, "help.usage", "usage", usage.get(command));
+				plugin.msg.send(sender, "help.aliases", "aliases", Suitcase.getStringFromList(aliases.get(command), ","));
+				// get each argument
+				for (String argument : info.keySet()) {
+					if (usage.get(command).contains(argument)) {
+						plugin.msg.send(sender, "help.info", "object", argument, "info", info.get(argument));
+					}
+				}
+				plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), full);
+			}
+			else {
+				// no permission to that command
+				plugin.msg.send(sender, "error.command.deny", "command", full);
+				plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), full);
+			}
+		}
+		else {
+			plugin.msg.send(sender, "error.command.deny", "command", full);
+			plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), full);
+		}
+	}
+	
+	/**
+	 * Executes /suitcase info
+	 * @param sender Command sender
+	 */
+	public void info(CommandSender sender) {
+		if (plugin.perm.hasPermission(sender.getName(), permission.get("info"))) {
+			// send plugin info
+			plugin.msg.send(sender, "info.header");
+			plugin.msg.send(sender, "info.version", "version", plugin.name + " " + plugin.getDescription().getFullName());
+			plugin.msg.send(sender, "info.description", "description", plugin.getDescription().getDescription());
+			plugin.msg.send(sender, "info.authors", "authors", Suitcase.getStringFromList(plugin.getDescription().getAuthors(), ","));
+			plugin.msg.send(sender, "info.website", "website", plugin.getDescription().getWebsite());
+			plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase info");
+		}
+		else {
+			// no permission to info command
+			plugin.msg.send(sender, "error.command.deny", "command", "/suitcase info");
+			plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase info");
+		}
+	}
+	
+	/**
+	 * Executes /suitcase rate
+	 * @param sender Command sender
+	 */
+	public void rate(CommandSender sender) {
+		rate(sender, sender.getName());
+	}
+	
+	/**
+	 * Executes /suitcase rate player
+	 * @param sender Command sender
+	 * @param target View rating and warnings of target
+	 */
+	public void rate(CommandSender sender, String target) {
+		String full = "/suitcase rate " + target;
+		if (plugin.perm.hasPermission(sender.getName(), permission.get("rate"))) {
+			// check if rating is enabled
+			if (plugin.cfg.getBoolean("mechanics.rating.enable")) {
+				if (plugin.con.isRegistered(target)) {
+					// show rating and warnings
+					if (sender instanceof Player) {
+						// send target's rating and warnings
+						if (target.equals(sender.getName())) {
+							plugin.msg.send(sender, "rate.header", "player", "Your");
+						}
+						else {
+							plugin.msg.send(sender, "rate.header", "player", target + "'s");
+						}
+
+						plugin.msg.send(sender, "rate.rating", "rating", String.valueOf(plugin.con.getRating(sender.getName())));
+						plugin.msg.send(sender, "rate.warnings", "warnings", String.valueOf(plugin.con.getWarnings(sender.getName())));
+
+						plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), full);
+					}
+					else {
+						// console has no rating
+						plugin.msg.send(sender, "error.command.console", "command", full);
+						plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), full);
+					}
+				}
+				else {
+					// player not registered
+					plugin.msg.send(sender, "error.player.name", "player", target);
+					plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
+				}
+			}
+			else {
+				// rating is not enabled
+				plugin.msg.send(sender, "error.command.disabled", "command", full);
+				plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), full);
+			}
+		}
+		else {
+			// player doesn't have permission
+			plugin.msg.send(sender, "error.command.deny", "command", "/suitcase rate");
+			plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), full);
+		}
+	}
+	
+	/**
+	 * Executes /suitcase rate player rating
+	 * @param sender Command sender
+	 * @param target Player to be rated
+	 * @param rating Rating value
+	 */
+	public void rate(CommandSender sender, String target, int rating) {
+		String full = "/suitcase rate " + target + " " + rating;
+		if (!target.equals(sender.getName())) {
+			// check if player exists
+			if (plugin.con.isRegistered(target)) {
+				if (rating >= 0 && rating <= plugin.cfg.getInt("mechanics.rating.maximum")) {
+					if (plugin.con.setRating(sender.getName(), target, rating)) {
+						plugin.msg.send(sender, "rate.done", "player", target);
+						plugin.msg.sendAll("rate", "target", target, "rating", String.valueOf(rating), "sender", sender.getName());
+						plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), full);
+					}
+					else {
+						// player can't be rated
+						plugin.msg.send(sender, "error.player.rate", "player", target);
+						plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), full);
+					}
+				}
+				else {
+					// rating out of range
+					plugin.msg.send(sender, "error.argument.rating", "rating", String.valueOf(rating));
+					plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
+				}
+			}
+			else {
+				// player doesn't exist
+				plugin.msg.send(sender, "error.player.name", "player", target);
+				plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
+			}
+		}
+		else {
+			// player can't rate himself
+			plugin.msg.send(sender, "error.player.self");
+			plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
+		}
+	}
+
+	/**
+	 * Executes /suitcase warn player
+	 * @param sender Command sender
+	 * @param target Player to be warned
+	 */
+	public void warn(CommandSender sender, String target) {
+		String full = "/suitcase warn " + target;
+		if (plugin.perm.hasPermission(sender.getName(), permission.get("warn"))) {
+			// we don't have to check if the given player is the sender himself because he has the permission to warn
+			// check if warning is enabled
+			if (plugin.cfg.getBoolean("mechanics.warnings.enable")) {
+				// check if targeted player exists
+				if (plugin.con.isRegistered(target)) {
+					if (plugin.con.setWarnings(target, true)) {
+						plugin.msg.send(sender, "warn.done", "player", target);
+						plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), full);
+						plugin.msg.sendAll("warn", "player", target);
+					}
+					else {
+						// warning failed
+						plugin.msg.send(sender, "error.player.warn", "player", target);
+						plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), full);
+					}
+				}
+				else {
+					// player doesn't exist
+					plugin.msg.send(sender, "error.player.name", "player", target);
+					plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
+				}
+			}
+			else {
+				// warning is not enabled
+				plugin.msg.send(sender, "error.command.disabled", "command", "/suitcase warn");
+				plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase warn");
+			}
+		}
+		else {
+			// player isn't allowed to warn
+			plugin.msg.send(sender, "error.command.deny", "command", full);
+			plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), full);
+		}
+	}
+
+	/**
+	 * Executes /suitcase forgive player
+	 * @param sender Command sender
+	 * @param target Player to be warned
+	 */
+	public void forgive(CommandSender sender, String target) {
+		String full = "/suitcase forgive " + target;
+		if (plugin.perm.hasPermission(sender.getName(), permission.get("forgive"))) {
+			// check if forgiving is enabled
+			if (plugin.cfg.getBoolean("mechanics.warnings.enable")) {
+				// check if targeted player exists
+				if (plugin.con.isRegistered(target)) {
+					if (plugin.con.setWarnings(target, false)) {
+						plugin.msg.send(sender, "forgive.done", "player", target);
+						plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), full);
+						plugin.msg.sendAll("forgive", "player", target);
+					}
+					else {
+						// forgiving failed
+						plugin.msg.send(sender, "error.player.warn", "player", target);
+						plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), full);
+					}
+				}
+				else {
+					// player doesn't exist
+					plugin.msg.send(sender, "error.player.name", "player", target);
+					plugin.console.log(Action.PLAYER_COMMAND_INVALID, sender.getName(), full);
+				}
+			}
+			else {
+				// forgiving is not enabled
+				plugin.msg.send(sender, "error.command.disabled", "command", "/suitcase forgive");
+				plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase forgive");
+			}
+		}
+		else {
+			// player isn't allowed to forgive
+			plugin.msg.send(sender, "error.command.deny", "command", full);
+			plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), full);
+		}
+	}
+
+	/**
+	 * Executes /suitcase reload
+	 * @param sender Command sender
+	 */
+	public void reload(CommandSender sender) {
+		if (plugin.perm.hasPermission(sender.getName(), permission.get("reload"))) {
+			// be sure that we reload the plugin after we sent a message to console and before we send a message to the executing player or console
+			plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase reload");
+			
+			// reload plugin
+			if (plugin.reload()) {
+				plugin.msg.send(sender, "reload.done");
+			}
+			else {
+				plugin.console.log(Action.PLAYER_COMMAND_ERROR, sender.getName(), "/suitcase reload", "reloadFailed");
+				plugin.msg.send(sender, "error.command.internal", "command", "/suitcase reload");
+			}
+			
+			plugin.msg.send(sender, "reload.done");
+			plugin.msg.sendAll("reload");
+		}
+		else {
+			// no permission
+			plugin.msg.send(sender, "error.command.deny", "command", "/suitcase reload");
+			plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase reload");
+		}
+	}
+	
+	/** Plugin reset confirmation */
+	private String reset = "";
+	
+	/**
+	 * Executes /suitcase reset
+	 * @param sender Command sender
+	 */
+	public void reset(CommandSender sender) {
+		if (plugin.perm.hasPermission(sender.getName(), permission.get("reset"))) {
+			if (reset.equals(sender.getName())) {
+				// delete all files
+				if (plugin.reset()) {
+					plugin.console.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase reset");
+					plugin.msg.send(sender, "reset.done");
+					plugin.msg.sendAll("reset");
+					reset = "";
+				}
+				else {
+					plugin.console.log(Action.PLAYER_COMMAND_ERROR, sender.getName(), "/suitcase reset", "resetFailed");
+					plugin.msg.send(sender, "error.command.internal", "command", "/suitcase reset");
+				}
+			}
+			else {
+				reset = sender.getName();
+				plugin.msg.send(sender, "reset.confirm");
+			}
+		}
+		else {
+			// no permission
+			plugin.msg.send(sender, "error.command.deny", "command", "/suitcase reset");
+			plugin.console.log(Action.PLAYER_COMMAND_DENIED, sender.getName(), "/suitcase reset");
+		}
 	}
 }

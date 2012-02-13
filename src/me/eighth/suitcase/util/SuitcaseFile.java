@@ -125,16 +125,13 @@ public class SuitcaseFile {
 						plugin.console.log(Action.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename + "~", e.toString())));
 						return false;
 					}
-					
 				}
 				else {
-					plugin.console.log(Action.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, "newFileNullError")));
 					return false;
 				}
 			}
 		}
 		else {
-			plugin.console.log(Action.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, "oldFileNullError")));
 			return false;
 		}
 	}
@@ -152,7 +149,6 @@ public class SuitcaseFile {
 				file.createNewFile();
 			} catch (IOException e) {
 				plugin.console.log(Action.FILE_SAVE_ERROR, new ArrayList<String>(Arrays.asList(filename, e.toString())));
-				plugin.disable();
 				return null;
 			}
 		}

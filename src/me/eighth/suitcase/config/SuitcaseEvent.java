@@ -20,11 +20,8 @@ public class SuitcaseEvent {
 	/** Stores default events */
 	private Map<String, Object> defaults = new HashMap<String, Object>();
 	
-	/** Map of all callable events and its arguments */
-	private Map<String, ArrayList<String>> eventTag = new HashMap<String, ArrayList<String>>();
-	
 	/** Allocates ~/Suitcase/event.yml */
-	public FileConfiguration data;
+	private FileConfiguration data;
 	
 	/**
 	 * Event system file interface
@@ -34,31 +31,71 @@ public class SuitcaseEvent {
 		this.plugin = plugin;
 		
 		// set default events
-		defaults.put("event.rate.condition", "playerRate && (timeTick >= 1000)");
-		defaults.put("event.rate.action", new ArrayList<String>(Arrays.asList("broadcast()", "thanks()")));
-		defaults.put("event.warn.condition", "playerWarn");
-		defaults.put("event.warn.action", "kick('You have been warned.')");
-		defaults.put("action.broadcast.execute", "server"); // all/server/sender/target
-		defaults.put("action.broadcast.command", "broadcast {sender} has rated {target}.");
-		defaults.put("action.thanks.execute", "target");
-		defaults.put("action.thanks.command", "msg {sender} &7Thank you!");
-		defaults.put("action.kick.execute", "sender");
-		defaults.put("action.kick.command", "kick {target} {0}");
+		defaults.put("test1.condition", new ArrayList<String>(Arrays.asList("rate", "warn")));
+		defaults.put("test1.executor", "server"); // all/server/sender/target
+		defaults.put("test1.command", "broadcast {sender} has rated {target}.");
+	}
+	
+	/**
+	 * Returns a String
+	 * @param key Config.yml key
+	 */
+	public String getString(String key) {
+		return data.getString(key);
+	}
+	
+	/**
+	 * Returns an Integer
+	 * @param key Config.yml key
+	 */
+	public int getInt(String key) {
+		return data.getInt(key);
+	}
+	
+	/**
+	 * Returns a Boolean
+	 * @param key Config.yml key
+	 */
+	public boolean getBoolean(String key) {
+		return data.getBoolean(key);
+	}
+	
+	/**
+	 * Returns a Double
+	 * @param key Config.yml key
+	 */
+	public double getDouble(String key) {
+		return data.getDouble(key);
+	}
+	
+	public void call(String event, String...arguments) {
 		
-		// define eventTags for event.NAME.condition
-		eventTag.put("playerRate", new ArrayList<String>(Arrays.asList("positive", "negative"))); // 'all' is always possible
-		eventTag.put("playerWarn", new ArrayList<String>(Arrays.asList("warn", "forgive")));
-		eventTag.put("pluginStatus", new ArrayList<String>(Arrays.asList("enable", "reload", "disable")));
+		for (String eventName : data.getKeys(false)) {
+			
+			for (String condition : data.getStringList(eventName + ".condition")) {
+				
+				if (condition.contains(event)) {
+					
+					
+					
+					
+				}
+				
+			}
+			
+		}
+		
 	}
 	
 	/** Resets event configuration */
-	public void reset() {
+	public boolean reset() {
 		new File("plugins/Suitcase/event.yml").delete();
 		if (plugin.file.load("plugins/Suitcase/event.yml", defaults, true)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/event.yml"));
+			return true;
 		}
 		else {
-			plugin.console.log(Action.FILE_SAVE_ERROR, "event.yml", "FileNotLoaded");
+			return false;
 		}
 	}
 
@@ -69,7 +106,7 @@ public class SuitcaseEvent {
 			return true;
 		}
 		else {
-			plugin.console.log(Action.INIT_ERROR, "SuitcaseEvent", "FileNotLoaded");
+			plugin.console.log(Action.INIT_ERROR, "SuitcaseEvent");
 			return false;
 		}
 	}

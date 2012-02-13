@@ -10,6 +10,59 @@ import me.eighth.suitcase.Suitcase;
 
 public class SuitcaseConsole {
 	
+	/** Provides different plugin actions to be logged */
+	public enum Action {
+		/** Plugin enabling finished. No arguments */
+		PLUGIN_ENABLE,
+		/** Plugin reloading finished. No arguments */
+		PLUGIN_RELOAD,
+		/** Plugin disabling finished. No arguments */
+		PLUGIN_DISABLE,
+		
+		
+		/** Player successfully executed a command. Arguments: player name, command */
+		PLAYER_COMMAND_EXECUTED,
+		/** Player was denied a command. Arguments: player name, command */
+		PLAYER_COMMAND_DENIED,
+		/** Player tried an invalid command. Arguments: player name, command */
+		PLAYER_COMMAND_INVALID,
+		/** Error occurred while executing a command. Arguments: player name, command, error name */
+		PLAYER_COMMAND_ERROR,
+		
+		
+		/** Player was registered. Arguments: player name */
+		PLAYER_REGISTER,
+		/** Player was unregistered. Arguments: player name */
+		PLAYER_UNREGISTER,
+		
+		
+		/** Property missing in configuration file. Argument: key, file path, value */
+		PROPERTY_MISSING,
+		/** Redundant property found. Arguments: key, file path, value */
+		PROPERTY_REDUNDANT,
+		
+		
+		/** Configuration file is missing. Arguments: file name */
+		FILE_NOT_FOUND,
+		/** Error occurred while saving file. Arguments: file name, error class */
+		FILE_SAVE_ERROR,
+		
+		/** No log method found. No arguments */
+		LOG_ERROR,
+		/** Error occurred while initializing class. Arguments: init class */
+		INIT_ERROR,
+		/** Error occurred while freeing class. Arguments: free class */
+		FREE_ERROR,
+		/** Spotted invalid amount of arguments. Arguments: action, arguments */
+		ARGUMENTS_INVALID,
+		
+		
+		/** Reset Suitcase. No arguments */
+		RESET,
+		/** Send debug information. Arguments: information */
+		DEBUG
+	}
+	
 	/** Suitcase instance */
 	private Suitcase plugin;
 	
@@ -18,82 +71,6 @@ public class SuitcaseConsole {
 	
 	/** Message types linked to logger settings */
 	private Map<Action, String> dependences = new HashMap<Action, String>();
-	
-	/** Provides different plugin actions to be logged */
-	public enum Action {
-		
-		/** Plugin enabling started. No arguments */
-		PLUGIN_ENABLE_START,
-		
-		/** Plugin enabling finished. No arguments */
-		PLUGIN_ENABLE_FINISH,
-		
-		/** Error occurred while enabling plugin. Arguments: error name */
-		PLUGIN_ENABLE_ERROR,
-		
-		/** Plugin reloading started. No arguments */
-		PLUGIN_RELOAD_START,
-		
-		/** Plugin reloading finished. No arguments */
-		PLUGIN_RELOAD_FINISH,
-		
-		/** Error occurred while reloading plugin. Arguments: error name */
-		PLUGIN_RELOAD_ERROR,
-		
-		/** Plugin disabling started. No arguments */
-		PLUGIN_DISABLE_START,
-		
-		/** Plugin disabling finished. No arguments */
-		PLUGIN_DISABLE_FINISH,
-		
-		/** Error occurred while disabling plugin. Arguments: error name */
-		PLUGIN_DISABLE_ERROR,
-		
-		/** Player successfully executed a command. Arguments: player name, command */
-		PLAYER_COMMAND_EXECUTED,
-		
-		/** Player was denied a command. Arguments: player name, command */
-		PLAYER_COMMAND_DENIED,
-		
-		/** Player tried an invalid command. Arguments: player name, command */
-		PLAYER_COMMAND_INVALID,
-		
-		/** Error occurred while executing a command. Arguments: player name, command, error name */
-		PLAYER_COMMAND_ERROR,
-		
-		/** Player was registered. Arguments: player name */
-		PLAYER_REGISTER,
-		
-		/** Player was unregistered. Arguments: player name */
-		PLAYER_UNREGISTER,
-		
-		/** Property missing in configuration file. Argument: key, file path, value */
-		PROPERTY_MISSING,
-		
-		/** Redundant property found. Arguments: key, file path, value */
-		PROPERTY_REDUNDANT,
-		
-		/** Configuration file is missing. Arguments: file name */
-		FILE_NOT_FOUND,
-		
-		/** Error occurred while saving file. Arguments: file name, error class */
-		FILE_SAVE_ERROR,
-		
-		/** Reset Suitcase. No arguments */
-		RESET,
-		
-		/** Error occurred while initializing class. Arguments: init class, error type */
-		INIT_ERROR,
-		
-		/** Error occurred while freeing class. Arguments: free class, error type */
-		FREE_ERROR,
-		
-		/** Send debug information. Arguments: information */
-		DEBUG,
-		
-		/** Spotted invalid amount of arguments. Arguments: action, arguments */
-		ARGUMENTS_INVALID
-	}
 	
 	/**
 	 * Minecraft console logger with different levels
@@ -106,13 +83,8 @@ public class SuitcaseConsole {
 		dependences.put(Action.PLAYER_COMMAND_EXECUTED, "command");
 		dependences.put(Action.PLAYER_COMMAND_DENIED, "command");
 		dependences.put(Action.PLAYER_COMMAND_INVALID, "command");
-		dependences.put(Action.PLAYER_REGISTER, "command");
-		dependences.put(Action.PLAYER_UNREGISTER, "command");
-		
-		dependences.put(Action.PROPERTY_MISSING, "file"); // errors with 'config.yml' will always be shown
-		dependences.put(Action.PROPERTY_REDUNDANT, "file");
-		dependences.put(Action.FILE_NOT_FOUND, "file");
-		
+
+		dependences.put(Action.RESET, "debug");
 		dependences.put(Action.DEBUG, "debug");
 	}
 	
@@ -125,16 +97,12 @@ public class SuitcaseConsole {
 	private boolean checkArguments(Action action, ArrayList<String> arguments, int size) {
 		if (arguments.size() == size) {
 			if (dependences.containsKey(action)) {
-				if (plugin.cfg.data != null && plugin.cfg.data.contains("log.console." + dependences.get(action))) {
-					if (plugin.cfg.data.getBoolean("log.console." + dependences.get(action))) {
-						return true;
-					}
-					else {
-						return false;
-					}
+				// filter file dependences and config.yml
+				if (plugin.cfg.getBoolean("log.console." + dependences.get(action))) {
+					return true;
 				}
 				else {
-					return true;
+					return false;
 				}
 			}
 			else {
@@ -142,7 +110,7 @@ public class SuitcaseConsole {
 			}
 		}
 		else {
-			log(Action.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), plugin.getString(arguments, true))));
+			log(Action.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), Suitcase.getStringFromList(arguments, ","))));
 			return false;
 		}
 	}
@@ -173,53 +141,19 @@ public class SuitcaseConsole {
 		// log actions to console
 		switch (action) {
 			
-		case PLUGIN_ENABLE_START:
+		case PLUGIN_ENABLE:
 			if (checkArguments(action, arguments, 0)) {
-				mcLogger.info(plugin.pluginTag + plugin.name + " " + plugin.getDescription().getFullName() + " by " + plugin.getString(plugin.getDescription().getAuthors(), true) + " enabling...");
+				mcLogger.info(plugin.pluginTag + plugin.name + " " + plugin.getDescription().getFullName() + " by " + Suitcase.getStringFromList(plugin.getDescription().getAuthors(), ",") + " was enabled.");
 			}
 			return true;
-		case PLUGIN_ENABLE_ERROR:
-			if (checkArguments(action, arguments, 1)) {
-				mcLogger.severe(plugin.pluginTag + "Error '" + arguments.get(0) + "' occured while enabling plugin!");
-			}
-			return true;
-		case PLUGIN_ENABLE_FINISH:
+		case PLUGIN_RELOAD:
 			if (checkArguments(action, arguments, 0)) {
-				mcLogger.info(plugin.pluginTag + "Suitcase successfully enabled.");
+				mcLogger.info(plugin.pluginTag + "Suitcase was reloaded.");
 			}
 			return true;
-			
-			
-		case PLUGIN_RELOAD_START:
+		case PLUGIN_DISABLE:
 			if (checkArguments(action, arguments, 0)) {
-				mcLogger.info(plugin.pluginTag + "Reloading plugin...");
-			}
-			return true;
-		case PLUGIN_RELOAD_ERROR:
-			if (checkArguments(action, arguments, 1)) {
-				mcLogger.severe(plugin.pluginTag + "Error '" + arguments.get(0) + "' occured while reloading plugin!");
-			}
-			return true;
-		case PLUGIN_RELOAD_FINISH:
-			if (checkArguments(action, arguments, 0)) {
-				mcLogger.info(plugin.pluginTag + "Suitcase successfully reloaded.");
-			}
-			return true;
-			
-			
-		case PLUGIN_DISABLE_START:
-			if (checkArguments(action, arguments, 0)) {
-				mcLogger.info(plugin.pluginTag + "Disabling plugin...");
-			}
-			return true;
-		case PLUGIN_DISABLE_ERROR:
-			if (checkArguments(action, arguments, 1)) {
-				mcLogger.severe(plugin.pluginTag + "Error '" + arguments.get(0) + "' occured while disabling plugin!");
-			}
-			return true;
-		case PLUGIN_DISABLE_FINISH:
-			if (checkArguments(action, arguments, 0)) {
-				mcLogger.info(plugin.pluginTag + "Suitcase successfully disabled.");
+				mcLogger.info(plugin.pluginTag + "Suitcase was disabled.");
 			}
 			return true;
 			
@@ -309,24 +243,34 @@ public class SuitcaseConsole {
 			}
 			return true;
 			
+
+		case LOG_ERROR:
+			if (checkArguments(action, arguments, 0)) {
+				mcLogger.severe(plugin.pluginTag + "No log method was found! Temporary enabling YAML-file logging...");
+			}
+			return true;
+		case INIT_ERROR:
+			if (checkArguments(action, arguments, 1)) {
+				mcLogger.severe(plugin.pluginTag + "Error occured while initiating class '" + arguments.get(0) + "'!");
+			}
+			return true;
+		case FREE_ERROR:
+			if (checkArguments(action, arguments, 1)) {
+				mcLogger.severe(plugin.pluginTag + "Error occured while freeing class '" + arguments.get(0) + "'!");
+			}
+			return true;
+		case ARGUMENTS_INVALID:
+			if (checkArguments(action, arguments, 2)) {
+				mcLogger.severe(plugin.pluginTag + "Action '" + arguments.get(0) + "' was passed an invalid amount of arguments: '" + arguments.get(1) + "'!");
+			}
+			return false;
+			
 			
 		case RESET:
 			if (checkArguments(action, arguments, 0)) {
 				mcLogger.info(plugin.pluginTag + "Configuration and player data was reset.");
 			}
 			return true;
-		case INIT_ERROR:
-			if (checkArguments(action, arguments, 2)) {
-				mcLogger.severe(plugin.pluginTag + "Error '" + arguments.get(1) + "' occured while initiating class '" + arguments.get(0) + "'!");
-			}
-			return true;
-		case FREE_ERROR:
-			if (checkArguments(action, arguments, 2)) {
-				mcLogger.severe(plugin.pluginTag + "Error '" + arguments.get(1) + "' occured while freeing class '" + arguments.get(0) + "'!");
-			}
-			return true;
-			
-			
 		case DEBUG:
 			if (checkArguments(action, arguments, arguments.size())) {
 				for (int i = 0; i < arguments.size(); i++) {
@@ -334,18 +278,11 @@ public class SuitcaseConsole {
 				}
 			}
 			return true;
-		case ARGUMENTS_INVALID:
-			if (checkArguments(action, arguments, 2)) {
-				mcLogger.severe(plugin.pluginTag + "Action '" + arguments.get(0) + "' was passed an invalid amount of arguments: '" + arguments.get(1) + "'!");
-			}
-			plugin.disable();
-			return false;
 			
 			
 		// type was not handled
 		default:
-			mcLogger.severe(plugin.pluginTag + "Action '" + action.toString() + "' was not handled! Arguments: '" + plugin.getString(arguments, true) + "'");
-			plugin.disable();
+			mcLogger.severe(plugin.pluginTag + "Action '" + action.toString() + "' was not handled! Arguments: '" + Suitcase.getStringFromList(arguments, ",") + "'");
 			return false;
 		}
 	}

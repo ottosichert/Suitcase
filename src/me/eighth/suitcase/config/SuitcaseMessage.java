@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 public class SuitcaseMessage {
 	
@@ -21,7 +22,7 @@ public class SuitcaseMessage {
 	private Map<String, Object> defaults = new HashMap<String, Object>();
 
 	/** Allocates ~/Suitcase/message-xx_XX.yml */
-	public FileConfiguration data;
+	private FileConfiguration data;
 	
 	/**
 	 * Player interface messages (supports different languages)
@@ -37,10 +38,10 @@ public class SuitcaseMessage {
 		
 		// help command
 		defaults.put("help.header", " &7----- &2Suitcase {command,2} &7-----");
-		defaults.put("help.usage", "&5Usage &7>> {usage,3}");
+		defaults.put("help.usage", "&5Usage &7>> {usage,3,b,(\\[[^\\]]*\\])}");
 		defaults.put("help.aliases", "&5Aliases &7>> {aliases,3,7,(,)}");
-		defaults.put("help.info", "{object,3} &7>> {info,6}");
-		defaults.put("help.optional", "&6All arguments are optional and there are several aliases.");
+		defaults.put("help.info", "{object,3,b,(\\[[^\\]]*\\])} &7>> {info,6}");
+		defaults.put("help.optional", "&6All &b[arguments] &6are optional and there are several aliases.");
 		
 		// info command
 		defaults.put("info.header", " &7----- &2About Suitcase &7-----");
@@ -51,12 +52,10 @@ public class SuitcaseMessage {
 		
 		// rate command
 		defaults.put("rate.header", " &7----- {player,2,7,(\\')} &2stats &7-----");
-		defaults.put("rate.rating", "&5Rating &7>> {rating,r}&7/{maxrate,2}");
-		defaults.put("rate.warnings", "&5Warnings &7>> {warnings,w}&7/{maxwarn,4}");
-		defaults.put("rate.no-rating", "&5Rating &7>> &6No rating.");
-		defaults.put("rate.no-warnings", "&5Warnings &7>> &6No warnings.");
+		defaults.put("rate.rating", "&5Rating &7>> {rating,r,7,(/)}");
+		defaults.put("rate.warnings", "&5Warnings &7>> {warnings,w,7,(/)}");
 		
-		// basic commands
+		// other commands
 		defaults.put("rate.done", "&2You have successfully rated {player,a}&2.");
 		defaults.put("warn.done", "&2You have successfully warned {player,a}&2.");
 		defaults.put("forgive.done", "&2You have successfully forgiven {player,a}&2.");
@@ -65,26 +64,62 @@ public class SuitcaseMessage {
 		defaults.put("reset.confirm", "&2Re-enter this command to reset Suitcase.");
 		
 		// command errors
-		defaults.put("error.command.deny", "&4You don't have permission to use {command,7}&4!");
-		defaults.put("error.command.unknown", "&4Can't find command {command,7}&4! Try {help,7} &4instead.");
-		defaults.put("error.command.console", "{command,7} &4can't be run by console!");
-		defaults.put("error.command.disabled", "{command,7} &4is disabled!");
-		defaults.put("error.argument.count", "&4Invalid amount of arguments!");
-		defaults.put("error.argument.invalid", "&4Invalid argument {argument,7}&4!");
-		defaults.put("error.argument.help", "&4Can't find help for {command,7}&4!");
-		defaults.put("error.argument.rating", "&4Your entered rating {rating,7} &4is invalid!");
-		defaults.put("error.player.name", "&4Can't find player {player,7}&4!");
-		defaults.put("error.player.rate", "&4{player,7} &4doesn't have a rating!");
-		defaults.put("error.player.warn", "&4{player,7} &4can't be warned!");
-		defaults.put("error.player.self", "&4You can't rate yourself!");
+		defaults.put("error.command.deny", "&cYou don't have permission to use {command,7}&c!");
+		defaults.put("error.command.unknown", "&cCan't find command {command,7}&c! Try &7/suitcase help &cinstead.");
+		defaults.put("error.command.console", "{command,7} &ccan't be run by console!");
+		defaults.put("error.command.disabled", "{command,7} &cis disabled!");
+		defaults.put("error.command.internal", "&cAn error occured while executing {command,7}&c! Disabling plugin...");
+		defaults.put("error.argument.missing", "&cMissing argument/s {argument,7}&c!");
+		defaults.put("error.argument.invalid", "&cInvalid argument/s {argument,7}&c!");
+		defaults.put("error.argument.amount", "&cToo many arguments! Try &7/suitcase help {command,7} &cinstead.");
+		defaults.put("error.argument.help", "&cCan't find help for {command,7}&c!");
+		defaults.put("error.argument.rating", "&cYour entered rating {rating,7} &cis invalid!");
+		defaults.put("error.player.name", "&cCan't find player {player,7}&c!");
+		defaults.put("error.player.rate", "&c{player,7} &cdoesn't have a rating!");
+		defaults.put("error.player.warn", "&c{player,7} &ccan't be warned or forgiven!");
+		defaults.put("error.player.self", "&cYou can't rate yourself!");
 		
 		// broadcast
-		defaults.put("broadcast.warn", "&7* {player,6} &6was warned! &7*");
-		defaults.put("broadcast.forgive", "&7* {player,6} &6was forgiven! &7*");
-		defaults.put("broadcast.reset", "&7* &6Suitcase has been reset. &7*");
+		defaults.put("broadcast.rate", "&7* {target,6} &6was rated {rating,r} &6by {sender,6} &7*");
+		defaults.put("broadcast.warn", "&7* {target,6} &6was warned! &7*");
+		defaults.put("broadcast.forgive", "&7* {target,6} &6was forgiven! &7*");
+		defaults.put("broadcast.reload", "&7* &6Suitcase was reloaded. &7*");
+		defaults.put("broadcast.reset", "&7* &6Suitcase was reset. &7*");
 		
 		// join message(s)
 		defaults.put("join", "&7* &6Welcome, {player,6}&6! &7*&n&7* &6Rating: {rating,r} &7* &6Warnings: {warnings,w} &7*");
+	}
+	
+	/**
+	 * Returns a String
+	 * @param key Config.yml key
+	 */
+	public String getString(String key) {
+		return data.getString(key);
+	}
+	
+	/**
+	 * Returns an Integer
+	 * @param key Config.yml key
+	 */
+	public int getInt(String key) {
+		return data.getInt(key);
+	}
+	
+	/**
+	 * Returns a Boolean
+	 * @param key Config.yml key
+	 */
+	public boolean getBoolean(String key) {
+		return data.getBoolean(key);
+	}
+	
+	/**
+	 * Returns a Double
+	 * @param key Config.yml key
+	 */
+	public double getDouble(String key) {
+		return data.getDouble(key);
 	}
 	
 	/**
@@ -96,8 +131,7 @@ public class SuitcaseMessage {
 	public void send(CommandSender sender, String key, String...arguments) {
 		
 		// get the message for the given key
-		plugin.debug(key);
-		String message = data.getString(key);
+		String message = getString(key);
 		
 		String variable, replacement, result;
 		char firstChar;
@@ -135,59 +169,76 @@ public class SuitcaseMessage {
 					default:
 						// set rating color
 						if (split[1].equals("r")) {
-							Double rating = Double.parseDouble(replacement);
-							if (rating >= 0 && rating < plugin.cfg.data.getDouble("mechanics.rating.default") * 2 / 5) {
-								split[1] =  "4";
-							}
-							else if (rating >= plugin.cfg.data.getDouble("mechanics.rating.default") * 2 / 5 && rating < plugin.cfg.data.getDouble("mechanics.rating.default") * 4 / 5) {
-								split[1] =  "c";
-							}
-							else if (rating >= plugin.cfg.data.getDouble("mechanics.rating.default") * 4 / 5 && rating <= (plugin.cfg.data.getDouble("mechanics.rating.maximum") - plugin.cfg.data.getDouble("mechanics.rating.default")) / 5 + plugin.cfg.data.getDouble("mechanics.rating.default")) {
-								split[1] =  "e";
-							}
-							else if (rating > (plugin.cfg.data.getDouble("mechanics.rating.maximum") - plugin.cfg.data.getDouble("mechanics.rating.default")) / 5 + plugin.cfg.data.getDouble("mechanics.rating.default") && rating <= (plugin.cfg.data.getDouble("mechanics.rating.maximum") - plugin.cfg.data.getDouble("mechanics.rating.default")) * 3 / 5 + plugin.cfg.data.getDouble("mechanics.rating.default")) {
-								split[1] =  "a";
-							}
-							else if (rating > (plugin.cfg.data.getDouble("mechanics.rating.maximum") - plugin.cfg.data.getDouble("mechanics.rating.default")) * 3 / 5 + plugin.cfg.data.getDouble("mechanics.rating.default") && rating <= plugin.cfg.data.getDouble("mechanics.rating.maximum")) {
-								split[1] =  "2";
+							double rating = Double.parseDouble(replacement);
+							if (rating < 0) {
+								replacement = "&6No rating.";
 							}
 							else {
-								split[1] =  "7";
+								double def = plugin.cfg.getDouble("mechanics.rating.default");
+								double max = plugin.cfg.getDouble("mechanics.rating.maximum");
+
+								if (rating >= 0 && rating < def * 2 / 5) {
+									split[1] =  "4";
+								}
+								else if (rating >= def * 2 / 5 && rating < def * 4 / 5) {
+									split[1] =  "c";
+								}
+								else if (rating >= def * 4 / 5 && rating <= (max - def) / 5 + def) {
+									split[1] =  "e";
+								}
+								else if (rating > (max - def) / 5 + def && rating <= (max - def) * 3 / 5 + def) {
+									split[1] =  "a";
+								}
+								else if (rating > (max - def) * 3 / 5 + def && rating <= max) {
+									split[1] =  "2";
+								}
+								else {
+									split[1] =  "7";
+								}
+								replacement = "&" + split[1] + replacement + "/&2" + max;
 							}
 						}
-						
 						// set warnings color
 						else if (split[1].equals("w")) {
 							int warnings = Integer.parseInt(replacement);
-							if (warnings >= 0 && warnings < plugin.cfg.data.getInt("mechanics.warnings.maximum") * 1 / 5) {
-								split[1] =  "2";
-							}
-							else if (warnings >=  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 1 / 5 && warnings <  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 2 / 5) {
-								split[1] =  "a";
-							}
-							else if (warnings >=  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 2 / 5 && warnings <=  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 3 / 5) {
-								split[1] =  "e";
-							}
-							else if (warnings >  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 3 / 5 && warnings <=  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 4 / 5) {
-								split[1] =  "c";
-							}
-							else if (warnings >  plugin.cfg.data.getInt("mechanics.warnings.maximum") * 4 / 5 && warnings <=  plugin.cfg.data.getInt("mechanics.warnings.maximum")) {
-								split[1] =  "4";
+							if (warnings < 0) {
+								replacement = "&6No warnings.";
 							}
 							else {
-								split[1] =  "7";
+								int max = plugin.cfg.getInt("mechanics.warnings.maximum");
+
+								if (warnings >= 0 && warnings < max * 1 / 5) {
+									split[1] =  "2";
+								}
+								else if (warnings >=  max / 5 && warnings <  max * 2 / 5) {
+									split[1] =  "a";
+								}
+								else if (warnings >=  max * 2 / 5 && warnings <=  max * 3 / 5) {
+									split[1] =  "e";
+								}
+								else if (warnings >  max * 3 / 5 && warnings <=  max * 4 / 5) {
+									split[1] =  "c";
+								}
+								else if (warnings >  max * 4 / 5 && warnings <=  max) {
+									split[1] =  "4";
+								}
+								else {
+									split[1] =  "7";
+								}
+								replacement = "&" + split[1] + replacement + "/&4" + max;
 							}
 						}
+						// set replacement
+						else {
+							replacement = "&" + split[1] + replacement;
+						}
 						
-						// replace variable
-						replacement = "&" + split[1] + replacement;
 						if (split.length == 2) {
 							message = message.replaceAll("(?<!\\\\)\\{" + variable + ",[0-9a-frw]\\}", replacement);
 						}
-						
 						// split.length == 4
 						else {
-							message = message.replaceAll("(?<!\\\\)\\{" + variable + ",[0-9a-frw],[0-9a-f],\\(.*\\)}", replacement.replaceAll(split[3], "&" + split[2] + "$1&" + split[1]));
+							message = message.replaceAll("(?<!\\\\)\\{" + variable + ",[0-9a-frw],[0-9a-f],\\(.*\\)\\}", replacement.replaceAll(split[3], "&" + split[2] + "$1&" + split[1]));
 						}
 						break;
 					}
@@ -226,26 +277,48 @@ public class SuitcaseMessage {
 		}
 	}
 	
+	/**
+	 * Sends messages to all authorized players
+	 * @param key Message configuration key
+	 * @param arguments Variables and their replacement
+	 */
+	public void sendAll(String key, String...arguments) {
+		// check if broadcast message is enabled
+		if (plugin.cfg.getBoolean("broadcast." + key)) {
+			// send message to all players
+			for (Player player : plugin.getServer().getOnlinePlayers()) {
+				if (plugin.perm.hasPermission(player.getName(), "suitcase.broadcast")) {
+					send(player, "broadcast." + key, arguments);
+				}
+			}
+			// send message to console
+			if (plugin.cfg.getBoolean("log.console.broadcast")) {
+				send(plugin.getServer().getConsoleSender(), "broadcast." + key, arguments);
+			}
+		}
+	}
+	
 	/** Resets message configuration */
-	public void reset() {
-		File dataFile = new File("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml");
+	public boolean reset() {
+		File dataFile = new File("plugins/Suitcase/message-" + plugin.cfg.getString("mechanics.locale") + ".yml");
 		dataFile.delete();
-		if (plugin.file.load("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml", defaults, true)) {
+		if (plugin.file.load("plugins/Suitcase/message-" + plugin.cfg.getString("mechanics.locale") + ".yml", defaults, true)) {
 			data = YamlConfiguration.loadConfiguration(dataFile);
+			return true;
 		}
 		else {
-			plugin.console.log(Action.FILE_SAVE_ERROR, dataFile.getName(), "FileNotLoaded");
+			return false;
 		}
 	}
 	
 	/** Gets and reads message configuration */
 	public boolean init() {
-		if (plugin.file.load("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml", defaults, false)) {
-			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/message-" + plugin.cfg.data.getString("mechanics.locale") + ".yml"));
+		if (plugin.file.load("plugins/Suitcase/message-" + plugin.cfg.getString("mechanics.locale") + ".yml", defaults, false)) {
+			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/message-" + plugin.cfg.getString("mechanics.locale") + ".yml"));
 			return true;
 		}
 		else {
-			plugin.console.log(Action.INIT_ERROR, "SuitcaseMessage", "FileNotLoaded");
+			plugin.console.log(Action.INIT_ERROR, "SuitcaseMessage");
 			return false;
 		}
 	}

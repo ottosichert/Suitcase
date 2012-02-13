@@ -34,7 +34,7 @@ public class SuitcasePermission {
 		else {
 			OfflinePlayer player = plugin.getServer().getOfflinePlayer(sender); // we need permissions for offline players as well
 			if (player != null) {
-				if (plugin.cfg.data.getBoolean("mechanics.op-permissions")) {
+				if (plugin.cfg.getBoolean("mechanics.op-permissions")) {
 					if (player.isOp()) {
 						return true; // OPs have all permissions for suitcase if mechanics.op-permissions is enabled
 					}

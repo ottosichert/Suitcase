@@ -1,8 +1,6 @@
 package me.eighth.suitcase.log;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
+import org.bukkit.entity.Player;
 
 import me.eighth.suitcase.Suitcase;
 import me.eighth.suitcase.util.SuitcaseConsole.Action;
@@ -26,19 +24,19 @@ public class SuitcaseConnector {
 	 */
 	public double getRating(String target) {
 		if (plugin.perm.hasPermission(target, "suitcase.rate")) {
-			if (plugin.cfg.data.getBoolean("log.database.enable")) {
-				return Math.round(new Random().nextDouble() * 100.0) / 10.0;
+			if (plugin.cfg.getBoolean("log.database.enable")) {
+				return 4.2;
 			}
-			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+			else if (plugin.cfg.getBoolean("log.file.enable")) {
 				return plugin.yml.getRating(target);
 			}
 			else {
-				return 0.0;
+				return -1.0;
 			}
 		}
 		else {
 			// targeted player must have permission to be rated
-			return 0.0;
+			return -1.0;
 		}
 	}
 	
@@ -46,14 +44,14 @@ public class SuitcaseConnector {
 	 * Sets the rating of a player
 	 * @param sender Rating player
 	 * @param target Rated player
-	 * @param rating Rating for this player
+	 * @param rating Rating value
 	 */
 	public boolean setRating(String sender, String target, int rating) {
 		if (plugin.perm.hasPermission(target, "suitcase.rate")) {
-			if (plugin.cfg.data.getBoolean("log.database.enable")) {
+			if (plugin.cfg.getBoolean("log.database.enable")) {
 				return true;
 			}
-			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+			else if (plugin.cfg.getBoolean("log.file.enable")) {
 				return plugin.yml.setRating(sender, target, rating);
 			}
 			else {
@@ -71,19 +69,19 @@ public class SuitcaseConnector {
 	 */
 	public int getWarnings(String target) {
 		if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
-			if (plugin.cfg.data.getBoolean("log.database.enable")) {
+			if (plugin.cfg.getBoolean("log.database.enable")) {
 				return 2;
 			}
-			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+			else if (plugin.cfg.getBoolean("log.file.enable")) {
 				return plugin.yml.getWarnings(target);
 			}
 			else {
-				return 1;
+				return -1;
 			}
 		}
 		else {
 			// players with permission to warn can't be warned themselves
-			return new Random().nextInt(4);
+			return -1;
 		}
 	}
 	
@@ -94,10 +92,10 @@ public class SuitcaseConnector {
 	 */
 	public boolean setWarnings(String target, boolean warning) {
 		if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
-			if (plugin.cfg.data.getBoolean("log.database.enable")) {
+			if (plugin.cfg.getBoolean("log.database.enable")) {
 				return true;
 			}
-			else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+			else if (plugin.cfg.getBoolean("log.file.enable")) {
 				return plugin.yml.setWarnings(target, warning);
 			}
 			else {
@@ -114,10 +112,10 @@ public class SuitcaseConnector {
 	 * @param target Selected player
 	 */
 	public boolean isRegistered(String target) {
-		if (plugin.cfg.data.getBoolean("log.database.enable")) {
+		if (plugin.cfg.getBoolean("log.database.enable")) {
 			return true;
 		}
-		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+		else if (plugin.cfg.getBoolean("log.file.enable")) {
 			return plugin.yml.isRegistered(target);
 		}
 		else {
@@ -129,52 +127,60 @@ public class SuitcaseConnector {
 	 * Registers a player
 	 * @param target Selected player
 	 */
-	public boolean register(String target) {
-		if (plugin.cfg.data.getBoolean("log.database.enable")) {
-			return true;
+	public void register(String target) {
+		if (plugin.cfg.getBoolean("log.database.enable")) {
+			
 		}
-		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
-			return plugin.yml.register(target);
+		else if (plugin.cfg.getBoolean("log.file.enable")) {
+			plugin.yml.register(target);
 		}
-		else {
-			return false;
+	}
+	
+	/** Registers all online players */
+	public void registerAll() {
+		for (Player player : plugin.getServer().getOnlinePlayers()) {
+			register(player.getName());
 		}
 	}
 	
 	/** Resets all player ratings and warnings */
-	public void reset() {
-		if (plugin.cfg.data.getBoolean("log.database.enable")) {
-			
+	public boolean reset() {
+		if (plugin.cfg.getBoolean("log.database.enable")) {
+			return true;
 		}
-		if (plugin.cfg.data.getBoolean("log.file.enable")) {
-			plugin.yml.reset();
+		if (plugin.cfg.getBoolean("log.file.enable")) {
+			return plugin.yml.reset();
+		}
+		else {
+			return false;
 		}
 	}
 	
 	/** Initializes file or database logger */
 	public boolean init() {
-		if (plugin.cfg.data.getBoolean("log.database.enable")) {
+		if (plugin.cfg.getBoolean("log.database.enable")) {
 			return plugin.db.init();
 		}
-		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+		else if (plugin.cfg.getBoolean("log.file.enable")) {
 			return plugin.yml.init();
 		}
 		else {
-			plugin.console.log(Action.INIT_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConnector", "NoLogMethodEnabled")));
-			return false;
+			// no log method enabled
+			plugin.console.log(Action.LOG_ERROR);
+			plugin.cfg.setBoolean("log.file.enable", true);
+			return true;
 		}
 	}
 	
 	/** Disposes file or closes database connection */
 	public boolean free() {
-		if (plugin.cfg.data.getBoolean("log.database.enable")) {
+		if (plugin.cfg.getBoolean("log.database.enable")) {
 			return plugin.db.free();
 		}
-		else if (plugin.cfg.data.getBoolean("log.file.enable")) {
+		else if (plugin.cfg.getBoolean("log.file.enable")) {
 			return plugin.yml.free();
 		}
 		else {
-			plugin.console.log(Action.FREE_ERROR, new ArrayList<String>(Arrays.asList("SuitcaseConnector", "NoLogMethodEnabled")));
 			return false;
 		}
 	}

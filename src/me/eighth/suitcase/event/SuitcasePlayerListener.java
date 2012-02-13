@@ -1,10 +1,10 @@
 package me.eighth.suitcase.event;
 
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 
 import me.eighth.suitcase.Suitcase;
-import me.eighth.suitcase.util.SuitcaseConsole.Action;
 
 public class SuitcasePlayerListener extends PlayerListener {
 	
@@ -12,7 +12,7 @@ public class SuitcasePlayerListener extends PlayerListener {
 	private Suitcase plugin;
 	
 	/**
-	 * Handles onPlayerJoin to register new players
+	 * Register joining players and execute sign commands
 	 * @param plugin Instance of Suitcase
 	 */
 	public SuitcasePlayerListener(Suitcase plugin) {
@@ -21,13 +21,14 @@ public class SuitcasePlayerListener extends PlayerListener {
 	
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		// get joining player and register him
-		if (!plugin.con.isRegistered(event.getPlayer().getName())) {
-			if (plugin.con.register((event.getPlayer().getName()))) {
-				plugin.console.log(Action.PLAYER_REGISTER, (event.getPlayer().getName()));
-			}
-		}
+		// register joining player
+		plugin.con.register(event.getPlayer().getName());
 		// send join message
 		plugin.msg.send(event.getPlayer(), "join", "player", event.getPlayer().getName(), "rating", String.valueOf(plugin.con.getRating(event.getPlayer().getName())), "warnings", String.valueOf(plugin.con.getWarnings(event.getPlayer().getName())));
+	}
+	
+	@Override
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		// TODO: Sign interact
 	}
 }

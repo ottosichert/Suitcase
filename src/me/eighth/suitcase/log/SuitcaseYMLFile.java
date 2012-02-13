@@ -31,18 +31,17 @@ public class SuitcaseYMLFile {
 	 * @param target Selected player
 	 */
 	private boolean calculateRating(String target) {
-		target = target.toLowerCase();
 		if (isRegistered(target)) {
 			FileConfiguration playerData = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/players/" + target + ".yml"));
 			// add default
-			int totalRating = plugin.cfg.data.getInt("mechanics.rating.default");
+			int totalRating = plugin.cfg.getInt("mechanics.rating.default");
 			int count = 1;
 			for (String ratingPlayers : playerData.getKeys(false)) {
 				totalRating += playerData.getInt(ratingPlayers);
 				count++;
 			}
 			
-			data.set(target + ".rating", Math.round(Double.valueOf(totalRating) / Double.valueOf(count) * 100.0 ) / 10.0);
+			data.set(target + ".rating", Math.round(Double.valueOf(totalRating) / Double.valueOf(count) * 100.0) / 10.0);
 			return true;
 		}
 		else {
@@ -55,7 +54,6 @@ public class SuitcaseYMLFile {
 	 * @param target Selected player
 	 */
 	protected double getRating(String target) {
-		target = target.toLowerCase();
 		if (isRegistered(target)) {
 			return data.getDouble(target + ".rating");
 		}
@@ -71,7 +69,6 @@ public class SuitcaseYMLFile {
 	 * @param rating Rating for this player
 	 */
 	protected boolean setRating(String sender, String target, int rating) {
-		target = target.toLowerCase();
 		if (isRegistered(sender) && isRegistered(target)) {
 			Map<String, Object> playerMap = new HashMap<String, Object>();
 			playerMap.put(sender, rating);
@@ -79,7 +76,6 @@ public class SuitcaseYMLFile {
 				return calculateRating(target);
 			}
 			else {
-				plugin.console.log(Action.FILE_SAVE_ERROR, "players/" + target + ".yml", "FileNotLoaded");
 				return false;
 			}
 		}
@@ -93,17 +89,8 @@ public class SuitcaseYMLFile {
 	 * @param target Selected player
 	 */
 	protected boolean isRegistered(String target) {
-		target = target.toLowerCase();
 		if (data.getKeys(false).contains(target)) {
-			if (plugin.perm.hasPermission(target, "suitcase.rate")) {
-				return true;
-			}
-			else {
-				// don't forget to remove unauthorized player
-				plugin.console.log(Action.PLAYER_UNREGISTER, target);
-				unregister(target);
-				return false;
-			}
+			return true;
 		}
 		else {
 			return false;
@@ -114,17 +101,30 @@ public class SuitcaseYMLFile {
 	 * Registers a player
 	 * @param target Selected player
 	 */
-	protected boolean register(String target) {
-		target = target.toLowerCase();
-		data.set(target + ".rating", plugin.cfg.data.getDouble("mechanics.rating.default"));
-		data.set(target + ".warnings", 0);
-		if (plugin.file.load("plugins/Suitcase/player.yml", data)) {
-			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
-			return true;
-		}
-		else {
-			plugin.console.log(Action.FILE_SAVE_ERROR, "player.yml", "FileNotLoaded");
-			return false;
+	protected void register(String target) {
+		if (!isRegistered(target)) {
+			
+			// set rating
+			if (plugin.perm.hasPermission(target, "suitcase.rate")) {
+				data.set(target + ".rating", plugin.cfg.getDouble("mechanics.rating.default"));
+			}
+			else {
+				data.set(target + ".rating", -1.0);
+			}
+			
+			// set warnings
+			if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
+				data.set(target + ".warnings", 0);
+			}
+			else {
+				data.set(target + ".warnings", -1);
+			}
+			
+			// save file
+			if (plugin.file.load("plugins/Suitcase/player.yml", data)) {
+				data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
+				plugin.console.log(Action.PLAYER_REGISTER, target);
+			}
 		}
 	}
 	
@@ -132,8 +132,7 @@ public class SuitcaseYMLFile {
 	 * Unregisters a player
 	 * @param target Selected player
 	 */
-	private void unregister(String target) {
-		target = target.toLowerCase();
+	public void unregister(String target) {
 		Map<String, Object> dataMap = new HashMap<String, Object>();
 		// remove player from player.yml
 		for (String key : data.getKeys(false)) {
@@ -148,9 +147,6 @@ public class SuitcaseYMLFile {
 		if (plugin.file.load("plugins/Suitcase/player.yml", dataMap)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
 		}
-		else {
-			plugin.console.log(Action.FILE_SAVE_ERROR, "player.yml", "FileNotLoaded");
-		}
 	}
 	
 	/**
@@ -158,7 +154,6 @@ public class SuitcaseYMLFile {
 	 * @param target Selected player
 	 */
 	protected int getWarnings(String target) {
-		target = target.toLowerCase();
 		if (isRegistered(target)) {
 			return data.getInt(target + ".warnings");
 		}
@@ -173,12 +168,11 @@ public class SuitcaseYMLFile {
 	 * @param warning True if player is warned or false if player is forgiven
 	 */
 	protected boolean setWarnings(String target, boolean warning) {
-		target = target.toLowerCase();
 		if (isRegistered(target)) {
 			int value;
 			value = getWarnings(target);
 			if (warning) { // increase counter by one
-				if (value < plugin.cfg.data.getInt("mechanics.warnings.maximum")) {
+				if (value < plugin.cfg.getInt("mechanics.warnings.maximum")) {
 					value++;
 				}
 			}
@@ -192,7 +186,6 @@ public class SuitcaseYMLFile {
 				return true;
 			}
 			else {
-				plugin.console.log(Action.FILE_SAVE_ERROR, "player.yml", "FileNotLoaded");
 				return false;
 			}
 		}
@@ -202,17 +195,22 @@ public class SuitcaseYMLFile {
 	}
 	
 	/** Resets player data */
-	protected void reset() {
+	protected boolean reset() {
 		// clear 'player.yml' and 'players/'
 		new File("plugins/Suitcase/player.yml").delete();
-		new File("plugins/Suitcase/players/").delete();
+		for (File playerFile : new File("plugins/Suitcase/players/").listFiles()) {
+			playerFile.delete();
+		}
 		if (plugin.file.load("plugins/Suitcase/player.yml")) {
-			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
 			plugin.console.log(Action.RESET);
+			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
+			// re-register all online players
+			plugin.con.registerAll();
+			return true;
 		}
 		else {
 			// saving new empty file failed
-			plugin.console.log(Action.FILE_SAVE_ERROR, "player.yml", "FileNotLoaded");
+			return false;
 		}
 	}
 	
@@ -228,7 +226,6 @@ public class SuitcaseYMLFile {
 			return true;
 		}
 		else {
-			plugin.console.log(Action.INIT_ERROR, "SuitcaseYMLFile", "FileNotLoaded");
 			return false;
 		}
 	}
