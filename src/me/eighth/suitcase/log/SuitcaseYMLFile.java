@@ -1,6 +1,7 @@
 package me.eighth.suitcase.log;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,14 +35,14 @@ public class SuitcaseYMLFile {
 		if (isRegistered(target)) {
 			FileConfiguration playerData = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/players/" + target + ".yml"));
 			// add default
-			int totalRating = plugin.cfg.getInt("mechanics.rating.default");
+			int totalRating = plugin.cfg.getInt("rating.default");
 			int count = 1;
 			for (String ratingPlayers : playerData.getKeys(false)) {
 				totalRating += playerData.getInt(ratingPlayers);
 				count++;
 			}
 			
-			data.set(target + ".rating", Math.round(Double.valueOf(totalRating) / Double.valueOf(count) * 100.0) / 10.0);
+			data.set(target + ".rating", Math.round(Double.valueOf(totalRating) / Double.valueOf(count) * 10.0) / 10.0);
 			return true;
 		}
 		else {
@@ -58,8 +59,54 @@ public class SuitcaseYMLFile {
 			return data.getDouble(target + ".rating");
 		}
 		else {
-			return 0.0; // player doesn't exist
+			return -1.0; // player doesn't exist
 		}
+	}
+	
+	/**
+	 * Returns an ArrayList of the top ten best rated players
+	 */
+	protected ArrayList<String> getTopRatings() {
+		ArrayList<String> players = new ArrayList<String>(); // all registered players
+		ArrayList<Double> ratings = new ArrayList<Double>(); // rating of those
+		ArrayList<String> values = new ArrayList<String>(); // final list of players
+		double rating;
+		int index;
+		
+		for (String player : data.getKeys(false)) {
+			rating = data.getDouble(player + ".rating");
+			if (rating >= 0.0) {
+				// add player and his rating
+				players.add(player);
+				ratings.add(rating);
+			}
+		}
+		
+		for (int i = 0; i < 10; i++) {
+			rating = -1.0;
+			index = -1;
+			
+			for (int j = 0; j < players.size(); j++) {
+				// get top rating
+				if (ratings.get(j) > rating) {
+					rating = ratings.get(j);
+					index = j;
+				}
+			}
+			
+			if (index >= 0) {
+				// add player to top list
+				values.add(players.get(index));
+
+				// temporary reset player's rating
+				ratings.set(index, -1.0);
+			}
+			else {
+				break;
+			}
+		}
+		
+		return values;
 	}
 	
 	/**
@@ -72,7 +119,7 @@ public class SuitcaseYMLFile {
 		if (isRegistered(sender) && isRegistered(target)) {
 			Map<String, Object> playerMap = new HashMap<String, Object>();
 			playerMap.put(sender, rating);
-			if (plugin.file.load("plugins/Suitcase/players/" + target + ".yml", playerMap)) {
+			if (plugin.load("plugins/Suitcase/players/" + target + ".yml", playerMap)) {
 				return calculateRating(target);
 			}
 			else {
@@ -89,7 +136,7 @@ public class SuitcaseYMLFile {
 	 * @param target Selected player
 	 */
 	protected boolean isRegistered(String target) {
-		if (data.getKeys(false).contains(target)) {
+		if (data.contains(target) && data.contains(target + ".rating") && data.contains(target + ".warnings")) {
 			return true;
 		}
 		else {
@@ -105,15 +152,15 @@ public class SuitcaseYMLFile {
 		if (!isRegistered(target)) {
 			
 			// set rating
-			if (plugin.perm.hasPermission(target, "suitcase.rate")) {
-				data.set(target + ".rating", plugin.cfg.getDouble("mechanics.rating.default"));
+			if (plugin.hasPermission(target, "rate")) {
+				data.set(target + ".rating", plugin.cfg.getDouble("rating.default"));
 			}
 			else {
 				data.set(target + ".rating", -1.0);
 			}
 			
 			// set warnings
-			if (!plugin.perm.hasPermission(target, "suitcase.warn")) {
+			if (!plugin.hasPermission(target, "warn")) {
 				data.set(target + ".warnings", 0);
 			}
 			else {
@@ -121,9 +168,9 @@ public class SuitcaseYMLFile {
 			}
 			
 			// save file
-			if (plugin.file.load("plugins/Suitcase/player.yml", data)) {
+			if (plugin.load("plugins/Suitcase/player.yml", data)) {
 				data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
-				plugin.console.log(Action.PLAYER_REGISTER, target);
+				plugin.log(Action.PLAYER_REGISTER, target);
 			}
 		}
 	}
@@ -144,7 +191,7 @@ public class SuitcaseYMLFile {
 		// remove player file
 		new File("plugins/Suitcase/players/" + target + ".yml").delete();
 		// save file and use new FileConfig
-		if (plugin.file.load("plugins/Suitcase/player.yml", dataMap)) {
+		if (plugin.load("plugins/Suitcase/player.yml", dataMap)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
 		}
 	}
@@ -158,7 +205,7 @@ public class SuitcaseYMLFile {
 			return data.getInt(target + ".warnings");
 		}
 		else {
-			return 0; // player doesn't exist
+			return -1; // player doesn't exist
 		}
 	}
 	
@@ -172,7 +219,7 @@ public class SuitcaseYMLFile {
 			int value;
 			value = getWarnings(target);
 			if (warning) { // increase counter by one
-				if (value < plugin.cfg.getInt("mechanics.warnings.maximum")) {
+				if (value < plugin.cfg.getInt("warnings.maximum")) {
 					value++;
 				}
 			}
@@ -181,7 +228,7 @@ public class SuitcaseYMLFile {
 			}
 			data.set(target + ".warnings", value);
 			
-			if (plugin.file.load("plugins/Suitcase/player.yml", data)) {
+			if (plugin.load("plugins/Suitcase/player.yml", data)) {
 				data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
 				return true;
 			}
@@ -198,11 +245,13 @@ public class SuitcaseYMLFile {
 	protected boolean reset() {
 		// clear 'player.yml' and 'players/'
 		new File("plugins/Suitcase/player.yml").delete();
-		for (File playerFile : new File("plugins/Suitcase/players/").listFiles()) {
-			playerFile.delete();
+		if (new File("plugins/Suitcase/players/").exists()) {
+			for (File playerFile : new File("plugins/Suitcase/players/").listFiles()) {
+				playerFile.delete();
+			}
 		}
-		if (plugin.file.load("plugins/Suitcase/player.yml")) {
-			plugin.console.log(Action.RESET);
+		if (plugin.load("plugins/Suitcase/player.yml")) {
+			plugin.log(Action.RESET);
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
 			// re-register all online players
 			plugin.con.registerAll();
@@ -216,23 +265,30 @@ public class SuitcaseYMLFile {
 	
 	/** Gets and loads player file  */
 	protected boolean init() {
-		if (plugin.file.load("plugins/Suitcase/player.yml")) {
+		if (plugin.load("plugins/Suitcase/player.yml")) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
 			
-			// recalculate rating if mechanics.rating.default changed
+			// recalculate rating if rating.default changed
 			for (String player : data.getKeys(false)) {
 				calculateRating(player);
 			}
 			return true;
 		}
 		else {
+			plugin.log(Action.INIT_ERROR, "YMLFileConfig");
 			return false;
 		}
 	}
 	
 	/** Disposes player file */
 	protected boolean free() {
-		data = null;
-		return true;
+		if (plugin.load("plugins/Suitcase/player.yml", data)) {
+			data = null;
+			return true;
+		}
+		else {
+			plugin.log(Action.FREE_ERROR, "YMLFileConfig");
+			return false;
+		}
 	}
 }

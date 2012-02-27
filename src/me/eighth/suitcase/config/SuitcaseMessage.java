@@ -55,6 +55,11 @@ public class SuitcaseMessage {
 		defaults.put("rate.rating", "&5Rating &7>> {rating,r,7,(/)}");
 		defaults.put("rate.warnings", "&5Warnings &7>> {warnings,w,7,(/)}");
 		
+		// top command
+		defaults.put("top.header", " &7----- &2Top ratings &7-----");
+		defaults.put("top.name", "&7#{rank,b} {player,3}");
+		defaults.put("top.stats", "{rating,r,7,(/)} &7>> {warnings,w,7,(/)}");
+		
 		// other commands
 		defaults.put("rate.done", "&2You have successfully rated {player,a}&2.");
 		defaults.put("warn.done", "&2You have successfully warned {player,a}&2.");
@@ -87,7 +92,7 @@ public class SuitcaseMessage {
 		defaults.put("broadcast.reset", "&7* &6Suitcase was reset. &7*");
 		
 		// join message(s)
-		defaults.put("join", "&7* &6Welcome, {player,6}&6! &7*&n&7* &6Rating: {rating,r} &7* &6Warnings: {warnings,w} &7*");
+		defaults.put("join", "&7* &6Welcome, {player,6}&6! &7*&n&7* &6Rating: {rating,r,7,(/)} &7* &6Warnings: {warnings,w,7,(/)} &7*");
 	}
 	
 	/**
@@ -131,10 +136,70 @@ public class SuitcaseMessage {
 	public void send(CommandSender sender, String key, String...arguments) {
 		
 		// get the message for the given key
-		String message = getString(key);
+		String message = parse(getString(key), arguments);
 		
-		String variable, replacement, result;
+		// replace \{ with {
+		message = message.replaceAll("\\\\\\{", "{");
+		
+		// send message to player
+		String result, hex = "0123456789abcdef";
 		char firstChar;
+		String[] split;
+		
+		for (String line : message.split("&n")) {
+			if (line.contains("&")) {
+				split = line.split("&");
+				result = split[0];
+				for (int i = 1; i < split.length; i++) {
+					if (split[i] != null) {
+						firstChar = split[i].toCharArray()[0];
+						if (hex.contains(String.valueOf(firstChar))) {
+							result += ChatColor.getByCode(hex.indexOf(firstChar)) + split[i].substring(1);
+						}
+						else {
+							result += "&" + split[i];
+						}
+					}
+					else {
+						result += "&";
+					}
+				}
+			}
+			else {
+				result = line;
+			}
+			sender.sendMessage(result);
+		}
+	}
+	
+	/**
+	 * Sends messages to all authorized players
+	 * @param key Message configuration key
+	 * @param arguments Variables and their replacement
+	 */
+	public void sendAll(String key, String...arguments) {
+		// check if broadcast message is enabled
+		if (plugin.cfg.getBoolean("broadcast." + key)) {
+			// send message to all players
+			for (Player player : plugin.getServer().getOnlinePlayers()) {
+				if (plugin.hasPermission(player.getName(), "broadcast")) {
+					send(player, "broadcast." + key, arguments);
+				}
+			}
+			// send message to console
+			if (plugin.cfg.getBoolean("log.console.broadcast")) {
+				send(plugin.getServer().getConsoleSender(), "broadcast." + key, arguments);
+			}
+		}
+	}
+	
+	/**
+	 * Parses a String and replaces all variables
+	 * @param message Input String
+	 * @param arguments Pair of variable and its replacement
+	 */
+	public String parse(String message, String...arguments) {
+		String variable, replacement;
 		String[] split;
 		
 		// group arguments to pairs, the name of a variable and its replacement
@@ -174,8 +239,8 @@ public class SuitcaseMessage {
 								replacement = "&6No rating.";
 							}
 							else {
-								double def = plugin.cfg.getDouble("mechanics.rating.default");
-								double max = plugin.cfg.getDouble("mechanics.rating.maximum");
+								double def = plugin.cfg.getDouble("rating.default");
+								double max = plugin.cfg.getDouble("rating.maximum");
 
 								if (rating >= 0 && rating < def * 2 / 5) {
 									split[1] =  "4";
@@ -205,7 +270,7 @@ public class SuitcaseMessage {
 								replacement = "&6No warnings.";
 							}
 							else {
-								int max = plugin.cfg.getInt("mechanics.warnings.maximum");
+								int max = plugin.cfg.getInt("warnings.maximum");
 
 								if (warnings >= 0 && warnings < max * 1 / 5) {
 									split[1] =  "2";
@@ -238,7 +303,7 @@ public class SuitcaseMessage {
 						}
 						// split.length == 4
 						else {
-							message = message.replaceAll("(?<!\\\\)\\{" + variable + ",[0-9a-frw],[0-9a-f],\\(.*\\)\\}", replacement.replaceAll(split[3], "&" + split[2] + "$1&" + split[1]));
+							message = message.replaceAll("(?<!\\\\)\\{" + variable + ",[0-9a-frw],[0-9a-f],\\([^\\)]*\\)\\}", replacement.replaceAll(split[3], "&" + split[2] + "$1&" + split[1]));
 						}
 						break;
 					}
@@ -246,63 +311,14 @@ public class SuitcaseMessage {
 			}
 		}
 		
-		// replace \{ with {
-		message = message.replaceAll("\\\\\\{", "{");
-		
-		// send message to player
-		String hex = "0123456789abcdef";
-		for (String line : message.split("&n")) {
-			if (line.contains("&")) {
-				split = line.split("&");
-				result = split[0];
-				for (int i = 1; i < split.length; i++) {
-					if (split[i] != null) {
-						firstChar = split[i].toCharArray()[0];
-						if (hex.contains(String.valueOf(firstChar))) {
-							result += ChatColor.getByCode(hex.indexOf(firstChar)) + split[i].substring(1);
-						}
-						else {
-							result += "&" + split[i];
-						}
-					}
-					else {
-						result += "&";
-					}
-				}
-			}
-			else {
-				result = line;
-			}
-			sender.sendMessage(result);
-		}
-	}
-	
-	/**
-	 * Sends messages to all authorized players
-	 * @param key Message configuration key
-	 * @param arguments Variables and their replacement
-	 */
-	public void sendAll(String key, String...arguments) {
-		// check if broadcast message is enabled
-		if (plugin.cfg.getBoolean("broadcast." + key)) {
-			// send message to all players
-			for (Player player : plugin.getServer().getOnlinePlayers()) {
-				if (plugin.perm.hasPermission(player.getName(), "suitcase.broadcast")) {
-					send(player, "broadcast." + key, arguments);
-				}
-			}
-			// send message to console
-			if (plugin.cfg.getBoolean("log.console.broadcast")) {
-				send(plugin.getServer().getConsoleSender(), "broadcast." + key, arguments);
-			}
-		}
+		return message;
 	}
 	
 	/** Resets message configuration */
 	public boolean reset() {
 		File dataFile = new File("plugins/Suitcase/message-" + plugin.cfg.getString("mechanics.locale") + ".yml");
 		dataFile.delete();
-		if (plugin.file.load("plugins/Suitcase/message-" + plugin.cfg.getString("mechanics.locale") + ".yml", defaults, true)) {
+		if (plugin.load("plugins/Suitcase/message-" + plugin.cfg.getString("mechanics.locale") + ".yml", defaults, true)) {
 			data = YamlConfiguration.loadConfiguration(dataFile);
 			return true;
 		}
@@ -313,20 +329,26 @@ public class SuitcaseMessage {
 	
 	/** Gets and reads message configuration */
 	public boolean init() {
-		if (plugin.file.load("plugins/Suitcase/message-" + plugin.cfg.getString("mechanics.locale") + ".yml", defaults, false)) {
+		if (plugin.load("plugins/Suitcase/message-" + plugin.cfg.getString("mechanics.locale") + ".yml", defaults, false)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/message-" + plugin.cfg.getString("mechanics.locale") + ".yml"));
 			return true;
 		}
 		else {
-			plugin.console.log(Action.INIT_ERROR, "SuitcaseMessage");
+			plugin.log(Action.INIT_ERROR, "SuitcaseMessage");
 			return false;
 		}
 	}
 	
 	/** Disposes message configuration */
 	public boolean free() {
-		data = null;
-		return true;
+		if (plugin.load("plugins/Suitcase/message-" + plugin.cfg.getString("mechanics.locale") + ".yml", data)) {
+			data = null;
+			return true;
+		}
+		else {
+			plugin.log(Action.INIT_ERROR, "SuitcaseMessage");
+			return false;
+		}
 	}
 	
 	/** Reloads message configuration */

@@ -36,6 +36,10 @@ public class SuitcaseConsole {
 		PLAYER_UNREGISTER,
 		
 		
+		/** Event successfully executed. Arguments: event name, action */
+		EVENT_EXECUTED,
+		
+		
 		/** Property missing in configuration file. Argument: key, file path, value */
 		PROPERTY_MISSING,
 		/** Redundant property found. Arguments: key, file path, value */
@@ -113,23 +117,6 @@ public class SuitcaseConsole {
 			log(Action.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), Suitcase.getStringFromList(arguments, ","))));
 			return false;
 		}
-	}
-	
-	/**
-	 * Logs an action to console
-	 * @param action Action type to be logged
-	 */
-	public boolean log(Action action) {
-		return log(action, new ArrayList<String>());
-	}
-	
-	/**
-	 * Logs an action to console
-	 * @param action Action type to be logged
-	 * @param arguments Action arguments
-	 */
-	public boolean log(Action action, String...arguments) {
-		return log(action, new ArrayList<String>(Arrays.asList(arguments)));
 	}
 	
 	/**
@@ -216,6 +203,13 @@ public class SuitcaseConsole {
 		case PLAYER_UNREGISTER:
 			if (checkArguments(action, arguments, 1)) {
 				mcLogger.info(plugin.pluginTag + "Player '" + arguments.get(0) + "' was successfully unregistered!");
+			}
+			return true;
+			
+
+		case EVENT_EXECUTED:
+			if (checkArguments(action, arguments, 2)) {
+				mcLogger.info(plugin.pluginTag + "Event '" + arguments.get(0) + "' was successfully executed by matching action '" + arguments.get(1) + "'!");
 			}
 			return true;
 			

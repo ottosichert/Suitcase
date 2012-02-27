@@ -23,10 +23,14 @@ public class SuitcasePermission {
 		this.plugin = plugin;
 		
 		// load default permissions
-		defaultPermissions = new ArrayList<String>(Arrays.asList("suitcase.help", "suitcase.broadcast", "suitcase.rate"));
+		defaultPermissions = new ArrayList<String>(Arrays.asList("help", "broadcast", "rate"));
 	}
 	
-	// returns true if sender has permission, otherwise false
+	/**
+	 * Checks if player or console has permission to a Suitcase action
+	 * @param sender Command sender or target
+	 * @param permission Suitcase permission
+	 */
 	public boolean hasPermission(String sender, String permission) {
 		if (sender.equals("CONSOLE")) { // console has permission to all commands
 			return true;
@@ -42,10 +46,10 @@ public class SuitcasePermission {
 						return true; // check if user has default permission
 					}
 					else {
-						return false; // user doesn't have permission
+						return false; // regular user doesn't have permission
 					}
 				}
-				else if (plugin.getServer().getPluginManager().getPermissionSubscriptions(permission).contains(sender)) {
+				else if (plugin.getServer().getPluginManager().getPermissionSubscriptions("suitcase." + permission).contains(sender)) {
 					return true; // get player's permission
 				}
 				else {

@@ -32,12 +32,23 @@ public class SuitcaseConfig {
 		defaults.put("mechanics.locale", "en_EN");
 		defaults.put("mechanics.full-help", false);
 		defaults.put("mechanics.op-permissions", true);
-		defaults.put("mechanics.rating.enable", true);
-		defaults.put("mechanics.rating.maximum", 10.0);
-		defaults.put("mechanics.rating.default", 5.0);
-		defaults.put("mechanics.warnings.enable", true);
-		defaults.put("mechanics.warnings.maximum", 3);
+		defaults.put("rating.enable", true);
+		defaults.put("rating.maximum", 10.0);
+		defaults.put("rating.default", 5.0);
+		defaults.put("warnings.enable", true);
+		defaults.put("warnings.maximum", 3);
+		defaults.put("sign.enable", true);
+		defaults.put("sign.text", "[Suitcase]");
+		defaults.put("sign.command.help", true);
+		defaults.put("sign.command.info", true);
+		defaults.put("sign.command.rate", true);
+		defaults.put("sign.command.top", true);
+		defaults.put("sign.command.warn", true);
+		defaults.put("sign.command.forgive", true);
+		defaults.put("sign.command.reload", true);
+		defaults.put("sign.command.reset", true);
 		defaults.put("log.console.command", true);
+		defaults.put("log.console.event", true);
 		defaults.put("log.console.debug", false);
 		defaults.put("log.console.broadcast", false);
 		defaults.put("log.database.enable", false);
@@ -102,7 +113,7 @@ public class SuitcaseConfig {
 	/** Resets plugin configuration */
 	public boolean reset() {
 		new File("plugins/Suitcase/config.yml").delete();
-		if (plugin.file.load("plugins/Suitcase/config.yml", defaults, true)) {
+		if (plugin.load("plugins/Suitcase/config.yml", defaults)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/config.yml"));
 			return true;
 		}
@@ -113,20 +124,26 @@ public class SuitcaseConfig {
 
 	/** Gets and reads plugin configuration file */
 	public boolean init() {
-		if (plugin.file.load("plugins/Suitcase/config.yml", defaults, false)) {
+		if (plugin.load("plugins/Suitcase/config.yml", defaults, false)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/config.yml"));
 			return true;
 		}
 		else {
-			plugin.console.log(Action.INIT_ERROR, "SuitcaseConfig");
+			plugin.log(Action.INIT_ERROR, "SuitcaseConfig");
 			return false;
 		}
 	}
 	
 	/** Disposes plugin configuration */
 	public boolean free() {
-		data = null;
-		return true;
+		if (plugin.load("plugins/Suitcase/config.yml", data)) {
+			data = null;
+			return true;
+		}
+		else {
+			plugin.log(Action.FREE_ERROR, "SuitcaseConfig");
+			return false;
+		}
 	}
 	
 	/** Reloads plugin configuration */

@@ -24,7 +24,10 @@ public class SuitcasePlayerListener extends PlayerListener {
 		// register joining player
 		plugin.con.register(event.getPlayer().getName());
 		// send join message
-		plugin.msg.send(event.getPlayer(), "join", "player", event.getPlayer().getName(), "rating", String.valueOf(plugin.con.getRating(event.getPlayer().getName())), "warnings", String.valueOf(plugin.con.getWarnings(event.getPlayer().getName())));
+		plugin.msg.send(event.getPlayer(), "join",
+				"player", event.getPlayer().getName(),
+				"rating", String.valueOf(plugin.con.getRating(event.getPlayer().getName())),
+				"warnings", String.valueOf(plugin.con.getWarnings(event.getPlayer().getName())));
 	}
 	
 	@Override

@@ -1,10 +1,14 @@
 package me.eighth.suitcase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import me.eighth.suitcase.config.SuitcaseConfig;
 import me.eighth.suitcase.config.SuitcaseEvent;
 import me.eighth.suitcase.config.SuitcaseMessage;
+import me.eighth.suitcase.event.SuitcaseBlockListener;
 import me.eighth.suitcase.event.SuitcaseCommandExecutor;
 import me.eighth.suitcase.event.SuitcasePlayerListener;
 import me.eighth.suitcase.log.SuitcaseConnector;
@@ -15,6 +19,7 @@ import me.eighth.suitcase.util.SuitcaseFile;
 import me.eighth.suitcase.util.SuitcasePermission;
 import me.eighth.suitcase.util.SuitcaseConsole.Action;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -41,14 +46,15 @@ public class Suitcase extends JavaPlugin {
 	
 	public final SuitcaseCommandExecutor command = new SuitcaseCommandExecutor(this);
 	public final SuitcasePlayerListener player = new SuitcasePlayerListener(this);
+	public final SuitcaseBlockListener block = new SuitcaseBlockListener(this);
 	
 	public final SuitcaseConnector con = new SuitcaseConnector(this);
 	public final SuitcaseDatabase db = new SuitcaseDatabase(this);
 	public final SuitcaseYMLFile yml = new SuitcaseYMLFile(this);
 	
-	public final SuitcaseConsole console = new SuitcaseConsole(this);
-	public final SuitcaseFile file = new SuitcaseFile(this);
-	public final SuitcasePermission perm = new SuitcasePermission(this);
+	private final SuitcaseConsole console = new SuitcaseConsole(this);
+	private final SuitcaseFile file = new SuitcaseFile(this);
+	private final SuitcasePermission perm = new SuitcasePermission(this);
 
 	@Override
 	public void onEnable() {
@@ -58,7 +64,8 @@ public class Suitcase extends JavaPlugin {
 		// register event
 		PluginManager manager = getServer().getPluginManager();
 		manager.registerEvent(Event.Type.PLAYER_JOIN, player, Event.Priority.Lowest, this);
-		manager.registerEvent(Event.Type.PLAYER_INTERACT, player, Event.Priority.Lowest, this);
+		manager.registerEvent(Event.Type.PLAYER_INTERACT, player, Event.Priority.Highest, this);
+		manager.registerEvent(Event.Type.SIGN_CHANGE, block, Event.Priority.Highest, this);
 		
 		// load and check configuration
 		if (!cfg.init() || !msg.init() || !event.init() || !con.init()) {
@@ -70,7 +77,7 @@ public class Suitcase extends JavaPlugin {
 		con.registerAll();
 		
 		// enabling finished, send to log
-		console.log(Action.PLUGIN_ENABLE);
+		log(Action.PLUGIN_ENABLE);
 	}
 	
 	@Override
@@ -82,7 +89,7 @@ public class Suitcase extends JavaPlugin {
 		cfg.free();
 		
 		// disabling finished, send to log
-		console.log(Action.PLUGIN_DISABLE);
+		log(Action.PLUGIN_DISABLE);
 	}
 	
 	/**
@@ -90,7 +97,7 @@ public class Suitcase extends JavaPlugin {
 	 * @param arguments Debug information
 	 */
 	public void debug(String...arguments) {
-		console.log(Action.DEBUG, arguments);
+		log(Action.DEBUG, arguments);
 	}
 	
 	/**
@@ -107,7 +114,7 @@ public class Suitcase extends JavaPlugin {
 		// reload settings and connector
 		if (cfg.reload() && msg.reload() && event.reload() && con.reload()) {
 			// reloading finished, send to log
-			console.log(Action.PLUGIN_RELOAD);
+			log(Action.PLUGIN_RELOAD);
 			return true;
 		}
 		else {
@@ -120,7 +127,7 @@ public class Suitcase extends JavaPlugin {
 	public boolean reset() {
 		// reset player ratings
 		if (cfg.reset() && msg.reset() && event.reset() && con.reset()) {
-			console.log(Action.RESET);
+			log(Action.RESET);
 			return true;
 		}
 		else {
@@ -131,5 +138,74 @@ public class Suitcase extends JavaPlugin {
 	/** Disables plugin due to an internal error */
 	public void disable() {
 		setEnabled(false);
+	}
+
+	
+	/**
+	 * Logs an action to console
+	 * @param action Action type to be logged
+	 */
+	public boolean log(Action action) {
+		return log(action, new ArrayList<String>());
+	}
+	
+	/**
+	 * Logs an action to console
+	 * @param action Action type to be logged
+	 * @param arguments Action arguments
+	 */
+	public boolean log(Action action, String...arguments) {
+		return log(action, new ArrayList<String>(Arrays.asList(arguments)));
+	}
+
+	/**
+	 * Logs an action to console
+	 * @param action Action type to be logged
+	 * @param arguments Action arguments
+	 */
+	public boolean log(Action action, ArrayList<String> arguments) {
+		return console.log(action, arguments);
+	}
+	
+	/** Loads a file and merges its value with its defaults */
+	public boolean load(String filename) {
+		return load(filename, new HashMap<String, Object>());
+	}
+
+	/** Loads a file and merges its value with its defaults */
+	public boolean load(String filename, FileConfiguration defaults) {
+		return load(filename, defaults, true);
+	}
+
+	/** Loads a file and merges its value with its defaults */
+	public boolean load(String filename, Map<String, Object> defaults) {
+		return load(filename, defaults, true);
+	}
+	
+	/** Loads a file and merges its value with its defaults */
+	public boolean load(String filename, FileConfiguration defaults, boolean optional) {
+		Map<String, Object> defaultsMap = new HashMap<String, Object>();
+		for (String key : defaults.getKeys(true)) {
+			if (!defaults.isConfigurationSection(key)) {
+				debug(key, defaults.get(key).toString());
+				defaultsMap.put(key, defaults.get(key));
+			}
+		}
+		return file.load(filename, defaultsMap, optional);
+	}
+
+	/** Loads a file and merges its value with its defaults */
+	public boolean load(String filename, Map<String, Object> defaults, boolean optional) {
+		return file.load(filename, defaults, optional);
+	}
+	
+	
+	/**
+	 * Checks if player or console has permission to a Suitcase action
+	 * @param sender Command sender or target
+	 * @param permission Suitcase permission
+	 */
+	public boolean hasPermission(String sender, String permission) {
+		return perm.hasPermission(sender, permission);
 	}
 }
