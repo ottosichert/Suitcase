@@ -25,21 +25,13 @@ public class SuitcaseConnector {
 	 * @param target Selected player
 	 */
 	public double getRating(String target) {
-		if (plugin.hasPermission(target, "rate")) {
-			if (plugin.cfg.getBoolean("log.database.enable")) {
-				return 4.2;
-			}
-			else if (plugin.cfg.getBoolean("log.file.enable")) {
-				return plugin.yml.getRating(target);
-			}
-			else {
-				return -1.0;
-			}
+		if (plugin.cfg.getBoolean("log.database.enable")) {
+			return plugin.db.getRating(target);
 		}
-		else {
-			// targeted player must have permission to be rated
-			return -1.0;
+		else if (plugin.cfg.getBoolean("log.file.enable")) {
+			return plugin.yml.getRating(target);
 		}
+		return -1.0;
 	}
 	
 	/**
@@ -47,14 +39,12 @@ public class SuitcaseConnector {
 	 */
 	public ArrayList<String> getTopRatings() {
 		if (plugin.cfg.getBoolean("log.database.enable")) {
-			return new ArrayList<String>();
+			return plugin.db.getTopRatings();
 		}
 		else if (plugin.cfg.getBoolean("log.file.enable")) {
 			return plugin.yml.getTopRatings();
 		}
-		else {
-			return new ArrayList<String>();
-		}
+		return new ArrayList<String>();
 	}
 	
 	/**
@@ -64,20 +54,13 @@ public class SuitcaseConnector {
 	 * @param rating Rating value
 	 */
 	public boolean setRating(String sender, String target, int rating) {
-		if (plugin.hasPermission(target, "rate")) {
-			if (plugin.cfg.getBoolean("log.database.enable")) {
-				return true;
-			}
-			else if (plugin.cfg.getBoolean("log.file.enable")) {
-				return plugin.yml.setRating(sender, target, rating);
-			}
-			else {
-				return false;
-			}
+		if (plugin.cfg.getBoolean("log.database.enable")) {
+			return plugin.db.setRating(sender, target, rating);
 		}
-		else {
-			return false;
+		else if (plugin.cfg.getBoolean("log.file.enable")) {
+			return plugin.yml.setRating(sender, target, rating);
 		}
+		return false;
 	}
 	
 	/**
@@ -85,21 +68,13 @@ public class SuitcaseConnector {
 	 * @param target Selected player
 	 */
 	public int getWarnings(String target) {
-		if (!plugin.hasPermission(target, "warn")) {
-			if (plugin.cfg.getBoolean("log.database.enable")) {
-				return 2;
-			}
-			else if (plugin.cfg.getBoolean("log.file.enable")) {
-				return plugin.yml.getWarnings(target);
-			}
-			else {
-				return -1;
-			}
+		if (plugin.cfg.getBoolean("log.database.enable")) {
+			return plugin.yml.getWarnings(target);
 		}
-		else {
-			// players with permission to warn can't be warned themselves
-			return -1;
+		else if (plugin.cfg.getBoolean("log.file.enable")) {
+			return plugin.yml.getWarnings(target);
 		}
+		return -1;
 	}
 	
 	/**
@@ -108,20 +83,13 @@ public class SuitcaseConnector {
 	 * @param warning True if player is warned or false if player is forgiven
 	 */
 	public boolean setWarnings(String target, boolean warning) {
-		if (!plugin.hasPermission(target, "warn")) {
-			if (plugin.cfg.getBoolean("log.database.enable")) {
-				return true;
-			}
-			else if (plugin.cfg.getBoolean("log.file.enable")) {
-				return plugin.yml.setWarnings(target, warning);
-			}
-			else {
-				return false;
-			}
+		if (plugin.cfg.getBoolean("log.database.enable")) {
+			return plugin.db.setWarnings(target, warning);
 		}
-		else {
-			return false;
+		else if (plugin.cfg.getBoolean("log.file.enable")) {
+			return plugin.yml.setWarnings(target, warning);
 		}
+		return false;
 	}
 	
 	/**
@@ -135,29 +103,31 @@ public class SuitcaseConnector {
 		else if (plugin.cfg.getBoolean("log.file.enable")) {
 			return plugin.yml.isRegistered(target);
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 	
 	/**
 	 * Registers a player
 	 * @param target Selected player
 	 */
-	public void register(String target) {
+	public boolean register(String target) {
 		if (plugin.cfg.getBoolean("log.database.enable")) {
-			
+			return false;
 		}
 		else if (plugin.cfg.getBoolean("log.file.enable")) {
-			plugin.yml.register(target);
+			return plugin.yml.register(target);
 		}
+		return false;
 	}
 	
 	/** Registers all online players */
-	public void registerAll() {
+	public boolean registerAll() {
 		for (Player player : plugin.getServer().getOnlinePlayers()) {
-			register(player.getName());
+			if (!register(player.getName())) {
+				return false;
+			}
 		}
+		return true;
 	}
 	
 	/** Resets all player ratings and warnings */
@@ -168,9 +138,7 @@ public class SuitcaseConnector {
 		if (plugin.cfg.getBoolean("log.file.enable")) {
 			return plugin.yml.reset();
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 	
 	/** Initializes file or database logger */
@@ -181,12 +149,10 @@ public class SuitcaseConnector {
 		else if (plugin.cfg.getBoolean("log.file.enable")) {
 			return plugin.yml.init();
 		}
-		else {
-			// no log method enabled
-			plugin.log(Action.LOG_ERROR);
-			plugin.cfg.setBoolean("log.file.enable", true);
-			return true;
-		}
+		// no log method enabled
+		plugin.log(Action.LOG_ERROR);
+		plugin.cfg.setBoolean("log.file.enable", true);
+		return true;
 	}
 	
 	/** Disposes file or closes database connection */
@@ -197,9 +163,7 @@ public class SuitcaseConnector {
 		else if (plugin.cfg.getBoolean("log.file.enable")) {
 			return plugin.yml.free();
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 	
 	/** Reloads file or database connection */
@@ -207,8 +171,6 @@ public class SuitcaseConnector {
 		if (free() && init()) {
 			return true;
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 }

@@ -57,8 +57,8 @@ public class SuitcaseMessage {
 		
 		// top command
 		defaults.put("top.header", " &7----- &2Top ratings &7-----");
-		defaults.put("top.name", "&7#{rank,b} {player,3}");
-		defaults.put("top.stats", "{rating,r,7,(/)} &7>> {warnings,w,7,(/)}");
+		defaults.put("top.stats", "&b#{rank,3} {player,b} &7>> &bR {rating,r,7,(/)} &3- &bW {warnings,w,7,(/)}");
+		defaults.put("top.empty", "&6No registered players found.");
 		
 		// other commands
 		defaults.put("rate.done", "&2You have successfully rated {player,a}&2.");
@@ -154,7 +154,7 @@ public class SuitcaseMessage {
 					if (split[i] != null) {
 						firstChar = split[i].toCharArray()[0];
 						if (hex.contains(String.valueOf(firstChar))) {
-							result += ChatColor.getByCode(hex.indexOf(firstChar)) + split[i].substring(1);
+							result += ChatColor.getByChar(firstChar) + split[i].substring(1);
 						}
 						else {
 							result += "&" + split[i];

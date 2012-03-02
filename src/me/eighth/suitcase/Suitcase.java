@@ -3,7 +3,9 @@ package me.eighth.suitcase;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import me.eighth.suitcase.config.SuitcaseConfig;
 import me.eighth.suitcase.config.SuitcaseEvent;
@@ -20,7 +22,6 @@ import me.eighth.suitcase.util.SuitcasePermission;
 import me.eighth.suitcase.util.SuitcaseConsole.Action;
 
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -39,7 +40,6 @@ public class Suitcase extends JavaPlugin {
 	public final String consoleTag = "[CONSOLE_COMMAND] ";
 	
 	// Suitcase classes
-	
 	public final SuitcaseConfig cfg = new SuitcaseConfig(this);
 	public final SuitcaseEvent event = new SuitcaseEvent(this);
 	public final SuitcaseMessage msg = new SuitcaseMessage(this);
@@ -63,9 +63,8 @@ public class Suitcase extends JavaPlugin {
 		
 		// register event
 		PluginManager manager = getServer().getPluginManager();
-		manager.registerEvent(Event.Type.PLAYER_JOIN, player, Event.Priority.Lowest, this);
-		manager.registerEvent(Event.Type.PLAYER_INTERACT, player, Event.Priority.Highest, this);
-		manager.registerEvent(Event.Type.SIGN_CHANGE, block, Event.Priority.Highest, this);
+		manager.registerEvents(player, this);
+		manager.registerEvents(block, this);
 		
 		// load and check configuration
 		if (!cfg.init() || !msg.init() || !event.init() || !con.init()) {
@@ -96,8 +95,17 @@ public class Suitcase extends JavaPlugin {
 	 * Sends a debug message to console
 	 * @param arguments Debug information
 	 */
-	public void debug(String...arguments) {
-		log(Action.DEBUG, arguments);
+	public boolean d(String...arguments) {
+		return log(Action.DEBUG, arguments);
+	}
+	
+	/**
+	 * Gets string from ArrayList and removes brackets
+	 * @param list An ArrayList of Strings to be converted to a single String
+	 * @param separator Set an item separator
+	 */
+	public static String getStringFromList(List<String> list, String separator) {
+		return getStringFromList(new ArrayList<String>(list), separator);
 	}
 	
 	/**
@@ -106,7 +114,51 @@ public class Suitcase extends JavaPlugin {
 	 * @param separator Set an item separator
 	 */
 	public static String getStringFromList(ArrayList<String> list, String separator) {
-		return list.toString().replaceAll("^\\[|\\]$", "").replaceAll(", ", separator + " ");
+		return list.toString().replaceAll("^\\[|\\]$", "").replaceAll(", ", separator);
+	}
+	
+	/**
+	 * Removes Strings from an ArrayList
+	 * @param defaults ArrayList to remove Strings from
+	 * @param remove Strings to be removed
+	 */
+	public static ArrayList<String> removeStringsFromList(String[] defaults, String...remove) {
+		return removeStringsFromList(new ArrayList<String>(Arrays.asList(defaults)), remove);
+	}
+	
+	/**
+	 * Removes Strings from an ArrayList
+	 * @param defaults ArrayList to remove Strings from
+	 * @param remove Strings to be removed
+	 */
+	public static ArrayList<String> removeStringsFromList(Set<String> defaults, String...remove) {
+		return removeStringsFromList(new ArrayList<String>(Arrays.asList(defaults.toArray(new String[0]))), remove);
+	}
+	
+	/**
+	 * Removes Strings from an ArrayList
+	 * @param defaults ArrayList to remove Strings from
+	 * @param remove Strings to be removed
+	 */
+	public static ArrayList<String> removeStringsFromList(List<String> defaults, String...remove) {
+		return removeStringsFromList(new ArrayList<String>(defaults), remove);
+	}
+	
+	/**
+	 * Removes Strings from an ArrayList
+	 * @param defaults ArrayList to remove Strings from
+	 * @param remove Strings to be removed
+	 */
+	public static ArrayList<String> removeStringsFromList(ArrayList<String> defaults, String...remove) {
+		for (String defaultsString : defaults) {
+			for (String removeString : remove) {
+				if (defaultsString.equals(removeString)) {
+					defaults.remove(defaultsString);
+					break;
+				}
+			}
+		}
+		return defaults;
 	}
 	
 	/** Reloads plugin */
@@ -167,34 +219,55 @@ public class Suitcase extends JavaPlugin {
 		return console.log(action, arguments);
 	}
 	
-	/** Loads a file and merges its value with its defaults */
+	/**
+	 * Loads a file and merges its value with its defaults
+	 * @param filename File to be loaded
+	 */
 	public boolean load(String filename) {
 		return load(filename, new HashMap<String, Object>());
 	}
-
-	/** Loads a file and merges its value with its defaults */
+	
+	/**
+	 * Loads a file and merges its value with its defaults
+	 * @param filename File to be loaded
+	 * @param defaults Path keys and values
+	 */
 	public boolean load(String filename, FileConfiguration defaults) {
 		return load(filename, defaults, true);
 	}
-
-	/** Loads a file and merges its value with its defaults */
+	
+	/**
+	 * Loads a file and merges its value with its defaults
+	 * @param filename File to be loaded
+	 * @param defaults Path keys and values
+	 */
 	public boolean load(String filename, Map<String, Object> defaults) {
 		return load(filename, defaults, true);
 	}
 	
-	/** Loads a file and merges its value with its defaults */
+	/**
+	 * Loads a file and merges its value with its defaults
+	 * @param filename File to be loaded
+	 * @param defaults Path keys and values
+	 * @param optional Keep redundant keys and hide console messages
+	 */
 	public boolean load(String filename, FileConfiguration defaults, boolean optional) {
 		Map<String, Object> defaultsMap = new HashMap<String, Object>();
 		for (String key : defaults.getKeys(true)) {
 			if (!defaults.isConfigurationSection(key)) {
-				debug(key, defaults.get(key).toString());
+				d(key, defaults.get(key).toString());
 				defaultsMap.put(key, defaults.get(key));
 			}
 		}
-		return file.load(filename, defaultsMap, optional);
+		return load(filename, defaultsMap, optional);
 	}
 
-	/** Loads a file and merges its value with its defaults */
+	/**
+	 * Loads a file and merges its value with its defaults
+	 * @param filename File to be loaded
+	 * @param defaults Path keys and values
+	 * @param optional Keep redundant keys and hide console messages
+	 */
 	public boolean load(String filename, Map<String, Object> defaults, boolean optional) {
 		return file.load(filename, defaults, optional);
 	}

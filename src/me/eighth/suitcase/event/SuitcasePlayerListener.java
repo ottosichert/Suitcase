@@ -1,12 +1,14 @@
 package me.eighth.suitcase.event;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 
 import me.eighth.suitcase.Suitcase;
 
-public class SuitcasePlayerListener extends PlayerListener {
+public class SuitcasePlayerListener implements Listener {
 	
 	/** Suitcase instance */
 	private Suitcase plugin;
@@ -19,7 +21,7 @@ public class SuitcasePlayerListener extends PlayerListener {
 		this.plugin = plugin;
 	}
 	
-	@Override
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		// register joining player
 		plugin.con.register(event.getPlayer().getName());
@@ -29,8 +31,8 @@ public class SuitcasePlayerListener extends PlayerListener {
 				"rating", String.valueOf(plugin.con.getRating(event.getPlayer().getName())),
 				"warnings", String.valueOf(plugin.con.getWarnings(event.getPlayer().getName())));
 	}
-	
-	@Override
+
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		// TODO: Sign interact
 	}

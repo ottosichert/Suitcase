@@ -78,11 +78,12 @@ public class SuitcaseFile {
 							newConfig.set(path, oldConfig.get(path));
 						}
 					}
-					
-					for (String path : oldConfig.getKeys(true)) {
-						// look for redundant properties and ensure they aren't sections
-						if (!defaults.containsKey(path) && !oldConfig.isConfigurationSection(path) && !optional) {
-							plugin.log(Action.PROPERTY_REDUNDANT, new ArrayList<String>(Arrays.asList(path, filename, oldConfig.get(path).toString())));
+					if (!optional) {
+						for (String path : Suitcase.removeStringsFromList(oldConfig.getKeys(false), defaults.keySet().toArray(new String[0]))) {
+							// look for redundant properties and ensure they aren't sections
+							if (!oldConfig.isConfigurationSection(path)) {
+								plugin.log(Action.PROPERTY_REDUNDANT, new ArrayList<String>(Arrays.asList(path, filename, oldConfig.get(path).toString())));
+							}
 						}
 					}
 					

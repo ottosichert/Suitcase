@@ -37,6 +37,7 @@ public class SuitcaseYMLFile {
 			// add default
 			int totalRating = plugin.cfg.getInt("rating.default");
 			int count = 1;
+			// add other players
 			for (String ratingPlayers : playerData.getKeys(false)) {
 				totalRating += playerData.getInt(ratingPlayers);
 				count++;
@@ -45,9 +46,7 @@ public class SuitcaseYMLFile {
 			data.set(target + ".rating", Math.round(Double.valueOf(totalRating) / Double.valueOf(count) * 10.0) / 10.0);
 			return true;
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 	
 	/**
@@ -148,7 +147,7 @@ public class SuitcaseYMLFile {
 	 * Registers a player
 	 * @param target Selected player
 	 */
-	protected void register(String target) {
+	protected boolean register(String target) {
 		if (!isRegistered(target)) {
 			
 			// set rating
@@ -171,15 +170,17 @@ public class SuitcaseYMLFile {
 			if (plugin.load("plugins/Suitcase/player.yml", data)) {
 				data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
 				plugin.log(Action.PLAYER_REGISTER, target);
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	/**
 	 * Unregisters a player
 	 * @param target Selected player
 	 */
-	public void unregister(String target) {
+	public boolean unregister(String target) {
 		Map<String, Object> dataMap = new HashMap<String, Object>();
 		// remove player from player.yml
 		for (String key : data.getKeys(false)) {
@@ -188,12 +189,12 @@ public class SuitcaseYMLFile {
 				dataMap.put(key + ".warnings", data.get(key + ".warnings"));
 			}
 		}
-		// remove player file
-		new File("plugins/Suitcase/players/" + target + ".yml").delete();
-		// save file and use new FileConfig
-		if (plugin.load("plugins/Suitcase/player.yml", dataMap)) {
+		// remove player file, save players and use new FileConfig
+		if (new File("plugins/Suitcase/players/" + target + ".yml").delete() && plugin.load("plugins/Suitcase/player.yml", dataMap)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
+			return true;
 		}
+		return false;
 	}
 	
 	/**
@@ -204,9 +205,8 @@ public class SuitcaseYMLFile {
 		if (isRegistered(target)) {
 			return data.getInt(target + ".warnings");
 		}
-		else {
-			return -1; // player doesn't exist
-		}
+		// player doesn't exist
+		return -1;
 	}
 	
 	/**
@@ -232,13 +232,8 @@ public class SuitcaseYMLFile {
 				data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/player.yml"));
 				return true;
 			}
-			else {
-				return false;
-			}
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 	
 	/** Resets player data */
@@ -257,10 +252,8 @@ public class SuitcaseYMLFile {
 			plugin.con.registerAll();
 			return true;
 		}
-		else {
-			// saving new empty file failed
-			return false;
-		}
+		// saving new empty file failed
+		return false;
 	}
 	
 	/** Gets and loads player file  */
@@ -274,10 +267,8 @@ public class SuitcaseYMLFile {
 			}
 			return true;
 		}
-		else {
-			plugin.log(Action.INIT_ERROR, "YMLFileConfig");
-			return false;
-		}
+		plugin.log(Action.INIT_ERROR, "YMLFileConfig");
+		return false;
 	}
 	
 	/** Disposes player file */
@@ -286,9 +277,7 @@ public class SuitcaseYMLFile {
 			data = null;
 			return true;
 		}
-		else {
-			plugin.log(Action.FREE_ERROR, "YMLFileConfig");
-			return false;
-		}
+		plugin.log(Action.FREE_ERROR, "YMLFileConfig");
+		return false;
 	}
 }

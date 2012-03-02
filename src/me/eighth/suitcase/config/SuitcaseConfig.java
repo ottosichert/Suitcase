@@ -112,14 +112,11 @@ public class SuitcaseConfig {
 	
 	/** Resets plugin configuration */
 	public boolean reset() {
-		new File("plugins/Suitcase/config.yml").delete();
-		if (plugin.load("plugins/Suitcase/config.yml", defaults)) {
+		if (new File("plugins/Suitcase/config.yml").delete() && plugin.load("plugins/Suitcase/config.yml", defaults)) {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/config.yml"));
 			return true;
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 
 	/** Gets and reads plugin configuration file */
@@ -128,10 +125,8 @@ public class SuitcaseConfig {
 			data = YamlConfiguration.loadConfiguration(new File("plugins/Suitcase/config.yml"));
 			return true;
 		}
-		else {
-			plugin.log(Action.INIT_ERROR, "SuitcaseConfig");
-			return false;
-		}
+		plugin.log(Action.INIT_ERROR, "SuitcaseConfig");
+		return false;
 	}
 	
 	/** Disposes plugin configuration */
@@ -140,10 +135,8 @@ public class SuitcaseConfig {
 			data = null;
 			return true;
 		}
-		else {
-			plugin.log(Action.FREE_ERROR, "SuitcaseConfig");
-			return false;
-		}
+		plugin.log(Action.FREE_ERROR, "SuitcaseConfig");
+		return false;
 	}
 	
 	/** Reloads plugin configuration */
@@ -151,8 +144,6 @@ public class SuitcaseConfig {
 		if (free() && init()) {
 			return true;
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 }

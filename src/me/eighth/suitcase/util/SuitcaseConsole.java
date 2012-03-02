@@ -44,6 +44,8 @@ public class SuitcaseConsole {
 		PROPERTY_MISSING,
 		/** Redundant property found. Arguments: key, file path, value */
 		PROPERTY_REDUNDANT,
+		/** Property option or value doesn't match. Arguments: key, file path, value */
+		PROPERTY_BAD_TYPE,
 		
 		
 		/** Configuration file is missing. Arguments: file name */
@@ -87,6 +89,8 @@ public class SuitcaseConsole {
 		dependences.put(Action.PLAYER_COMMAND_EXECUTED, "command");
 		dependences.put(Action.PLAYER_COMMAND_DENIED, "command");
 		dependences.put(Action.PLAYER_COMMAND_INVALID, "command");
+		
+		dependences.put(Action.EVENT_EXECUTED, "event");
 
 		dependences.put(Action.RESET, "debug");
 		dependences.put(Action.DEBUG, "debug");
@@ -101,22 +105,16 @@ public class SuitcaseConsole {
 	private boolean checkArguments(Action action, ArrayList<String> arguments, int size) {
 		if (arguments.size() == size) {
 			if (dependences.containsKey(action)) {
-				// filter file dependences and config.yml
+				// only send if action is enabled
 				if (plugin.cfg.getBoolean("log.console." + dependences.get(action))) {
 					return true;
 				}
-				else {
-					return false;
-				}
-			}
-			else {
-				return true;
 			}
 		}
 		else {
-			log(Action.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), Suitcase.getStringFromList(arguments, ","))));
-			return false;
+			log(Action.ARGUMENTS_INVALID, new ArrayList<String>(Arrays.asList(action.toString(), Suitcase.getStringFromList(arguments, ", "))));
 		}
+		return false;
 	}
 	
 	/**
@@ -130,7 +128,7 @@ public class SuitcaseConsole {
 			
 		case PLUGIN_ENABLE:
 			if (checkArguments(action, arguments, 0)) {
-				mcLogger.info(plugin.pluginTag + plugin.name + " " + plugin.getDescription().getFullName() + " by " + Suitcase.getStringFromList(plugin.getDescription().getAuthors(), ",") + " was enabled.");
+				mcLogger.info(plugin.pluginTag + plugin.name + " " + plugin.getDescription().getFullName() + " by " + Suitcase.getStringFromList(plugin.getDescription().getAuthors(), ", ") + " was enabled.");
 			}
 			return true;
 		case PLUGIN_RELOAD:
@@ -224,6 +222,11 @@ public class SuitcaseConsole {
 				mcLogger.warning(plugin.pluginTag + "Redundant property '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Removed value '" + arguments.get(2) + "'.");
 			}
 			return true;
+		case PROPERTY_BAD_TYPE:
+			if (checkArguments(action, arguments, 3)) {
+				mcLogger.warning(plugin.pluginTag + "Bad type of property '" + arguments.get(0) + "' in '" + arguments.get(1) + "'! Ignoring value '" + arguments.get(2) + "'.");
+			}
+			return true;
 			
 			
 		case FILE_NOT_FOUND:
@@ -268,7 +271,7 @@ public class SuitcaseConsole {
 		case DEBUG:
 			if (checkArguments(action, arguments, arguments.size())) {
 				for (int i = 0; i < arguments.size(); i++) {
-					mcLogger.info(plugin.pluginTag + "### DEBUG: '" + arguments.get(i) + "' ###");
+					mcLogger.info(plugin.pluginTag + "### DEBUG(" + (i + 1) + "/" + arguments.size() + "): '" + arguments.get(i) + "' ###");
 				}
 			}
 			return true;
@@ -277,8 +280,8 @@ public class SuitcaseConsole {
 		// type was not handled
 		default:
 			mcLogger.severe(plugin.pluginTag + "Action '" + action.toString() + "' was not handled! Arguments: '" + Suitcase.getStringFromList(arguments, ",") + "'");
-			return false;
 		}
+		return false;
 	}
 	
 }

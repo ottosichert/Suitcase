@@ -97,7 +97,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 		if (arguments.size() == 0) {
 			arguments.add("help");
 		}
-		String full = "/suitcase " + Suitcase.getStringFromList(arguments, "");
+		String full = "/suitcase " + Suitcase.getStringFromList(arguments, " ");
 		
 		if (isAlias("help", arguments.get(0))) {
 			if (arguments.size() == 1) {
@@ -286,7 +286,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 				// send header, usage and aliases
 				plugin.msg.send(sender, "help.header", "command", command);
 				plugin.msg.send(sender, "help.usage", "usage", usage.get(command));
-				plugin.msg.send(sender, "help.aliases", "aliases", Suitcase.getStringFromList(aliases.get(command), ","));
+				plugin.msg.send(sender, "help.aliases", "aliases", Suitcase.getStringFromList(aliases.get(command), ", "));
 				// get each argument
 				for (String argument : usage.get(command).split(" ")) {
 					if (info.containsKey(argument.replaceAll("[\\[\\]]", ""))) {
@@ -317,7 +317,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 			plugin.msg.send(sender, "info.header");
 			plugin.msg.send(sender, "info.version", "version", plugin.name + " " + plugin.getDescription().getFullName());
 			plugin.msg.send(sender, "info.description", "description", plugin.getDescription().getDescription());
-			plugin.msg.send(sender, "info.authors", "authors", Suitcase.getStringFromList(plugin.getDescription().getAuthors(), ","));
+			plugin.msg.send(sender, "info.authors", "authors", Suitcase.getStringFromList(plugin.getDescription().getAuthors(), ", "));
 			plugin.msg.send(sender, "info.website", "website", plugin.getDescription().getWebsite());
 			plugin.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), "/suitcase info");
 		}
@@ -405,7 +405,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 								"target", target,
 								"rating", String.valueOf(rating),
 								"sender", sender.getName());
-						plugin.event.call("rate", sender.getName(), target, String.valueOf(rating));
+						plugin.event.call("rate " + rating, sender.getName(), target);
 						plugin.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), full);
 					}
 					else {
@@ -446,11 +446,18 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 				
 				// show top 10 players
 				ArrayList<String> values = plugin.con.getTopRatings();
-				for (int i = 0; i < values.size(); i++) {
-					plugin.msg.send(sender, "top.name", "rank", String.valueOf(i + 1), "player", values.get(i));
-					plugin.msg.send(sender, "top.stats",
-							"rating", String.valueOf(plugin.con.getRating(values.get(i))),
-							"warnings", String.valueOf(plugin.con.getWarnings(values.get(i))));
+				if (values.size() > 0) {
+					for (int i = 0; i < values.size(); i++) {
+						plugin.msg.send(sender, "top.stats",
+								"rank", String.valueOf(i + 1),
+								"player", values.get(i),
+								"rating", String.valueOf(plugin.con.getRating(values.get(i))),
+								"warnings", String.valueOf(plugin.con.getWarnings(values.get(i))));
+					}
+				}
+				else {
+					// no registered players
+					plugin.msg.send(sender, "stats.empty");
 				}
 			}
 			else {
@@ -481,7 +488,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 					if (plugin.con.setWarnings(target, true)) {
 						plugin.msg.send(sender, "warn.done", "player", target);
 						plugin.msg.sendAll("warn", "target", target);
-						plugin.event.call("warn", sender.getName(), target, String.valueOf(plugin.con.getWarnings(target)));
+						plugin.event.call("warn " + plugin.con.getWarnings(target), sender.getName(), target);
 						plugin.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), full);
 					}
 					else {
@@ -524,7 +531,7 @@ public class SuitcaseCommandExecutor implements CommandExecutor {
 					if (plugin.con.setWarnings(target, false)) {
 						plugin.msg.send(sender, "forgive.done", "player", target);
 						plugin.msg.sendAll("forgive", "target", target);
-						plugin.event.call("forgive", sender.getName(), target, "0");
+						plugin.event.call("forgive", sender.getName(), target);
 						plugin.log(Action.PLAYER_COMMAND_EXECUTED, sender.getName(), full);
 					}
 					else {
